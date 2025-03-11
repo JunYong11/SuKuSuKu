@@ -1,10 +1,7 @@
 package com.web.sukusuku.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,6 +11,7 @@ import java.util.List;
 @Table(name = "user")
 @Data
 @NoArgsConstructor
+@ToString(exclude = {"posts", "calendars", "studyProgresses", "reviewQueues", "levelTests"})
 public class User {
 
     @Id
@@ -48,5 +46,3 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<LevelTest> levelTests = new ArrayList<>();
 }
-
-

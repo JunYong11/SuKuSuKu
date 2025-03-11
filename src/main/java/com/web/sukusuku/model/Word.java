@@ -3,11 +3,11 @@ package com.web.sukusuku.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-
 @Data
 @Entity
 @Table(name = "word")
-@Getter @Setter @NoArgsConstructor
+@NoArgsConstructor
+@ToString(exclude = {"chapter"})
 public class Word {
 
     @Id
@@ -23,4 +23,3 @@ public class Word {
     @JoinColumn(name = "chapter_id", nullable = false)
     private Chapter chapter;
 }
-

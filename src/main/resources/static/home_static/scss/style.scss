@@ -32,7 +32,8 @@ $quarternary: #24d2c8;
 @mixin gradient-background(){
 	background: rgba(206,75,232,1);
 	background: -moz-linear-gradient(-45deg, rgba(206,75,232,1) 0%, rgba(32,124,229,1) 100%);
-	background: -webkit-gradient(left top, right bottom, color-stop(0%, rgba(206,75,232,1)), color-stop(100%, rgba(32,124,229,1)));
+	//background: -webkit-gradient(left top, right bottom, color-stop(0%, rgba(206,75,232,1)), color-stop(100%, rgba(32,124,229,1)));
+	background: linear-gradient(to bottom right, rgba(206,75,232,1) 0%, rgba(32,124,229,1) 100%);
 	background: -webkit-linear-gradient(-45deg, rgba(206,75,232,1) 0%, rgba(32,124,229,1) 100%);
 	background: -o-linear-gradient(-45deg, rgba(206,75,232,1) 0%, rgba(32,124,229,1) 100%);
 	background: -ms-linear-gradient(-45deg, rgba(206,75,232,1) 0%, rgba(32,124,229,1) 100%);
@@ -356,7 +357,8 @@ h1, h2, h3, h4, h5,
 		opacity: .5;
 		background: rgba(32,124,229,0);
 		background: -moz-linear-gradient(45deg, rgba(32,124,229,0) 0%, rgba(146,95,206,0) 55%, rgba(240,72,187,1) 100%);
-		background: -webkit-gradient(left bottom, right top, color-stop(0%, rgba(32,124,229,0)), color-stop(55%, rgba(146,95,206,0)), color-stop(100%, rgba(240,72,187,1)));
+		//background: -webkit-gradient(left bottom, right top, color-stop(0%, rgba(32,124,229,0)), color-stop(55%, rgba(146,95,206,0)), color-stop(100%, rgba(240,72,187,1)));
+		background: linear-gradient(to top right, rgba(32,124,229,0) 0%, rgba(146,95,206,0) 55%, rgba(240,72,187,1) 100%);
 		background: -webkit-linear-gradient(45deg, rgba(32,124,229,0) 0%, rgba(146,95,206,0) 55%, rgba(240,72,187,1) 100%);
 		background: -o-linear-gradient(45deg, rgba(32,124,229,0) 0%, rgba(146,95,206,0) 55%, rgba(240,72,187,1) 100%);
 		background: -ms-linear-gradient(45deg, rgba(32,124,229,0) 0%, rgba(146,95,206,0) 55%, rgba(240,72,187,1) 100%);
@@ -1492,9 +1494,12 @@ textarea.form-control {
 
 // magnific pop up
 
+//.image-popup {
+//	cursor: -webkit-zoom-in;
+//	cursor: -moz-zoom-in;
+//	cursor: zoom-in;
+//}
 .image-popup {
-	cursor: -webkit-zoom-in;
-	cursor: -moz-zoom-in;
 	cursor: zoom-in;
 }
 .mfp-with-zoom .mfp-container,
@@ -1722,7 +1727,7 @@ textarea.form-control {
 		width: 100%;
 		color: rgba(255,255,255,.8);
 		margin-bottom: 25px;
-		&:last-child(){
+		&:last-child{
 			margin-bottom: 0;
 		}
 		p{

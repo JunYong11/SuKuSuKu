@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Components / Cards - NiceAdmin Bootstrap Template</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="/assets/img/favicon.png" rel="icon">
+  <link href="/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.g.assets.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="/assets/css/style.css" rel="stylesheet">
+  
+  <!-- FullCalendar CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@3.10.0/dist/fullcalendar.min.css" rel="stylesheet">
+
+  <!-- jQuery (required for FullCalendar) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+  
+</head>
+
+<body>
+
+  <div th:replace="~{header.html}"></div>
+  <div th:replace="~{sidebar.html}"></div>
+
+
+<!-- ========================= 수정 시작 =========================================================-->
+<meta charset="UTF-8">
+<title>공부하기</title>
+<!-- 필요하다면 Bootstrap CSS 링크 추가 -->
+<!-- <link href="path/to/bootstrap.min.css" rel="stylesheet"> -->
+<style>
+  /* 필요한 경우, 추가 커스텀 스타일 */
+  .card {
+    /* 기존 카드에 적용된 그림자, 배경색 등이 있다면 그대로 사용 */
+    /* 예) box-shadow: 0 2px 8px rgba(0,0,0,0.1); */
+    margin: 20px auto;
+    max-width: 800px; /* 화면에서 카드가 너무 넓어지지 않도록 제한 */
+  }
+
+  .card-body {
+    /* 카드 안쪽 패딩 등은 기존 코드에 맞추어 사용 */
+    /* 예) padding: 20px; */
+  }
+
+  .kanji-box {
+
+    border-radius: 8px;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+  }
+  /* md 이상일 때: 오른쪽 칼럼이 가로로 붙어 있을 때 */
+  @media (min-width: 768px) {
+    .button-group {
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 250px;
+    }
+    .button-group button {
+      flex: 0 0 48%;
+    }
+  }
+  /* md 미만일 때: 오른쪽 칼럼이 아래로 내려갈 때 한 줄로 배치 */
+  @media (max-width: 767.98px) {
+    .button-group {
+      flex-wrap: nowrap;
+    }
+  }
+
+  .kanji-box .small-text {
+    font-size: 1.2rem;
+  }
+
+  .kanji-box .large-text {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 8px 0;
+  }
+</style>
+
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    <h1>공부하기</h1>
+    <nav>
+      <!-- <nav class="d-flex justify-content-end"> -->
+      <!-- <nav class="d-flex justify-content-center"> -->
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item active">레벨 선택</li>
+        <li class="breadcrumb-item ">즐겨찾기</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <!-- 카드 영역 -->
+<!--    <div class="container my-5">-->
+    <div class="card">
+      <div class="card-body">
+        <!-- 상단 제목(예: Frame 1)과 우측 '레벨 선택' -->
+        <div class="d-flex justify-content-end align-items-center mt-3">
+          <!-- <button class="btn btn-secondary">레벨 선택</button> -->
+        </div>
+
+        <!-- <hr /> -->
+
+        <!-- 중앙 컨텐츠 영역 -->
+        <div class="row">
+          <!-- 왼쪽: 한자 박스 -->
+          <div class="col-md-6 d-flex justify-content-center align-items-center">
+            <div class="kanji-box">
+              <div class="small-text">かんじ</div>
+              <div class="large-text">漢字</div>
+              <div class="small-text">한자</div>
+            </div>
+          </div>
+
+          <!-- 오른쪽: 정답 개수/총 단어 개수 + 버튼들 -->
+          <div class="col-md-6 text-center">
+            <div class="d-flex flex-column align-items-center">
+              <p class="mt-4 ">정답 개수 / 총 단어 개수</p>
+              <div class="d-flex flex-wrap justify-content-center gap-2 button-group">              <!-- 기존 코드에서 사용하는 버튼 스타일 클래스 재활용 -->
+                <button class="btn btn-primary">안다</button>
+                <button class="btn btn-primary">안다</button>
+                <button class="btn btn-primary">안다</button>
+                <button class="btn btn-primary">안다</button>
+              </div>
+            </div>
+          </div>
+          </div><!-- /.row -->
+        </div><!-- /.card-body -->
+      </div><!-- /.card -->
+</section><!-- /.section -->
+
+</main><!-- /.main -->
+<!-- =========================   수정 끝 =====================================   -->
+
+<!-- ======= Footer ======= -->
+<footer id="footer" class="footer">
+  <div class="copyright">
+    &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
+  </div>
+  <div class="credits">
+    Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+  </div>
+</footer><!-- End Footer -->
+
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+<!-- Vendor JS Files -->
+<script src="/assets/vendor/apexcharts/apexcharts.min.js"></script>
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/chart.js/chart.umd.js"></script>
+<script src="/assets/vendor/echarts/echarts.min.js"></script>
+<script src="/assets/vendor/quill/quill.js"></script>
+<script src="/assets/vendor/simple-datatables/simple-datatables.js"></script>
+<script src="/assets/vendor/tinymce/tinymce.min.js"></script>
+<script src="/assets/vendor/php-email-form/validate.js"></script>
+
+<!-- Template Main JS File -->
+<script src="/assets/js/main.js"></script>
+
+<!-- Custom Calendar JS -->
+<script>
+  $(document).ready(function() {
+    // 작은 캘린더 초기화
+    $('#calendar').fullCalendar({
+      events: [
+        {
+          title: 'Sample Event',
+          start: '2025-03-10',
+          end: '2025-03-12'
+        }
+      ]
+    });
+
+    // 큰 캘린더 초기화
+    $('#small-calendar').on('click', function() {
+      $('#small-calendar').hide();
+      $('#large-calendar').show();
+
+      $('#full-calendar').fullCalendar({
+        events: [
+          {
+            title: 'Sample Event',
+            start: '2025-03-15',
+            end: '2025-03-16'
+          }
+        ]
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

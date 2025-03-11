@@ -1,21 +1,15 @@
 package com.web.sukusuku.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-
+import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "leveltest")
 @Data
 @NoArgsConstructor
+@ToString(exclude = {"user", "level"})
 public class LevelTest {
 
     @Id
@@ -33,8 +27,4 @@ public class LevelTest {
     @ManyToOne
     @JoinColumn(name = "level_id", insertable = false, updatable = false)
     private Level level;
-
-
 }
-
-

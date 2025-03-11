@@ -5,6 +5,7 @@ import com.web.sukusuku.repository.StudyRepository;
 import com.web.sukusuku.repository.WordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,12 +13,12 @@ import java.util.List;
 
 @Slf4j
 @Transactional(readOnly = true) // 클레스에 해당하는 모든 메서드들이 이 걸 수행함
-@RequiredArgsConstructor
-@Service
+@RequiredArgsConstructor// final 생성자 주입
+@Service // 서비스 단 class
 public class StudyService {
     private final StudyRepository studyRepository;
     //test용
-    private WordRepository wordRepository;
+    private final WordRepository wordRepository;
 
 //    // 단어 전체 조회
 //    public Word getPostById(Integer word_id) {
@@ -35,7 +36,9 @@ public class StudyService {
         List<Word> words = wordRepository.findBywordIdBetween(start, end);
 
         // 로그로 출력하여 단어 개수와 상세 내용을 확인
-        log.info("Fetched {} words with word_id between 0 and 10: {}", words.size(), words);
+//        log.info("Fetched {} words with word_id between 0 and 10: {}", words.size(), words);
+        log.info("서비스 로그 확인");
+        log.info(" words with word_id between 0 and 10: {}", words);
 
 //			// 각 단어의 word_id가 0~10 범위에 있는지 검증
 //			for (Word word : words) {
@@ -44,4 +47,3 @@ public class StudyService {
 
     }
 }
-

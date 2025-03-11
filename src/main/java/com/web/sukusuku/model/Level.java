@@ -1,21 +1,18 @@
 package com.web.sukusuku.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-//@Entity // db에 저장
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "level")
+@ToString(exclude = {"chapters", "levelTests"})
 public class Level {
 
     @Id
@@ -31,4 +28,3 @@ public class Level {
     @OneToMany(mappedBy = "level")
     private List<LevelTest> levelTests = new ArrayList<>();
 }
-

@@ -1,34 +1,31 @@
 package com.web.sukusuku.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 
-@Data
-//@Entity // db에 저장
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Entity
-@Table(name = "level")
+@Table(name = "calendar")
+@Data
+@NoArgsConstructor
+@ToString(exclude = {"user"})
 public class Calendar {
 
     @Id
-    @Column(name = "level_id")
-    private Integer levelId;
+    @Column(name = "calendar_id")
+    private Integer calendarId;
 
-    @Column(name = "level_name")
-    private String levelName;
+    private String title;
+    private String content;
 
-    @OneToMany(mappedBy = "level")
-    private List<Chapter> chapters = new ArrayList<>();
+    @Column(name = "start_date", nullable = false)
+    private LocalDateTime startDate;
 
-    @OneToMany(mappedBy = "level")
-    private List<LevelTest> levelTests = new ArrayList<>();
+    @Column(name = "end_date", nullable = false)
+    private LocalDateTime endDate;
+
+    @ManyToOne
+    @JoinColumn(name = "username", referencedColumnName = "username")
+    private User user;
 }
-
