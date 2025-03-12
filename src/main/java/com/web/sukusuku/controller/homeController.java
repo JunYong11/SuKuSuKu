@@ -10,7 +10,15 @@ public class homeController {
 	
 	@GetMapping("/")
 	public String getMethodName() {
-		return "example";
+		return "leveltest/leveltest";
+	}
+	@GetMapping("/problem")
+	public String getMethod() {
+		return "leveltest/problem";
+	}
+	@GetMapping("/result")
+	public String getMethodResult() {
+		return "leveltest/result";
 	}
 	
 }
