@@ -225,18 +225,20 @@ body {
 	<div th:replace="~{footer.html}"></div>
 
 	<script>
+	function getGrade(score) {
+		  if (score >= 17) return 'N1';
+		  if (score >= 13) return 'N2';
+		  if (score >= 9) return 'N3';
+		  if (score >= 5) return 'N4';
+		  return 'N5';
+		}
+	
     document.addEventListener('DOMContentLoaded', () => {
       const score = parseInt(localStorage.getItem('score') || '0');
       const total = parseInt(localStorage.getItem('total') || '20');
       const wrongAnswers = JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
 
-      const getGrade = (score) => {
-        if (score >= 17) return 'N1';
-        if (score >= 13) return 'N2';
-        if (score >= 9) return 'N3';
-        if (score >= 5) return 'N4';
-        return 'N5';
-      };
+      
 
       const grade = getGrade(score);
 
@@ -335,8 +337,13 @@ body {
     }
 
     function goSignup() {
-      location.href = "/signup";
-    }
+    	  const score = parseInt(localStorage.getItem('score') || '0');
+    	  const grade = getGrade(score); // 등급 계산
+    	  localStorage.setItem('selectedLevel', grade); // 저장 후 이동
+    	  location.href = "/register";
+
+    	}
+
 
     function goMypage() {
       location.href = "/mypage";
@@ -353,6 +360,8 @@ body {
     	    button.textContent = "틀린 문제 보기";
     	  }
     	}
+    const grade = getGrade(score); // 예시: N1 ~ N5
+    localStorage.setItem('selectedLevel', grade);
 
 
   </script>
