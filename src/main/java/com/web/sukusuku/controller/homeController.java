@@ -10,7 +10,7 @@ public class homeController {
 	
 	@GetMapping("/")
 	public String getMethodName() {
-		return "MyPage";
+		return "mypage/mypage";
 	}
 	
 	
