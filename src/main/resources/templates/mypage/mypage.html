@@ -63,6 +63,37 @@
 .form-control {
 	margin-bottom: 10px;
 }
+.group-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; /* 자동 줄바꿈 */
+    gap: 10px;
+    margin-top: 10px;
+    position: relative; /* 입력창 위치 조정을 위해 필요 */
+  }
+
+  .group-box {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    font-weight: bold; /* 글자 볼드 처리 */
+  }
+
+  /* 입력창을 + 버튼 아래에 위치 */
+  .popup {
+    display: none;
+    position: absolute;
+    top: 40px; /* + 버튼 아래에 위치 */
+    left: 0;
+    background: white;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+    white-space: nowrap; /* 가로 너비 유지 */
+  }
 </style>
 </head>
 
@@ -112,16 +143,23 @@
 				<div class="col-xl-8">
 					<div class="card">
 						<div class="card-body">
-							<div
-								style="display: flex; justify-content: space-between; align-items: center;">
-								<h5 class="card-title" style="font-size: 20px; margin: 0;">Project</h5>
-								<button
-									style="border: none; background: none; font-size: 20px; cursor: pointer;">+</button>
-							</div>
+							<h5 class="card-title" style="font-size: 20px; margin: 0;">Project</h5>
 							<div style="border-bottom: 1px solid black; width: 100%;"></div>
 
-							<p>여기에 새로운 기능을 추가하세요.</p>
+							<!-- 그룹 추가되는 부분 -->
+							<div class="group-container" id="groupContainer">
+								<button id="addGroupBtn"
+									style="border: none; background: none; font-size: 22px; cursor: pointer;">+</button>
+							</div>
 
+							<!-- 입력창 (초기에는 숨김) -->
+							<div id="popup" class="popup">
+								<input type="text" id="groupInput" placeholder="그룹명을 입력하세요" />
+								<button id="confirmAddBtn">추가</button>
+							</div>
+
+							<p>여기에 새로운 기능을 추가하세요.</p>
+							             
 							<div id="extra-widget">
 								<div>dkdkdkdkdkdkdk</div>
 
@@ -129,6 +167,59 @@
 						</div>
 					</div>
 				</div>
+
+<script>
+  const addGroupBtn = document.getElementById("addGroupBtn");
+  const popup = document.getElementById("popup");
+  const confirmAddBtn = document.getElementById("confirmAddBtn");
+  const groupInput = document.getElementById("groupInput");
+  const groupContainer = document.getElementById("groupContainer");
+
+  // 순서대로 변경될 색상 배열
+  const colors = ["#007bff", "#6c757d", "#343a40", "#28a745", "#ffc107", "#dc3545"];
+  let colorIndex = 0;
+
+  // + 버튼 클릭 시 입력창 표시 (위치 동기화)
+  addGroupBtn.addEventListener("click", () => {
+    popup.style.display = "block";
+    updatePopupPosition();
+  });
+
+  // 그룹 추가 버튼 클릭 시
+  confirmAddBtn.addEventListener("click", () => {
+    const groupName = groupInput.value.trim();
+    if (groupName === "") return; // 빈 값 방지
+
+    // 새로운 그룹 박스 생성
+    const groupBox = document.createElement("div");
+    groupBox.classList.add("group-box");
+    groupBox.textContent = groupName;
+
+    // 색상 순서대로 적용
+    groupBox.style.background = colors[colorIndex];
+    groupBox.style.color = "white"; // 글자색 흰색 유지
+
+    // 다음 색상으로 변경 (배열을 순환하도록 설정)
+    colorIndex = (colorIndex + 1) % colors.length;
+
+    // 그룹을 추가하고 버튼을 오른쪽으로 밀어냄
+    groupContainer.insertBefore(groupBox, addGroupBtn);
+
+    // 입력창 위치 업데이트
+    updatePopupPosition();
+
+    // 입력창 초기화 및 숨김
+    groupInput.value = "";
+  });
+
+  // 입력창 위치 업데이트 함수
+  function updatePopupPosition() {
+    popup.style.left = `${addGroupBtn.offsetLeft}px`; // + 버튼 위치에 맞춰 이동
+  }
+
+  // 창 크기 변경 시 입력창 위치 업데이트
+  window.addEventListener("resize", updatePopupPosition);
+</script>
 			</div>
 		</section>
 	</main>
