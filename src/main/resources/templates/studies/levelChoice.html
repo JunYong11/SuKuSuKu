@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Components / Cards - NiceAdmin Bootstrap Template</title>
+  <title>레벨 선택</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -76,6 +77,8 @@
     }
     .chapter-card:hover {
       transform: scale(1.03);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 강조 */
+
     }
     .chapter-card h3 {
       margin-top: 0;
@@ -88,8 +91,10 @@
 </head>
 <body>
 <!-- Header 및 Sidebar (Thymeleaf 템플릿 사용) -->
-<div th:replace="~{header.html}"></div>
-<div th:replace="~{sidebar.html}"></div>
+<!-- 헤더 불러오기 -->
+<div th:replace="~{header :: headerFragment}"></div>
+<!-- 사이드바 불러오기 -->
+<div th:replace="~{sidebar :: sidebarFragment}"></div>
 
 <main id="main" class="main">
   <div class="pagetitle">
@@ -104,118 +109,32 @@
   </div><!-- End Page Title -->
 
   <!-- 카드 영역 -->
-  <section class="section">
-    <div class="container my-5">
-      <div class="card">
-        <div class="card-body">
-          <!-- 레벨(탭) 메뉴 -->
-          <ul class="nav nav-tabs d-flex" id="levelTabs" role="tablist">
-            <li class="nav-item flex-fill" role="presentation">
-              <button class="nav-link w-100 active" id="N1-tab" data-bs-toggle="tab" data-bs-target="#N1" type="button" role="tab" aria-controls="N1" aria-selected="true">N1</button>
-            </li>
-            <li class="nav-item flex-fill" role="presentation">
-              <button class="nav-link w-100" id="N2-tab" data-bs-toggle="tab" data-bs-target="#N2" type="button" role="tab" aria-controls="N2" aria-selected="false">N2</button>
-            </li>
-            <li class="nav-item flex-fill" role="presentation">
-              <button class="nav-link w-100" id="N3-tab" data-bs-toggle="tab" data-bs-target="#N3" type="button" role="tab" aria-controls="N3" aria-selected="false">N3</button>
-            </li>
-            <li class="nav-item flex-fill" role="presentation">
-              <button class="nav-link w-100" id="N4-tab" data-bs-toggle="tab" data-bs-target="#N4" type="button" role="tab" aria-controls="N4" aria-selected="false">N4</button>
-            </li>
-            <li class="nav-item flex-fill" role="presentation">
-              <button class="nav-link w-100" id="N5-tab" data-bs-toggle="tab" data-bs-target="#N5" type="button" role="tab" aria-controls="N5" aria-selected="false">N5</button>
-            </li>
-          </ul>
-          <!-- 탭 콘텐츠 영역 -->
-          <div class="tab-content pt-2" id="levelTabsContent">
-            <!-- N1 탭 -->
-            <div class="tab-pane fade show active" id="N1" role="tabpanel" aria-labelledby="N1-tab">
-              <h2 class="text-center">챕터 목록 - N1</h2>
-              <div id="chapters-container-N1">
-                <!-- N1 챕터 카드들이 동적으로 생성됩니다 -->
-              </div>
-            </div>
-            <!-- N2 탭 -->
-            <div class="tab-pane fade" id="N2" role="tabpanel" aria-labelledby="N2-tab">
-              <h2 class="text-center">챕터 목록 - N2</h2>
-              <div id="chapters-container-N2">
-                <!-- N2 챕터 카드들이 동적으로 생성됩니다 -->
-              </div>
-            </div>
-            <!-- N3 탭 -->
-            <div class="tab-pane fade" id="N3" role="tabpanel" aria-labelledby="N3-tab">
-              <h2 class="text-center">챕터 목록 - N3</h2>
-              <div id="chapters-container-N3">
-                <!-- N3 챕터 카드들이 동적으로 생성됩니다 -->
-              </div>
-            </div>
-            <!-- N4 탭 -->
-            <div class="tab-pane fade" id="N4" role="tabpanel" aria-labelledby="N4-tab">
-              <h2 class="text-center">챕터 목록 - N4</h2>
-              <div id="chapters-container-N4">
-                <!-- N4 챕터 카드들이 동적으로 생성됩니다 -->
-              </div>
-            </div>
-            <!-- N5 탭 -->
-            <div class="tab-pane fade" id="N5" role="tabpanel" aria-labelledby="N5-tab">
-              <h2 class="text-center">챕터 목록 - N5</h2>
-              <div id="chapters-container-N5">
-                <!-- N5 챕터 카드들이 동적으로 생성됩니다 -->
-              </div>
-            </div>
-          </div><!-- End 탭 콘텐츠 -->
+  <form th:action="@{/studies/levelChoice}" method="get">
+    <ul class="nav nav-tabs d-flex" role="tablist">
+      <li class="nav-item flex-fill" th:each="level : ${levels}">
+        <button type="submit" class="nav-link w-100"
+                name="levelId" th:value="${level.levelId}"
+                th:text="${level.levelName}">레벨</button>
+      </li>
+    </ul>
+  </form>
+
+  <div th:if="${chapters != null}" th:each="chapter : ${chapters}">
+    <h2 th:text="'챕터 목록 - ' + ${chapter.levelId}">챕터 목록</h2>
+
+    <div class="row">
+      <div class="col-md-4" >
+        <div class="chapter-card">
+          <h3 th:text="'Chapter ' + ${chapter.chapterId} + ' - ' + ${chapter.chapterName}"></h3>
+          <p th:text="'누적 단어 수: ' + ${chapter.cumulativeWords} + '개'"></p>
+          <p th:text="'회독 횟수: ' + ${chapter.reviewCount} + '회'"></p>
+          <a th:href="@{/studies/startStudy(levelId=${chapter.levelId}, chapterId=${chapter.chapterId})}"
+             class="btn btn-primary d-block mt-2">공부 시작</a>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Bootstrap JS Bundle (Popper 포함) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      // 예시 데이터: 각 레벨별 챕터 개수 (실제 데이터에 따라 수정)
-      const levelChapters = {
-        N1: 3,
-        N2: 2,
-        N3: 4,
-        N4: 1,
-        N5: 5
-      };
-
-      // 선택한 레벨에 해당하는 챕터 목록을 생성하는 함수
-      function loadChapters(level) {
-        const container = document.getElementById(`chapters-container-${level}`);
-        container.innerHTML = ''; // 기존 내용 초기화
-        const chapterCount = levelChapters[level] || 0;
-        for (let i = 1; i <= chapterCount; i++) {
-          // 각 챕터는 누적 단어 50개씩 추가
-          const cumulativeWords = i * 50;
-          // 예시 회독 횟수: 단순히 10씩 증가
-          const reviewCount = i * 10;
-          // 챕터 카드 생성
-          const card = document.createElement('div');
-          card.className = 'chapter-card';
-          card.innerHTML = `<h3>Chapter ${i}</h3>
-                                <p>누적 단어 수: ${cumulativeWords}개</p>
-                                <p>회독 횟수: ${reviewCount}회</p>`;
-          // 챕터 카드 클릭 시 study페이지로 이동 (쿼리스트링에 level과 chapter 정보를 포함)
-          card.addEventListener('click', function() {
-            window.location.href = `study.html?level=${level}&chapter=${i}`;
-          });
-          container.appendChild(card);
-        }
-      }
-
-      // 탭이 활성화될 때마다 해당 레벨의 챕터를 로드
-      document.querySelectorAll('#levelTabs button').forEach(button => {
-        button.addEventListener('shown.bs.tab', function (event) {
-          const level = event.target.textContent.trim(); // 탭 텍스트가 레벨명 (예: "N1")
-          loadChapters(level);
-        });
-      });
-
-      // 페이지 로드 시 기본 활성 탭(N1)의 챕터를 로드
-      loadChapters('N1');
-    </script>
-  </section>
 </main>
 
 <!-- Footer -->

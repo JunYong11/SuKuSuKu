@@ -1,43 +1,88 @@
 package com.web.sukusuku.controller;
 
+import com.web.sukusuku.dto.ChapterDto;
+import com.web.sukusuku.model.Level;
 import com.web.sukusuku.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 //import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-//@SpringBootTest
 @RequiredArgsConstructor
-//@Controller
-//@Transactional // 트렌젝셔널 어노테이션 :비즈니스 로직이 수행되는 Service 계층에 쓰는 게 원칙
-@RestController//(@Controller + @ResponseBody)
-//@RequestMapping("/api/word")
+@Controller
+//@RestController//(@Controller + @ResponseBody)
+//@RequestMapping("studies")
 public class StudyController {
+	// 인터페이스 기준으로 선언!
 	private final StudyService studyService;
 
-//	@GetMapping("/")
-//	public String getMethodName() {
-//	studyService.WordRepositoryTest();
-//
-//
-////		return "studies/study";
-//		return "studies/levelChoice";
-//
-//	}
-@GetMapping("/")
-public String getMethodName() {
-	studyService.WordRepositoryTest();
-	log.info("test 완료");
+// =========== 레벨 초이스 ===============
+// ✅ 전체 레벨 목록 + 기본 화면
+@GetMapping("/studies/levelChoice")
+public String moveLevelChoicePage(@RequestParam(required = false) Integer levelId, Model model) {
+	log.info("컨트롤러 levelId={}", levelId);
+	List<Level> levels = studyService.getAllLevels();
+	log.info("컨트롤러 levels: {}", levels);
+	model.addAttribute("levels", levels);
 
-	// return "studies/study"; -> RestController면 반환 값이 JSON/String 이다.
-	return "테스트 완료!";  // 단순히 문자열 반환, 뷰 리턴하려면 @Controller 사용해야 함
+	if (levelId != null) {
+		log.info("컨트롤러 levelId={}", levelId);
+		List<ChapterDto> chapterDto = studyService.getChaptersByLevelId(levelId);
+		log.info("chapterDto={}", chapterDto);
+
+//		model.addAttribute("selectedLevelId", levelId);
+		model.addAttribute("chapters", chapterDto);
+	}
+
+	return "studies/levelChoice";
 }
+
+
+//	@PostMapping("/levelChoice")
+//	public String levelChoice(@RequestParam Integer levelId, Model model) {
+//		log.info("컨트롤러 levelId={}", levelId);
+//
+//		List<ChapterDto> chapterDto = studyService.getChaptersByLevelId(levelId);
+//		log.info("chapterDto={}", chapterDto);
+//
+////		model.addAttribute("chapters", chapterDto);  // 뷰에 넘겨주기!
+//
+//		return "studies/levelChoice"; // templates/studies/levelChoice.html
+//	}
+
+
+//	@GetMapping("/levelChoice/{levelId}")
+//	public String getChapters(@RequestParam Integer levelId,
+//										Model model) {
+////		String username = principal.getName();  // 로그인한 유저 아이디
+//		List<ChapterDto> chapterDto = studyService.getChaptersByLevelId(levelId);
+//		model.addAttribute("chapters", chapterDto);
+//
+//		 return "/levelChoice";
+//	}
+
+//	@GetMapping("/levelChocie")
+//	public String levelChocie() {
+//		return "/levelChocie";
+//	}
+//
+ 	// 스터디에서 사용하면 될듯
+//	@GetMapping("/levelChoice/{levelId}/{chapterId}/words")
+//	public List<Word> getWords(@PathVariable Integer levelId,
+//							   @PathVariable Integer chapterId) {
+//		log.info("컨트롤러 levelId: {}, chapterId: {}", levelId, chapterId);
+//
+//		return studyService.getWordsByLevelAndChapter(levelId, chapterId);
+//	}
+}
+
+
 
 	
-}
+

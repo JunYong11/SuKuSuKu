@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>챕터 목록</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<h1>레벨 [[${levelId}]] - 챕터 목록</h1>
+
+<ul>
+  <li th:each="chapter : ${chapters}">
+    <button onclick="loadWords([[${levelId}]], [[${chapter.chapterId}]])">
+      [[${chapter.chapterName}]]
+    </button>
+  </li>
+</ul>
+
+<!-- 여기에 단어 목록을 AJAX로 가져와서 표시 -->
+<div id="wordList"></div>
+
+<script>
+  function loadWords(levelId, chapterId) {
+    $.ajax({
+      url: `/api/study/level/${levelId}/chapter/${chapterId}/words`,
+      type: 'GET',
+      success: function (data) {
+        let wordList = $('#wordList');
+        wordList.empty();
+        wordList.append('<h2>' + data.chapterName + ' 단어 목록</h2>');
+        wordList.append('<table border="1"><tr><th>Kanji</th><th>Hiragana</th><th>Meaning</th></tr>');
+
+        data.words.forEach(function (word) {
+          wordList.append('<tr>' +
+                  '<td>' + word.kanji + '</td>' +
+                  '<td>' + word.hiragana + '</td>' +
+                  '<td>' + word.meaning + '</td>' +
+                  '</tr>');
+        });
+
+        wordList.append('</table>');
+      },
+      error: function (err) {
+        alert('단어를 불러오는 데 실패했습니다!');
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
