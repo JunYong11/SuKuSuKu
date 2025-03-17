@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>레벨 테스트 - NiceAdmin</title>
+  <meta content="레벨 테스트 페이지" name="description">
+  <meta content="레벨 테스트, 실력 점검" name="keywords">
+
+  <!-- Favicons -->
+  <link href="/assets/img/favicon.png" rel="icon">
+  <link href="/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Nunito:300,400,600,700|Poppins:300,400,500,600,700"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="/assets/css/style.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f5f7fa;
+    }
+
+    .level-test-container {
+      height: calc(100vh - 100px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .level-test-title {
+      font-size: 70px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+      text-shadow: 1px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .level-test-subtitle {
+      font-size: 20px;
+      color: #666;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .start-btn {
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 600;
+      padding: 15px 40px;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .start-btn:hover {
+      background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+      transform: translateY(-3px);
+      color: #fff;
+    }
+
+.level-test-title,
+.level-test-subtitle,
+.start-btn {
+  opacity: 0;
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.level-test-title {
+  animation-delay: 0.1s; 
+}
+
+.level-test-subtitle {
+  animation-delay: 0.25s; 
+}
+
+.start-btn {
+  animation-delay: 0.4s; 
+}
+
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+  </style>
+
+</head>
+
+<body>
+
+  <!-- 상단바 -->
+  <div th:replace="~{header.html}"></div>
+
+  <!-- 사이드바 -->
+  <div th:replace="~{sidebar.html}"></div>
+
+  <!-- 메인 콘텐츠 -->
+  <main id="main" class="main">
+
+    <div class="level-test-container">
+
+      <h1 class="level-test-title">레벨 테스트</h1>
+      <p class="level-test-subtitle">자신의 실력을 테스트해보세요</p>
+
+      <a href="/problem" class="start-btn">레벨 테스트 시작하기</a>
+
+    </div>
+
+  </main><!-- End #main -->
+
+  <!-- 푸터 -->
+  <div th:replace="~{footer.html}"></div>
+<!-- Vendor JS Files -->
+<script src="/assets/vendor/apexcharts/apexcharts.min.js"></script>
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/chart.js/chart.umd.js"></script>
+<script src="/assets/vendor/echarts/echarts.min.js"></script>
+<script src="/assets/vendor/quill/quill.js"></script>
+<script src="/assets/vendor/simple-datatables/simple-datatables.js"></script>
+<script src="/assets/vendor/tinymce/tinymce.min.js"></script>
+<script src="/assets/vendor/php-email-form/validate.js"></script>
+
+<!-- Template Main JS File -->
+<script src="/assets/js/main.js"></script>
+</body>
+
+</html>

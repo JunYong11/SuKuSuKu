@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>레벨 테스트 문제풀이 - NiceAdmin</title>
+
+  <!-- Favicons -->
+  <link href="/assets/img/favicon.png" rel="icon">
+  <link href="/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Nunito:300,400,600,700|Poppins:300,400,500,600,700" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="/assets/css/style.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f5f7fa;
+    }
+
+    .problem-container {
+      height: calc(100vh - 100px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .progress-box {
+      background-color: #ffffff;
+      color: #333;
+      font-size: 18px;
+      font-weight: 600;
+      padding: 12px 24px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      min-width: 200px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e0e0e0;
+    }
+
+    .question-box {
+      background-color: #ffffff;
+      color: #333;
+      font-size: 28px;
+      font-weight: 600;
+      padding: 40px 30px;
+      margin-bottom: 40px;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 800px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e0e0e0;
+      transition: all 0.3s ease;
+    }
+	.progress-box:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	}
+    .question-box:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .choices {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .choice-btn {
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: #fff;
+      border: none;
+      padding: 20px 40px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      min-width: 220px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    }
+
+    .choice-btn:hover {
+      background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <!-- 상단바 -->
+  <div th:replace="~{header.html}"></div>
+
+  <!-- 사이드바 -->
+  <div th:replace="~{sidebar.html}"></div>
+
+  <!-- 메인 콘텐츠 -->
+  <main id="main" class="main">
+
+    <div class="problem-container">
+
+      <!-- 진행도 -->
+      <div class="progress-box" id="progress">문제 로딩 중...</div>
+
+      <!-- 문제 -->
+      <div class="question-box" ><div style="font-size : 16px">Q. 괄호 안에 들어갈 알맞은 한자 또는 히라가나를 선택하세요.
+</div>
+      	<div id="question">문제 내용이 나옵니다</div>
+      </div>
+
+      <!-- 선택지 -->
+      <div class="choices">
+        <button class="choice-btn" onclick="nextProblem(1)" id="choice1">1번</button>
+        <button class="choice-btn" onclick="nextProblem(2)" id="choice2">2번</button>
+        <button class="choice-btn" onclick="nextProblem(3)" id="choice3">3번</button>
+        <button class="choice-btn" onclick="nextProblem(4)" id="choice4">4번</button>
+      </div>
+
+    </div>
+
+  </main><!-- End #main -->
+
+  <!-- 푸터 -->
+  <div th:replace="~{footer.html}"></div>
+
+  <script>
+    let problems = [];        // 문제 리스트
+    let current = 0;          // 현재 문제 번호
+    let score = 0;            // 점수
+    let wrongAnswers = [];    // 틀린 문제 리스트
+
+    // 문제 상태 저장
+    function saveProgress() {
+      localStorage.setItem('current', current);
+      localStorage.setItem('score', score);
+      localStorage.setItem('wrongAnswers', JSON.stringify(wrongAnswers));
+    }
+
+    // 문제 불러오기
+    async function fetchProblems() {
+      try {
+        const response = await fetch('http://localhost:8080/leveltest/problem');
+        problems = await response.json();
+
+        if (problems.length === 0) {
+          document.getElementById('question').textContent = "문제가 없습니다.";
+          return;
+        }
+
+        // 이전 상태 복구
+        const savedCurrent = parseInt(localStorage.getItem('current'));
+        const savedScore = parseInt(localStorage.getItem('score'));
+        const savedWrongAnswers = JSON.parse(localStorage.getItem('wrongAnswers'));
+
+        if (!isNaN(savedCurrent)) {
+          const resume = confirm("진행 중이던 테스트가 있습니다. 이어서 하시겠습니까?");
+          if (resume) {
+            current = savedCurrent;
+            score = isNaN(savedScore) ? 0 : savedScore;
+            wrongAnswers = Array.isArray(savedWrongAnswers) ? savedWrongAnswers : [];
+          } else {
+            localStorage.removeItem('current');
+            localStorage.removeItem('score');
+            localStorage.removeItem('wrongAnswers');
+          }
+        }
+
+        showProblem(current);
+
+      } catch (error) {
+        console.error("문제 데이터를 불러오는 중 오류 발생:", error);
+        document.getElementById('question').textContent = "문제를 불러올 수 없습니다.";
+      }
+    }
+
+    // 문제 출력
+    function showProblem(index) {
+      const problem = problems[index];
+
+      document.getElementById('progress').textContent = `${index + 1} / ${problems.length}`;
+      document.getElementById('question').innerHTML = highlightProblemText(problem.problem);
+
+      document.getElementById(`choice1`).textContent = `1번 : ${problem.one}`;
+      document.getElementById(`choice2`).textContent = `2번 : ${problem.two}`;
+      document.getElementById(`choice3`).textContent = `3번 : ${problem.three}`;
+      document.getElementById(`choice4`).textContent = `4번 : ${problem.four}`;
+    }
+
+    // 정답 체크 및 다음 문제로 이동
+    function nextProblem(choiceIndex) {
+      const problem = problems[current];
+      const choices = [problem.one, problem.two, problem.three, problem.four];
+      const selectedAnswer = choices[choiceIndex - 1];
+      const correctAnswer = problem.answer;
+
+      if (selectedAnswer === correctAnswer) {
+        score++;
+      } else {
+    	  wrongAnswers.push({
+    		  questionNumber: current + 1,
+    		  question: problem.problem,
+    		  choices: choices,
+    		  correctAnswer: correctAnswer,
+    		  selectedAnswer: selectedAnswer
+    		});
+      }
+
+      current++;
+      saveProgress();
+
+      if (current < problems.length) {
+        showProblem(current);
+      } else {
+        // 퀴즈 끝났을 때
+        localStorage.setItem('score', score);
+        localStorage.setItem('total', problems.length);
+        localStorage.setItem('wrongAnswers', JSON.stringify(wrongAnswers));
+        localStorage.removeItem('current'); // 진행상황 초기화
+        location.href = "/result";  // 결과 페이지로 이동
+      }
+    }
+
+    // 문제 안의 괄호 강조 처리
+    function highlightProblemText(text) {
+      return text.replace(/\((.*?)\)/g, (match, p1) => {
+        if (!p1.trim()) {
+          return '( )';
+        } else {
+          return `(<strong style="color: #ff000f;">${p1}</strong>)`;
+        }
+      });
+    }
+
+    // 시작 시 문제 가져오기
+    window.onload = fetchProblems;
+  </script>
+
+<!-- Vendor JS Files -->
+<script src="/assets/vendor/apexcharts/apexcharts.min.js"></script>
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/chart.js/chart.umd.js"></script>
+<script src="/assets/vendor/echarts/echarts.min.js"></script>
+<script src="/assets/vendor/quill/quill.js"></script>
+<script src="/assets/vendor/simple-datatables/simple-datatables.js"></script>
+<script src="/assets/vendor/tinymce/tinymce.min.js"></script>
+<script src="/assets/vendor/php-email-form/validate.js"></script>
+
+<!-- Template Main JS File -->
+<script src="/assets/js/main.js"></script>
+</body>
+
+</html>
