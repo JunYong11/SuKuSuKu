@@ -10,7 +10,7 @@ import com.web.sukusuku.model.User;
 @Controller
 public class homeController {
 
-	
+
 	@GetMapping("/")
 	public String getMethodName() {
 		return "home";
@@ -33,6 +33,6 @@ public class homeController {
 	    return "user/register";
 	}
 
-	
+
 	
 }
