@@ -15,4 +15,6 @@ public class StudyDto {
     private Integer chapterId;
     private String chapterName;
     private List<Word> words; // 단어 목록
+
+    // 정답 갯수
 }

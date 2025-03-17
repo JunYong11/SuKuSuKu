@@ -80,9 +80,8 @@ public class StudyServiceImpl implements StudyService {
     @Override
     public List<Word> getWordsByLevelAndChapter(Integer levelId, Integer chapterId) {
 //        log.info("서비스I(단어 조회) : levelId: " + levelId + ", chapterId: " + chapterId);
-        // 단어 갯수(누적 단어 숫자)
-        /*1. 챕터 1의 누적 : 챕터1 단어 개수 , 챕터2의 누적 개수: 챕터1 + 챕터2 단어 개수,  챕터3의 누적 단어 개수 : 챕터1 + 챕터2 + 챕터3의 단어개수*/
         return wordRepository.findWordsByLevelAndChapter(levelId, chapterId);  // 레벨과 챕터에 맞는 단어 조회
+        // 이걸 dto로 만들어야함 ( 외운 단어는 list 에서 삭제, 복습할 거 저장하려면 )
     }
 
 
