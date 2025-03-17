@@ -45,55 +45,81 @@
 <style>
 #calendar {
 	width: 100%;
-	max-width: 300px; /* 프로필 카드와 비슷한 크기로 설정 */
-	height: 300px; /* 위젯처럼 작은 크기 */
 	font-size: 0.8rem;
 }
 
-#calendarModal .modal-dialog {
-	max-width: 1000px; /* 원하는 크기로 조정 */
-	width: 90%; /* 반응형 조절 */
+.fc-daygrid-day:hover .add-event-btn {
+	display: block;
 }
 
-#calendarModal .modal-content {
-	height: 800px; /* 원하는 높이 */
-	overflow-y: auto; /* 내용이 넘칠 경우 스크롤 추가 */
+.add-event-btn {
+	display: none;
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	background: #007bff;
+	color: white;
+	border: none;
+	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+	text-align: center;
+	cursor: pointer;
+	font-size: 14px;
+	line-height: 18px;
 }
 
 .form-control {
 	margin-bottom: 10px;
 }
+
 .group-container {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap; /* 자동 줄바꿈 */
-    gap: 10px;
-    margin-top: 10px;
-    position: relative; /* 입력창 위치 조정을 위해 필요 */
-  }
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap; /* 자동 줄바꿈 */
+	gap: 10px;
+	margin-top: 10px;
+	position: relative; /* 입력창 위치 조정을 위해 필요 */
+}
 
-  .group-box {
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    font-weight: bold; /* 글자 볼드 처리 */
-  }
+.group-box {
+	padding: 5px 10px;
+	border-radius: 5px;
+	font-size: 14px;
+	display: flex;
+	align-items: center;
+	font-weight: bold; /* 글자 볼드 처리 */
+}
 
-  /* 입력창을 + 버튼 아래에 위치 */
-  .popup {
-    display: none;
-    position: absolute;
-    top: 40px; /* + 버튼 아래에 위치 */
-    left: 0;
-    background: white;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
-    white-space: nowrap; /* 가로 너비 유지 */
-  }
+/* 입력창을 + 버튼 아래에 위치 */
+.popup {
+	display: none;
+	position: absolute;
+	top: 40px; /* + 버튼 아래에 위치 */
+	left: 0;
+	background: white;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+	white-space: nowrap; /* 가로 너비 유지 */
+}
+
+/* 추가 버튼 스타일 */
+#confirmAddBtn {
+	background-color: #007bff; /* 파란색 배경 */
+	color: white; /* 흰색 글자 */
+	border: none;
+	padding: 5px 10px;
+	border-radius: 5px;
+	cursor: pointer;
+	font-weight: bold; /* 글자 볼드 */
+	font-size: 14px;
+}
+
+#confirmAddBtn:hover {
+	background-color: #0056b3; /* 버튼에 마우스 올리면 어두운 파란색 */
+}
 </style>
 </head>
 
@@ -134,7 +160,6 @@
 									href="#" class="instagram"><i class="bi bi-instagram"></i></a>
 								<a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
 							</div>
-							<div id='calendar' onclick="openCalendarModal()"></div>
 						</div>
 					</div>
 				</div>
@@ -158,96 +183,96 @@
 								<button id="confirmAddBtn">추가</button>
 							</div>
 
-							<p>여기에 새로운 기능을 추가하세요.</p>
-							             
 							<div id="extra-widget">
-								<div>dkdkdkdkdkdkdk</div>
+								<p>여기에 새로운 기능을 추가하세요.</p>
 
 							</div>
 						</div>
 					</div>
-				</div>
-
-<script>
-  const addGroupBtn = document.getElementById("addGroupBtn");
-  const popup = document.getElementById("popup");
-  const confirmAddBtn = document.getElementById("confirmAddBtn");
-  const groupInput = document.getElementById("groupInput");
-  const groupContainer = document.getElementById("groupContainer");
-
-  // 순서대로 변경될 색상 배열
-  const colors = ["#007bff", "#6c757d", "#343a40", "#28a745", "#ffc107", "#dc3545"];
-  let colorIndex = 0;
-
-  // + 버튼 클릭 시 입력창 표시 (위치 동기화)
-  addGroupBtn.addEventListener("click", () => {
-    popup.style.display = "block";
-    updatePopupPosition();
-  });
-
-  // 그룹 추가 버튼 클릭 시
-  confirmAddBtn.addEventListener("click", () => {
-    const groupName = groupInput.value.trim();
-    if (groupName === "") return; // 빈 값 방지
-
-    // 새로운 그룹 박스 생성
-    const groupBox = document.createElement("div");
-    groupBox.classList.add("group-box");
-    groupBox.textContent = groupName;
-
-    // 색상 순서대로 적용
-    groupBox.style.background = colors[colorIndex];
-    groupBox.style.color = "white"; // 글자색 흰색 유지
-
-    // 다음 색상으로 변경 (배열을 순환하도록 설정)
-    colorIndex = (colorIndex + 1) % colors.length;
-
-    // 그룹을 추가하고 버튼을 오른쪽으로 밀어냄
-    groupContainer.insertBefore(groupBox, addGroupBtn);
-
-    // 입력창 위치 업데이트
-    updatePopupPosition();
-
-    // 입력창 초기화 및 숨김
-    groupInput.value = "";
-  });
-
-  // 입력창 위치 업데이트 함수
-  function updatePopupPosition() {
-    popup.style.left = `${addGroupBtn.offsetLeft}px`; // + 버튼 위치에 맞춰 이동
-  }
-
-  // 창 크기 변경 시 입력창 위치 업데이트
-  window.addEventListener("resize", updatePopupPosition);
-</script>
-			</div>
-			<div class="col-xl-8">
 					<div class="card">
 						<div class="card-body">
-							<h5 class="card-title" style="font-size: 20px; margin: 0;">Project</h5>
-							<div style="border-bottom: 1px solid black; width: 100%;"></div>
-
-							<!-- 그룹 추가되는 부분 -->
-							<div class="group-container" id="groupContainer">
-								<button id="addGroupBtn"
-									style="border: none; background: none; font-size: 22px; cursor: pointer;">+</button>
-							</div>
-
-							<!-- 입력창 (초기에는 숨김) -->
-							<div id="popup" class="popup">
-								<input type="text" id="groupInput" placeholder="그룹명을 입력하세요" />
-								<button id="confirmAddBtn">추가</button>
-							</div>
-
-							<p>여기에 새로운 기능을 추가하세요.</p>
-							             
-							<div id="extra-widget">
-								<div>dkdkdkdkdkdkdk</div>
-
-							</div>
+							<div id='calendar'></div>
 						</div>
 					</div>
 				</div>
+
+
+
+				<script>
+
+const addGroupBtn = document.getElementById("addGroupBtn");
+const popup = document.getElementById("popup");
+const confirmAddBtn = document.getElementById("confirmAddBtn");
+const groupInput = document.getElementById("groupInput");
+const groupContainer = document.getElementById("groupContainer");
+
+// 더 예쁜 색상 배열로 변경
+const colors = [
+  "#FFB6C1", // 연한 핑크
+  "#FFD700", // 금색
+  "#32CD32", // 라임 그린
+  "#00BFFF", // 딥 스카이 블루
+  "#FF6347", // 토마토
+  "#8A2BE2"  // 블루 바이올렛
+];
+let colorIndex = 0;
+
+// + 버튼 클릭 시 입력창 표시 (위치 동기화)
+addGroupBtn.addEventListener("click", (event) => {
+  popup.style.display = "block";
+  updatePopupPosition();
+  event.stopPropagation(); // 이 클릭 이벤트가 부모로 전파되지 않도록 막기
+});
+
+// 그룹 추가 버튼 클릭 시
+confirmAddBtn.addEventListener("click", () => {
+  const groupName = groupInput.value.trim();
+  if (groupName === "") return; // 빈 값 방지
+
+  // 새로운 그룹 박스 생성
+  const groupBox = document.createElement("div");
+  groupBox.classList.add("group-box");
+  groupBox.textContent = groupName;
+
+  // 색상 순서대로 적용
+  groupBox.style.background = colors[colorIndex];
+  groupBox.style.color = "white"; // 글자색 흰색 유지
+
+  // 다음 색상으로 변경 (배열을 순환하도록 설정)
+  colorIndex = (colorIndex + 1) % colors.length;
+
+  // 그룹을 추가하고 버튼을 오른쪽으로 밀어냄
+  groupContainer.insertBefore(groupBox, addGroupBtn);
+
+  // 입력창 위치 업데이트
+  updatePopupPosition();
+
+  // 입력창 초기화 및 숨김
+  groupInput.value = "";
+  popup.style.display = "none"; // ✅ 추가 후 입력창 자동 숨김
+});
+
+// 입력창 위치 업데이트 함수
+function updatePopupPosition() {
+  popup.style.left = `${addGroupBtn.offsetLeft}px`; // + 버튼 위치에 맞춰 이동
+}
+
+//바깥 영역 클릭 시 팝업 닫기
+window.addEventListener("click", (event) => {
+  // 팝업과 + 버튼 외부를 클릭했을 경우에만 팝업을 숨김
+  if (!groupContainer.contains(event.target)) {
+    popup.style.display = "none";
+  }
+});
+
+// 팝업 내부 클릭 시 이벤트 전파를 막아서 팝업이 사라지지 않도록 함
+popup.addEventListener("click", (event) => {
+  event.stopPropagation(); // 팝업 클릭 이벤트가 바깥으로 전파되지 않도록 막음
+});
+
+</script>
+			</div>
+
 		</section>
 	</main>
 
@@ -255,31 +280,13 @@
 
 	<!-- ========================================== modal ============================================ -->
 
-	<!-- 캘린더 모달 -->
-	<div class="modal fade" id="calendarModal" tabindex="-1"
-		aria-labelledby="calendarModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="calendarModalLabel">전체 캘린더</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<div id="fullCalendar" onclick="insertCalendarModal()"></div>
-					<!-- 전체 캘린더 표시 -->
-				</div>
-			</div>
-		</div>
-	</div>
-
 	<!-- 일정 입력 모달 -->
 	<div class="modal fade" id="eventModal" tabindex="-1"
 		aria-labelledby="eventModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="eventModalLabel">새 일정 추가</h5>
+					<h5 class="modal-title">새 일정 추가</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close"></button>
 				</div>
@@ -287,9 +294,12 @@
 					<p>
 						<strong>선택한 날짜:</strong> <span id="selectedDate"></span>
 					</p>
-					<input type="hidden" id="selectedDateInput"> <input
-						type="text" id="schedule" class="form-control" placeholder="일정">
-					<input type="text" id="memo" class="form-control" placeholder="메모">
+					<label for="username" class="form-label">project</label> <input
+						type="hidden" id="selectedDateInput"> <input type="text"
+						id="schedule" class="form-control"> <input type="hidden"
+						id="selectedDateInput"> <input type="text" id="schedule"
+						class="form-control" placeholder="일정"> <input type="text"
+						id="memo" class="form-control" placeholder="메모">
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary"
@@ -304,93 +314,54 @@
 	<div th:replace="~{footer.html}"></div>
 
 	<!--  script -->
-	<script>
-		document.addEventListener('DOMContentLoaded', function() {
 
-			var calendarEl = document.getElementById('calendar');
-			var calendar = new FullCalendar.Calendar(calendarEl, {
-				expandRows : true, // 화면에 맞게 높이 재설정
-				slotMinTime : '08:00', // Day 캘린더에서 시작 시간
-				slotMaxTime : '20:00', // Day 캘린더에서 종료 시간
-
-				headerToolbar : {
-					left : 'prev,next',
-					center : 'title',
-					right : 'dayGridMonth'
-				},
-
-				initialView : 'dayGridMonth',
-				editable : true,
-				selectable : true, // 달력 일자 드래그 설정가능
-				nowIndicator : true, // 현재 시간 마크
-				dayMaxEvents : true, // 이벤트가 오버되면 높이 제한 (+ 몇 개식으로 표현)
-				locale : 'ko', // 한국어 설정
-			});
-
-			calendar.render();
-
-			function openCalendarModal() {
-				var calendarModal = new bootstrap.Modal(document
-						.getElementById('calendarModal'));
-				calendarModal.show();
-			}
-
-			function insertCalendarModal() {
-				var calendarModal = new bootstrap.Modal(document
-						.getElementById('eventModal'));
-				calendarModal.show();
-			}
-
-			window.openCalendarModal = openCalendarModal;
-		});
-	</script>
 
 	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-			var fullCalendarEl = document
-				.getElementById('fullCalendar');
-			var fullCalendar = new FullCalendar.Calendar( fullCalendarEl, {
-				expandRows : true, // 화면에 맞게 높이 재설정
-				slotMinTime : '08:00', // Day 캘린더에서 시작 시간
-				slotMaxTime : '20:00', // Day 캘린더에서 종료 시간
+	document.addEventListener('DOMContentLoaded', function () {
+	    var calendarEl = document.getElementById('calendar');
+	    var calendar = new FullCalendar.Calendar(calendarEl, {
+	        expandRows: true,
+	        initialView: 'dayGridMonth',
+	        locale: 'ko',
+	        selectable: true,
+	        dayMaxEvents: true,
+	        dateClick: function (info) {
+	            document.getElementById('selectedDate').innerText = info.dateStr;
+	            document.getElementById('selectedDateInput').value = info.dateStr;
+	            let eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+	            eventModal.show();
+	        },
+	        dayCellDidMount: function (info) {
+	            let btn = document.createElement('button');
+	            btn.textContent = '+';
+	            btn.classList.add('add-event-btn');
+	            btn.onclick = function (event) {
+	                event.stopPropagation();
+	                document.getElementById('selectedDate').innerText = info.dateStr;
+	                document.getElementById('selectedDateInput').value = info.dateStr;
+	                let eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+	                eventModal.show();
+	            };
+	            info.el.style.position = 'relative';
+	            info.el.appendChild(btn);
+	        }
+	    });
 
-				headerToolbar : {
-					left : 'prev,next',
-					center : 'title',
-					right : 'dayGridMonth'
-				},
+	    calendar.render();
 
-				initialView : 'dayGridMonth',
-				editable : true,
-				selectable : true, // 달력 일자 드래그 설정가능
-				nowIndicator : true, // 현재 시간 마크
-				dayMaxEvents : true, // 이벤트가 오버되면 높이 제한 (+ 몇 개식으로 표현)
-				locale : 'ko', // 한국어 설정
+	    // 사이드바 토글 이벤트 감지 후 캘린더 리렌더링
+	    function resizeCalendar() {
+	        setTimeout(() => {
+	            calendar.updateSize();
+	        }, 300); // 애니메이션이 끝날 시간 고려해서 약간의 딜레이
+	    }
 
-				select : function(info) {
-					let selectedDate = info.startStr;
-					document.getElementById('selectedDate').innerText = selectedDate;
-					document.getElementById('selectedDateInput').value = selectedDate;
-					let eventModal = new bootstrap.Modal(
-					document.getElementById('eventModal'));
-					eventModal.show();
-				}
-			});
+	    // 사이드바 버튼 클릭 감지 (부트스트랩 기반)
+	    document.querySelector('.toggle-sidebar-btn').addEventListener('click', resizeCalendar);
+	});
 
-			function openCalendarModal() {
-				var calendarModal = new bootstrap.Modal(
-					document.getElementById('calendarModal'));
-					calendarModal.show();
-				}
 
-				document.getElementById('calendarModal')
-					.addEventListener('shown.bs.modal', function() {
-						fullCalendar.render(); // 모달이 완전히 열린 후 렌더링
-			});
-
-			window.openCalendarModal = openCalendarModal;
-			});
-	</script>
+    </script>
 
 	<script>
 	document.getElementById('saveEvent').addEventListener('click', function() {

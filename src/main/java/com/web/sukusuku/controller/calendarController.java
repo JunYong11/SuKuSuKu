@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor // 롬복 생성자 주입 어노테이션
 @RestController
-public class CalendarController {
+public class calendarController {
 
 	// CalendarController.java
 	@PostMapping("/users/register")
