@@ -1,4 +1,4 @@
-package com.web.sukusuku.posts;
+package com.web.sukusuku.service;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,9 +14,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.web.sukusuku.files.FileRepository;
-import com.web.sukusuku.files.FileService;
-import com.web.sukusuku.files.UploadFile;
+import com.web.sukusuku.dto.PostUpdateDto;
+import com.web.sukusuku.model.Category;
+import com.web.sukusuku.model.Post;
+import com.web.sukusuku.model.UploadFile;
+import com.web.sukusuku.repository.FileRepository;
+import com.web.sukusuku.repository.PostRepository;
 
 import lombok.RequiredArgsConstructor;
 

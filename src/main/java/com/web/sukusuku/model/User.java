@@ -45,4 +45,5 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<LevelTest> levelTests = new ArrayList<>();
+    
 }

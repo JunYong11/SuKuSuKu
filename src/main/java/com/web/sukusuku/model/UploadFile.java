@@ -1,6 +1,4 @@
-package com.web.sukusuku.files;
-
-import com.web.sukusuku.posts.Post;
+package com.web.sukusuku.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

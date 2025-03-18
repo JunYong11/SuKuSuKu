@@ -1,4 +1,4 @@
-package com.web.sukusuku.posts;
+package com.web.sukusuku.model;
 
 public enum Category {
     자유게시판,

@@ -12,12 +12,8 @@ public class HomeController {
 	
 	@GetMapping("/")
 	public String getMethodName() {
-<<<<<<< HEAD:src/main/java/com/web/sukusuku/controller/HomeController.java
+		
 		return "home";
-=======
-		log.info("home controller");
-		return "index";	
->>>>>>> youngjae:src/main/java/com/web/sukusuku/controller/homeController.java
 	}
 	
 }

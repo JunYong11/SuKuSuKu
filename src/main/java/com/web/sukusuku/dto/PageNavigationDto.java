@@ -1,4 +1,4 @@
-package com.web.sukusuku.posts;
+package com.web.sukusuku.dto;
 
 import lombok.Builder;
 import lombok.Data;

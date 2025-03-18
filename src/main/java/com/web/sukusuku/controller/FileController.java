@@ -1,4 +1,4 @@
-package com.web.sukusuku.files;
+package com.web.sukusuku.controller;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
@@ -11,6 +11,9 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.web.sukusuku.model.UploadFile;
+import com.web.sukusuku.service.FileService;
 
 import lombok.RequiredArgsConstructor;
 

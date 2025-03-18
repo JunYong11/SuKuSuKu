@@ -1,6 +1,8 @@
-package com.web.sukusuku.comments;
+package com.web.sukusuku.dto;
 
 import java.time.LocalDateTime;
+
+import com.web.sukusuku.model.Comment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

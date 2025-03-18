@@ -1,4 +1,4 @@
-package com.web.sukusuku.comments;
+package com.web.sukusuku.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +8,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.web.sukusuku.dto.CommentCreateDto;
+import com.web.sukusuku.dto.CommentUpdateDto;
+import com.web.sukusuku.model.Comment;
+import com.web.sukusuku.repository.CommentRepository;
 
 @Slf4j
 @RequiredArgsConstructor

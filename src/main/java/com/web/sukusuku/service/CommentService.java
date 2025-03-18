@@ -1,6 +1,10 @@
-package com.web.sukusuku.comments;
+package com.web.sukusuku.service;
 
 import java.util.List;
+
+import com.web.sukusuku.dto.CommentCreateDto;
+import com.web.sukusuku.dto.CommentUpdateDto;
+import com.web.sukusuku.model.Comment;
 
 public interface CommentService {
     Comment saveComment(CommentCreateDto commentCreateDto);
