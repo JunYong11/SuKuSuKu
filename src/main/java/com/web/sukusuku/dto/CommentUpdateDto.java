@@ -1,4 +1,4 @@
-package com.web.sukusuku.comments;
+package com.web.sukusuku.dto;
 
 import lombok.Data;
 

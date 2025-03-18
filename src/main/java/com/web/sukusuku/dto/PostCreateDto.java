@@ -1,6 +1,9 @@
-package com.web.sukusuku.posts;
+package com.web.sukusuku.dto;
 
 import java.time.LocalDateTime;
+
+import com.web.sukusuku.model.Category;
+import com.web.sukusuku.model.Post;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

@@ -1,6 +1,9 @@
-package com.web.sukusuku.posts;
+package com.web.sukusuku.dto;
 
 import java.time.LocalDateTime;
+
+import com.web.sukusuku.model.Category;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

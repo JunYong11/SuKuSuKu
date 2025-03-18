@@ -1,4 +1,4 @@
-package com.web.sukusuku.posts;
+package com.web.sukusuku.service;
 
 import java.io.IOException;
 import java.util.List;
@@ -6,7 +6,10 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.web.sukusuku.files.UploadFile;
+import com.web.sukusuku.dto.PostUpdateDto;
+import com.web.sukusuku.model.Category;
+import com.web.sukusuku.model.Post;
+import com.web.sukusuku.model.UploadFile;
 
 public interface PostService {
 

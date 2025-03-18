@@ -1,4 +1,4 @@
-package com.web.sukusuku.files;
+package com.web.sukusuku.service;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,9 +9,10 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.web.sukusuku.files.UploadFile;
-import com.web.sukusuku.posts.Post;
-import com.web.sukusuku.posts.PostRepository;
+import com.web.sukusuku.model.Post;
+import com.web.sukusuku.model.UploadFile;
+import com.web.sukusuku.repository.FileRepository;
+import com.web.sukusuku.repository.PostRepository;
 
 import lombok.RequiredArgsConstructor;
 

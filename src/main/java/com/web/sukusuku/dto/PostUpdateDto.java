@@ -1,5 +1,7 @@
-package com.web.sukusuku.posts;
+package com.web.sukusuku.dto;
 
+
+import com.web.sukusuku.model.Category;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

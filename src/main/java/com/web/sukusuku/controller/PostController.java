@@ -1,4 +1,4 @@
-package com.web.sukusuku.posts;
+package com.web.sukusuku.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,8 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.web.sukusuku.files.UploadFile;
-import com.web.sukusuku.users.User;
+import com.web.sukusuku.dto.PageNavigationDto;
+import com.web.sukusuku.dto.PostCreateDto;
+import com.web.sukusuku.dto.PostUpdateDto;
+import com.web.sukusuku.dto.PostViewDto;
+import com.web.sukusuku.model.Category;
+import com.web.sukusuku.model.Post;
+import com.web.sukusuku.model.UploadFile;
+import com.web.sukusuku.model.User;
+import com.web.sukusuku.service.PostService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;

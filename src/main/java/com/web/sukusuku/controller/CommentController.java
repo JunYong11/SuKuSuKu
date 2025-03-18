@@ -1,4 +1,4 @@
-package com.web.sukusuku.comments;
+package com.web.sukusuku.controller;
 
 import lombok.RequiredArgsConstructor;
 import java.util.List;
@@ -7,7 +7,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.web.sukusuku.users.User;
+import com.web.sukusuku.dto.CommentCreateDto;
+import com.web.sukusuku.dto.CommentResponseDto;
+import com.web.sukusuku.dto.CommentUpdateDto;
+import com.web.sukusuku.model.Comment;
+import com.web.sukusuku.model.User;
+import com.web.sukusuku.service.CommentService;
 
 import jakarta.servlet.http.HttpSession;
 
