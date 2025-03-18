@@ -11,7 +11,7 @@ import com.web.sukusuku.model.Problem;
 import com.web.sukusuku.service.ProblemService;
 
 @RestController
-@RequestMapping("/leveltest")
+//@RequestMapping("/leveltest")
 public class ProblemController {
 
     private final ProblemService problemService;
@@ -25,4 +25,5 @@ public class ProblemController {
     public List<Problem> getRandomProblems() {
         return problemService.getRandomProblems();
     }
+
 }

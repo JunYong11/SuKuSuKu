@@ -15,9 +15,11 @@ import com.web.sukusuku.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequestMapping("/user")
+@Slf4j
 @RequiredArgsConstructor
 public class UserController {
 
@@ -29,13 +31,13 @@ public class UserController {
     public String showRegisterForm(Model model) {
         model.addAttribute("user", new User()); 
         return "user/register";
-
     }
 
     // 회원가입 처리
     @PostMapping("/register")
     public String registerUser(@ModelAttribute("user") User user, Model model) {
 
+    	log.info("user:{}",user);
         // 중복 아이디 검사
         if (userService.existsByUsername(user.getUsername())) {
             model.addAttribute("errorMessage", "이미 사용 중인 아이디입니다.");
@@ -44,7 +46,7 @@ public class UserController {
 
         // 성공 처리
         userService.register(user);
-        return "redirect:/login";  // 성공하면 로그인 페이지로 이동
+        return "redirect:/";  // 성공하면 로그인 페이지로 이동
     }
     
     @PostMapping("/login")
@@ -55,7 +57,7 @@ public class UserController {
 
         if (session.getAttribute("loginUser") != null) {
             // 이미 로그인된 상태
-            return "redirect:/level";
+            return "redirect:/home";
         }
 
         Optional<User> optionalUser = userService.findByUsername(username);
@@ -73,12 +75,12 @@ public class UserController {
         }
 
         session.setAttribute("loginUser", user);
-        return "redirect:/level";  // 로그인 성공 → 레벨 테스트 페이지로 이동
+        return "redirect:/";  // 로그인 성공 → 레벨 테스트 페이지로 이동
     }
 
 
 
-    @GetMapping("/logout")
+    @PostMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate(); // 세션 날리기
         return "redirect:/"; // 홈으로 이동
