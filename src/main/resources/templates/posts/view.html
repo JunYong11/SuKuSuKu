@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>글 상세보기</title>
+</head>
+<body>
+    <h1>글 상세보기</h1>
+    <div id="postDetail"></div>
+
+    <!-- 수정 / 삭제 버튼 -->
+    <button id="editBtn" onclick="goEdit()" style="display: none; margin-right: 10px;">수정하기</button>
+    <button id="deleteBtn" onclick="deletePost()" style="display: none; color: red;">삭제하기</button>
+
+    <script>
+        // URL에서 postId 추출
+        const pathParts = window.location.pathname.split('/');
+        const postId = pathParts[pathParts.length - 1];
+
+        function loadPost() {
+            fetch(`/posts/view/${postId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("게시글을 불러오지 못했습니다.");
+                    }
+                    return response.json();
+                })
+                .then(post => {
+                    const detailDiv = document.getElementById('postDetail');
+                    detailDiv.innerHTML = `
+                        <h2>${post.title}</h2>
+                        <p>카테고리: ${post.category}</p>
+                        <p>작성자: ${post.author}</p>
+                        <p>작성일: ${post.createdAt}</p>
+                        <p>${post.content}</p>
+                    `;
+
+                    if (post.isAuthor) {
+                        document.getElementById('editBtn').style.display = 'inline';
+                        document.getElementById('deleteBtn').style.display = 'inline';
+                    }
+                })
+                .catch(error => {
+                    alert(error.message);
+                    window.location.href = '/posts/list';
+                });
+        }
+
+        function goEdit() {
+            window.location.href = `/edit.html?postId=${postId}`;
+        }
+
+        function deletePost() {
+            if (confirm('정말 삭제하시겠습니까?')) {
+                fetch(`/posts/${postId}/delete`, {
+                    method: 'POST'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('삭제되었습니다.');
+                        window.location.href = '/posts/list';
+                    } else {
+                        alert('삭제 실패!');
+                    }
+                })
+                .catch(() => {
+                    alert('삭제 요청 중 오류가 발생했습니다.');
+                });
+            }
+        }
+
+        loadPost();
+    </script>
+</body>
+</html>
