@@ -1,10 +1,27 @@
 spring:
+  application:
+    name: SuKuSuKu
+    
+  web:
+    resources:
+      static-locations: classpath:/static/,classpath:/assets/,classpath:/home_static/
+  
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/post
+    url: jdbc:mysql://localhost:3306/sukusuku?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: root
     password: root
+
   jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect # MySQL 버전에 맞게 (중요!!)
     hibernate:
-      ddl-auto: update
-      
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
