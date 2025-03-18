@@ -1,0 +1,24 @@
+<form action="/posts/create" method="post" id="createForm">
+    <label>카테고리:
+        <select name="category">
+            <option value="FREE">자유게시판</option>
+            <option value="QUESTION">질문게시판</option>
+            <option value="RESOURCE">자료게시판</option>
+        </select>
+    </label>
+    <br><br>
+    <label>제목:
+        <input type="text" name="title">
+    </label>
+    <br><br>
+    <label>내용:
+        <textarea name="content" rows="10" cols="50"></textarea>
+    </label>
+    <br><br>
+    <label>비밀글:
+        <input type="checkbox" name="secret" value="true">
+    </label>
+    <br><br>
+    <!-- submit 타입으로 변경 -->
+    <button type="submit">작성하기</button>
+</form>
