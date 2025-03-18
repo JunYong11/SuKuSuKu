@@ -18,18 +18,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor // 롬복 생성자 주입 어노테이션
 @RestController
-public class calendarController {
+public class CalendarRestController {
 
 	// CalendarController.java
 	@PostMapping("/users/register")
 	public ResponseEntity<Map<String, String>> calendarCreate(@RequestBody CalendarCreateDto calendarCreateDto) {
-	    log.info("calendar: {}", calendarCreateDto);
+		log.info("calendar: {}", calendarCreateDto);
 
-	    // 데이터를 처리하고 응답을 반환
-	    Map<String, String> response = new HashMap<>();
-	    response.put("message", "이벤트가 저장되었습니다.");
-	    
-	    return ResponseEntity.ok(response);
+		// 데이터를 처리하고 응답을 반환
+		Map<String, String> response = new HashMap<>();
+		response.put("message", "이벤트가 저장되었습니다.");
+
+		return ResponseEntity.ok(response);
 	}
 
 }
