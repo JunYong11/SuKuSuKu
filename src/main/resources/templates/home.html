@@ -96,7 +96,6 @@ html {
 	margin-bottom: 15px;
 	display: none; /* 기본은 숨김 */
 }
-/* 흔들림 애니메이션 정의 */
 @keyframes shake {
   0% { transform: translateX(0); }
   20% { transform: translateX(-8px); }
@@ -130,11 +129,20 @@ html {
 						<a href="/">
 							<h1 class="custom-title">すくすく</h1>
 						</a>
-
-						<div class="d-flex flex-column mt-4" style="gap: 20px;">
-							<button id="learnBtn" class="btn btn-primary">학습하러가기</button>
-							<a href="#about" class="btn btn-outline-primary">사이트 자세히보기</a>
-						</div>
+						<th:block th:if="${session.loginUser == null}">
+							<div class="d-flex flex-column mt-4" style="gap: 20px;">
+								<button id="learnBtn" class="btn btn-primary">학습하러가기</button>
+								<a href="#about" class="btn btn-outline-primary">사이트 자세히보기</a>
+							</div>
+						</th:block>
+						
+						<th:block th:if="${session.loginUser != null}">
+							<div class="d-flex flex-column mt-4" style="gap: 20px;">
+								<a href="/studies/levelChoice" class="btn btn-primary">학습하러가기</a>
+								<a href="#about" class="btn btn-outline-primary">사이트 자세히보기</a>
+							</div>		
+    					</th:block>
+    						
 					</div>
 				</div>
 			</div>
@@ -148,12 +156,12 @@ html {
 
 						<div class="login-wrap p-4 p-md-5"
 							th:classappend="${loginError != null or errorMessage != null} ? ' shake'">
-
-							<h3 class="mb-4">로그인</h3>
-							<div id="login-message" class="message-box"></div>
-
 							<!-- 로그인 여부 확인 -->
 							<th:block th:if="${session.loginUser == null}">
+								<h3 class="mb-4">로그인</h3>
+								<div id="login-message" class="message-box"></div>
+
+							
 								<form th:action="@{/user/login}" method="post"
 									class="signup-form">
 									<div class="form-group">
@@ -181,16 +189,16 @@ html {
 									</div>
 								</form>
 								<!-- 로그인 폼 근처에 에러 메시지 출력 -->
-							<div th:if="${errorMessage}" class="error-message">
-								<p th:text="${errorMessage}"></p>
-							</div>
+								<div th:if="${errorMessage}" class="error-message">
+									<p th:text="${errorMessage}"></p>
+								</div>
 
 
-							<div class="btn-signup-small">
-								<a href="/user/register">회원가입 하러가기</a>
-							</div>
+								<div class="btn-signup-small">
+									<a href="/user/register">회원가입 하러가기</a>
+								</div>
 							</th:block>
-							
+
 							<!-- 로그인 상태일 경우 메시지 출력 -->
 							<th:block th:if="${session.loginUser != null}">
 								<p style="color: green; font-weight: bold;">로그인 되었습니다.</p>
@@ -198,46 +206,33 @@ html {
 									<button type="submit" class="btn btn-danger mt-3">로그아웃</button>
 								</form>
 							</th:block>
-						</div>	
+						</div>
 					</div>
 				</div>
 			</div>
 		</section>
 		<script>
-		document.addEventListener("DOMContentLoaded", function() {
-		    const learnBtn = document.getElementById('learnBtn');
-		    const loginMessage = document.getElementById('login-message');
-		    const loginWrap = document.querySelector('.login-wrap');
+			document.addEventListener("DOMContentLoaded", function() {
+				const learnBtn = document.getElementById('learnBtn');
+				const loginMessage = document.getElementById('login-message');
+				const loginWrap = document.querySelector('.login-wrap');
 
-		    // 이벤트 리스너 추가 전에 DOM 요소들이 존재하는지 확인
-		    console.log(learnBtn, loginMessage, loginWrap);
+				learnBtn.addEventListener('click', function() {
+					// 로그인 안 된 경우 메시지 표시 및 애니메이션 실행
+					loginMessage.textContent = "로그인 해주세요!";
+					loginMessage.style.display = "block";
 
-		    learnBtn.addEventListener('click', function() {
-		        // 로그인 상태 확인
-		        const isLoggedIn = localStorage.getItem("loginUser");
-		        console.log("로그인 상태:", isLoggedIn);  // 로그인 상태 확인
+					// 흔들림 클래스 추가
+					loginWrap.classList.add('shake');
 
-		        if (isLoggedIn) {
-		            console.log("로그인 완료, 페이지 이동");
-		            window.location.href = "/studies/levelChoice"; // 로그인 상태라면 /studies/levelChoice 페이지로 이동
-		        } else {
-		            // 로그인 안 된 경우 메시지 표시 및 애니메이션 실행
-		            loginMessage.textContent = "로그인 해주세요!";
-		            loginMessage.style.display = "block";
-
-		            // 흔들림 클래스 추가
-		            loginWrap.classList.add('shake');
-
-		            // 애니메이션 끝나면 클래스 제거
-		            loginWrap.addEventListener("animationend", function() {
-		                loginWrap.classList.remove('shake');
-		            }, {
-		                once: true
-		            });
-		        }
-		    });
-		});
-
+					// 애니메이션 끝나면 클래스 제거
+					loginWrap.addEventListener("animationend", function() {
+						loginWrap.classList.remove('shake');
+					}, {
+						once : true
+					});
+				});
+			});
 		</script>
 
 		<!-- 페이지 설명 섹션, 사이트에 대한 설명을 여기에 넣을 수 있음 -->
@@ -819,9 +814,7 @@ html {
 		<script src="/home_static/js/jquery.animateNumber.min.js"></script>
 		<script src="/home_static/js/bootstrap-datepicker.js"></script>
 		<script src="/home_static/js/scrollax.min.js"></script>
-		<script
-			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
-		<script src="/home_static/js/google-map.js"></script>
+		
 		<script src="/home_static/js/main.js"></script>
 </body>
 </html>
