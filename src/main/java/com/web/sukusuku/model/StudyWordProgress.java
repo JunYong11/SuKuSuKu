@@ -1,21 +1,19 @@
 package com.web.sukusuku.model;
-
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "review_queue")
+@Table(name = "study_word_progress")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReviewQueue {
-
+public class StudyWordProgress {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long queueId;
+    private Long progressId;
 
     @ManyToOne
     @JoinColumn(name = "username", nullable = false)
@@ -26,18 +24,24 @@ public class ReviewQueue {
     private Word word;
 
     @Enumerated(EnumType.STRING)
-    private ReviewStatus reviewStatus;
+    private Status status;
 
-    private LocalDateTime addedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime lastReviewedAt;
 
     @PrePersist
     public void prePersist() {
-        this.addedAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
+        this.lastReviewedAt = LocalDateTime.now();
     }
 
-    public enum ReviewStatus {
-        대기,
-        진행_중,
-        완료
+    @PreUpdate
+    public void preUpdate() {
+        this.lastReviewedAt = LocalDateTime.now();
+    }
+
+    public enum Status {
+        안다,
+        모른다
     }
 }

@@ -132,7 +132,7 @@
                   <h3 th:text="'Chapter ' + ${chapter.chapterId} + ' - ' + ${chapter.chapterName}">Chapter 제목</h3>
                   <p th:text="'누적 단어 수: ' + ${chapter.cumulativeWords} + '개'"></p>
                   <p th:text="'회독 횟수: ' + ${chapter.reviewCount} + '회'"></p>
-                  <a th:href="@{/studies/startStudy(levelId=${selectedLevelId})/(chapterId=${chapter.chapterId})}"
+                  <a th:href="@{/studies/startStudy/{levelId}/{chapterId}(levelId=${selectedLevelId}, chapterId=${chapter.chapterId})}"
                      class="btn btn-primary d-block mt-2">공부 시작</a>
                 </div>
               </div>
@@ -170,7 +170,7 @@
               <h3>Chapter ${chapter.chapterId} - ${chapter.chapterName}</h3>
               <p>누적 단어 수: ${chapter.cumulativeWords}개</p>
               <p>회독 횟수: ${chapter.reviewCount}회</p>
-              <a href="/studies/startStudy?levelId=${levelId}&chapterId=${chapter.chapterId}"
+              <a href="/studies/startStudy/${levelId}/${chapter.chapterId}"
                  class="btn btn-primary d-block mt-2">공부 시작</a>
             </div>
           </div>
