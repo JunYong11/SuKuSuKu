@@ -70,9 +70,6 @@ public class Post {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @Column(name = "username", nullable = false, length = 50)
-    private String author;
     
     @ManyToOne
     @JoinColumn(name = "username") // 실제 DB에서 사용할 외래 키 이름

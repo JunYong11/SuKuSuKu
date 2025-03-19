@@ -31,19 +31,4 @@ public class User {
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 
-    @OneToMany(mappedBy = "user")
-    private List<Post> posts = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    private List<Calendar> calendars = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    private List<StudyProgress> studyProgresses = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    private List<ReviewQueue> reviewQueues = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    private List<LevelTest> levelTests = new ArrayList<>();
-    
 }
