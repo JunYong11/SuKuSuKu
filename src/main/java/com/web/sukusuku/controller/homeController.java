@@ -5,6 +5,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.web.sukusuku.model.User;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @Controller
@@ -27,12 +29,15 @@ public class homeController {
 	public String getMethodResult() {
 		return "leveltest/result";
 	}
-	@GetMapping("/register")
-	public String showRegisterPage(Model model) {
-	    model.addAttribute("user", new User());
-	    return "user/register";
+	@GetMapping("/game/rain")
+	public String getMethodrain() {
+		return "game/rain";
 	}
-
+	@GetMapping("/game")
+	public String getMethodGame() {
+		return "game/main";
+	}
+	
 
 	
 }
