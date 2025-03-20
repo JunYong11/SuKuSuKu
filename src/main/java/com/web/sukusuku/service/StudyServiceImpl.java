@@ -56,10 +56,13 @@ public class StudyServiceImpl implements StudyService {
      *
      */
 // --------------------- study(회독) ----------------------------------------------
+// 레벨초이스에서 챕터선택하면 작동 1
 @Override
 public void startStudy(User user, Integer levelId, Integer chapterId) {
+    log.info("서I(startStudy) 시작");
+    // 챕터 공부 현황
     Optional<StudyProgress> existingProgress = studyProgressRepository.findByUserAndChapterId(user, chapterId);
-
+    log.info("서I(startStudy):existingProgress={}", existingProgress);
     if (existingProgress.isEmpty()) {
         StudyProgress progress = StudyProgress.builder()
                 .user(user)
@@ -70,7 +73,13 @@ public void startStudy(User user, Integer levelId, Integer chapterId) {
                 .build();
 
         studyProgressRepository.save(progress);
-
+        // 여기서 챕터안의 단어 조절하기
+        /* 아이디어 : 1. 레벨id랑 챕터.레벨id 랑 같은 모든 챕터 아이디 가지고 오기,
+                    2. 1.과 비교해서 갖고온 챕터id 보다 작거나 같을 때의 모든 단어 갖고 오기
+                        (if(1.<= 챕터.챕터id): for(챕터.챕터id,1.의 가장 작은 수,-1){밑의 코드}
+                    3. 이러면 아마 chapterDto에 누적개수 수정해야할듯
+                        if(this.챕터id == find!!){ set chapterDto.누적갯스(StudyWordProgress.word.size())}
+        * */
         List<Word> allWords = wordRepository.findByChapterChapterId(chapterId);
 
         for (Word word : allWords) {
@@ -84,7 +93,7 @@ public void startStudy(User user, Integer levelId, Integer chapterId) {
         }
     }
 }
-
+    // 레벨초이스에서 챕터선택하면 작동 2
     @Override
     public List<WordDto> getRemainingWordsByChapter(User user, Integer chapterId) {
         List<StudyWordProgress> progresses = studyWordProgressRepository.findByUserAndChapterId(user, chapterId);
@@ -102,7 +111,7 @@ public void startStudy(User user, Integer levelId, Integer chapterId) {
                 })
                 .toList();
     }
-
+    // 안다 버튼 누르면 작동
     @Override
     public void updateWordProgress(User user, WordProgressRequestDto dto) {
         Word word = wordRepository.findById(dto.getWordId())
