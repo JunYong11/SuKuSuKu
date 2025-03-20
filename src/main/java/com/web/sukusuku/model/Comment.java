@@ -6,26 +6,41 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "comment")
 @Data
 @NoArgsConstructor
-@ToString(exclude = {"user", "post"})
+@AllArgsConstructor
+@Builder
+@Table(name = "comment")
 public class Comment {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
-    private Integer commentId;
+    private Long commentId;
 
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "created_at")
+    @Column(length = 50, nullable = false)
+    private String username;
+
+    @Column(name = "post_id", nullable = false)
+    private Long postId;
+
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "username")
-    private User user;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

@@ -1,8 +1,5 @@
 package com.web.sukusuku.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,6 +10,9 @@ import com.web.sukusuku.dto.CommentCreateDto;
 import com.web.sukusuku.dto.CommentUpdateDto;
 import com.web.sukusuku.model.Comment;
 import com.web.sukusuku.repository.CommentRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor

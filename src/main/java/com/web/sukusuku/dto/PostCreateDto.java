@@ -1,18 +1,15 @@
 package com.web.sukusuku.dto;
 
-import java.time.LocalDateTime;
-
 import com.web.sukusuku.model.Category;
 import com.web.sukusuku.model.Post;
-import com.web.sukusuku.model.User;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-
 import lombok.Data;
 
 @Data
 public class PostCreateDto {
+	
 	@NotBlank(message="제목필수")
 	@Size(min = 1, message = "제목은 1자 이상 200자 이하로 입력해 주세요")
 	private String title;		// 제목
