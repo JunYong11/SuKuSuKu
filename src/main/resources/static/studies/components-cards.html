@@ -83,9 +83,9 @@
         <div>
             <label for="category">게시판 선택: </label>
             <select id="category" onchange="location.href='/posts/list?category=' + this.value">
-                <option value="FREE" th:selected="${category} == 'FREE'">자유 게시판</option>
-                <option value="QUESTION" th:selected="${category} == 'QUESTION'">질문 게시판</option>
-                <option value="DATA" th:selected="${category} == 'DATA'">자료 게시판</option>
+                <option value="자유게시판" th:selected="${category} == 'FREE'">자유 게시판</option>
+                <option value="질문게시판" th:selected="${category} == 'QUESTION'">질문 게시판</option>
+                <option value="자료게시판" th:selected="${category} == 'DATA'">자료 게시판</option>
             </select>
         </div>
 

@@ -12,20 +12,14 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-<<<<<<< HEAD
-    url: jdbc:mysql://localhost:3306/sukusuku
-    username: root
-    password: '00000000'
-=======
     url: jdbc:mysql://localhost:3306/sukusuku?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: root
     password: root
 
->>>>>>> a43a32051ec0ddc9d242b9e4713408dbaaa5a897
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect # MySQL 버전에 맞게 (중요!!)
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
