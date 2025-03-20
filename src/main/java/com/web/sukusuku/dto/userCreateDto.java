@@ -3,7 +3,7 @@ package com.web.sukusuku.dto;
 import lombok.Data;
 
 @Data
-public class UserCreateDto {
+public class userCreateDto {
 	
 	private String username;
 	private String password;

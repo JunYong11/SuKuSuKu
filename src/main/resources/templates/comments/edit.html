@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>댓글 수정</title>
+</head>
+<body>
+    <h1>댓글 수정</h1>
+    <form action="/comments/{commentId}/edit" method="post">
+        <textarea name="content">${comment.content}</textarea><br>
+        <input type="submit" value="댓글 수정">
+    </form>
+</body>
+</html>

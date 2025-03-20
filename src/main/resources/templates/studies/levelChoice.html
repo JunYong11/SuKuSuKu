@@ -2,148 +2,161 @@
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>레벨 선택</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
+<title>레벨 선택</title>
+<meta content="" name="description">
+<meta content="" name="keywords">
 
-  <!-- Favicons -->
-  <link href="/assets/img/favicon.png" rel="icon">
-  <link href="/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+<!-- Favicons -->
+<link href="/assets/img/favicon.png" rel="icon">
+<link href="/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.g.assets.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.g.assets.com" rel="preconnect">
+<link
+	href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+	rel="stylesheet">
 
-  <!-- Vendor CSS Files -->
-  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+<!-- Vendor CSS Files -->
+<link href="/assets/vendor/bootstrap/css/bootstrap.min.css"
+	rel="stylesheet">
+<link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css"
+	rel="stylesheet">
+<link href="/assets/vendor/boxicons/css/boxicons.min.css"
+	rel="stylesheet">
+<link href="/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+<link href="/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+<link href="/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+<link href="/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
-  <!-- Template Main CSS File -->
-  <link href="/assets/css/style.css" rel="stylesheet">
+<!-- Template Main CSS File -->
+<link href="/assets/css/style.css" rel="stylesheet">
 
-  <!-- FullCalendar CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@3.10.0/dist/fullcalendar.min.css" rel="stylesheet">
+<!-- FullCalendar CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/fullcalendar@3.10.0/dist/fullcalendar.min.css"
+	rel="stylesheet">
 
-  <!-- jQuery (required for FullCalendar) -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- jQuery (required for FullCalendar) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-  <!-- 커스텀 스타일 -->
-  <style>
-    /* 탭 콘텐츠 내 챕터 목록 관련 스타일 */
-    #chapters-container-N1,
-    #chapters-container-N2,
-    #chapters-container-N3,
-    #chapters-container-N4,
-    #chapters-container-N5 {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-    .chapter-card {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      padding: 15px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      cursor: pointer;
-      transition: transform 0.2s;
-      /* 기본: 작은 화면(모바일) - 한 행에 1개 */
-      flex: 1 1 calc(100% - 20px);
-      max-width: calc(100% - 20px);
-    }
-    /* 중간 화면(태블릿 등): 한 행에 2개 */
-    @media (min-width: 576px) {
-      .chapter-card {
-        flex: 1 1 calc(50% - 20px);
-        max-width: calc(50% - 20px);
-      }
-    }
-    /* 큰 화면(데스크탑): 한 행에 3개 */
-    @media (min-width: 992px) {
-      .chapter-card {
-        flex: 1 1 calc(33.33% - 20px);
-        max-width: calc(33.33% - 20px);
-      }
-    }
-    .chapter-card:hover {
-      transform: scale(1.03);
-    }
-    .chapter-card h3 {
-      margin-top: 0;
-    }
-    .chapter-card p {
-      margin: 5px 0;
-      color: #555;
-    }
-  </style>
+<!-- 커스텀 스타일 -->
+<style>
+/* 탭 콘텐츠 내 챕터 목록 관련 스타일 */
+#chapters-container-N1, #chapters-container-N2, #chapters-container-N3,
+	#chapters-container-N4, #chapters-container-N5 {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	justify-content: center;
+	margin-top: 20px;
+}
+
+.chapter-card {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 15px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	cursor: pointer;
+	transition: transform 0.2s;
+	/* 기본: 작은 화면(모바일) - 한 행에 1개 */
+	flex: 1 1 calc(100% - 20px);
+	max-width: calc(100% - 20px);
+}
+/* 중간 화면(태블릿 등): 한 행에 2개 */
+@media ( min-width : 576px) {
+	.chapter-card {
+		flex: 1 1 calc(50% - 20px);
+		max-width: calc(50% - 20px);
+	}
+}
+/* 큰 화면(데스크탑): 한 행에 3개 */
+@media ( min-width : 992px) {
+	.chapter-card {
+		flex: 1 1 calc(33.33% - 20px);
+		max-width: calc(33.33% - 20px);
+	}
+}
+
+.chapter-card:hover {
+	transform: scale(1.03);
+}
+
+.chapter-card h3 {
+	margin-top: 0;
+}
+
+.chapter-card p {
+	margin: 5px 0;
+	color: #555;
+}
+</style>
 </head>
 <body>
-<!-- Header 및 Sidebar (Thymeleaf 템플릿 사용) -->
-<!-- 헤더 불러오기 -->
-<div th:replace="~{header :: headerFragment}"></div>
-<!-- 사이드바 불러오기 -->
-<div th:replace="~{sidebar :: sidebarFragment}"></div>
+	<!-- Header 및 Sidebar (Thymeleaf 템플릿 사용) -->
+	<!-- 상단바 -->
+	<div th:replace="~{header.html}"></div>
 
-<main id="main" class="main">
-  <div class="pagetitle">
-    <h1>레벨 선택</h1>
-    <nav>
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-        <li class="breadcrumb-item active">레벨 선택</li>
-        <li class="breadcrumb-item">즐겨찾기</li>
-      </ol>
-    </nav>
-  </div><!-- End Page Title -->
+	<!-- 사이드바 -->
+	<div th:replace="~{sidebar.html}"></div>
+	
+	<main id="main" class="main">
+		<div class="pagetitle">
+			<h1>레벨 선택</h1>
+			<nav>
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="index.html">Home</a></li>
+					<li class="breadcrumb-item active">레벨 선택</li>
+					<li class="breadcrumb-item">즐겨찾기</li>
+				</ol>
+			</nav>
+		</div>
+		<!-- End Page Title -->
 
-  <!-- 카드 영역 -->
-  <!-- 카드 시작 -->
-  <section class="section">
-    <div class="container my-5">
-      <div class="card">
-        <div class="card-body">
+		<!-- 카드 영역 -->
+		<!-- 카드 시작 -->
+		<section class="section">
+			<div class="container my-5">
+				<div class="card">
+					<div class="card-body">
 
-          <!-- 레벨 탭 메뉴 -->
-          <!-- 레벨 탭 (JS에서 데이터-level-id를 이용함) -->
-          <ul class="nav nav-tabs d-flex" id="levelTabs" role="tablist">
-            <li class="nav-item flex-fill" th:each="level : ${levels}">
-              <button class="nav-link w-100"
-                      th:attr="data-level-id=${level.levelId}"
-                      th:text="${level.levelName}">레벨</button>
-            </li>
-          </ul>
+						<!-- 레벨 탭 메뉴 -->
+						<!-- 레벨 탭 (JS에서 데이터-level-id를 이용함) -->
+						<ul class="nav nav-tabs d-flex" id="levelTabs" role="tablist">
+							<li class="nav-item flex-fill" th:each="level : ${levels}">
+								<button class="nav-link w-100"
+									th:attr="data-level-id=${level.levelId}"
+									th:text="${level.levelName}">레벨</button>
+							</li>
+						</ul>
 
-          <!-- 초기 렌더링된 챕터 리스트 (서버 렌더링) -->
-          <div id="chapters-container">
-            <h2 th:text="'챕터 목록 - N' + ${selectedLevelId}">챕터 목록</h2>
-            <div class="row">
-              <div class="col-md-4" th:each="chapter : ${chapters}">
-                <div class="chapter-card">
-                  <h3 th:text="'Chapter ' + ${chapter.chapterId} + ' - ' + ${chapter.chapterName}">Chapter 제목</h3>
-                  <p th:text="'누적 단어 수: ' + ${chapter.cumulativeWords} + '개'"></p>
-                  <p th:text="'회독 횟수: ' + ${chapter.reviewCount} + '회'"></p>
-                  <a th:href="@{/studies/startStudy(levelId=${selectedLevelId})/(chapterId=${chapter.chapterId})}"
-                     class="btn btn-primary d-block mt-2">공부 시작</a>
-                </div>
-              </div>
-            </div>
-          </div>
+						<!-- 초기 렌더링된 챕터 리스트 (서버 렌더링) -->
+						<div id="chapters-container">
+							<h2 th:text="'챕터 목록 - N' + ${selectedLevelId}">챕터 목록</h2>
+							<div class="row">
+								<div class="col-md-4" th:each="chapter : ${chapters}">
+									<div class="chapter-card">
+										<h3
+											th:text="'Chapter ' + ${chapter.chapterId} + ' - ' + ${chapter.chapterName}">Chapter
+											제목</h3>
+										<p th:text="'누적 단어 수: ' + ${chapter.cumulativeWords} + '개'"></p>
+										<p th:text="'회독 횟수: ' + ${chapter.reviewCount} + '회'"></p>
+										<a
+											th:href="@{/studies/startStudy(levelId=${selectedLevelId})/(chapterId=${chapter.chapterId})}"
+											class="btn btn-primary d-block mt-2">공부 시작</a>
+									</div>
+								</div>
+							</div>
+						</div>
 
-        </div>
-      </div>
-    </div>
-  </section>
-  <script>
+					</div>
+				</div>
+			</div>
+		</section>
+		<script>
     document.querySelectorAll('#levelTabs button').forEach(button => {
       button.addEventListener('click', function(event) {
         event.preventDefault();
@@ -186,31 +199,35 @@
   </script>
 
 
-</main>
+	</main>
 
-<!-- Footer -->
-<footer id="footer" class="footer">
-  <div class="copyright">
-    &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
-  </div>
-  <div class="credits">
-    Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-  </div>
-</footer><!-- End Footer -->
+	<!-- Footer -->
+	<footer id="footer" class="footer">
+		<div class="copyright">
+			&copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights
+			Reserved
+		</div>
+		<div class="credits">
+			Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+		</div>
+	</footer>
+	<!-- End Footer -->
 
-<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+	<a href="#"
+		class="back-to-top d-flex align-items-center justify-content-center"><i
+		class="bi bi-arrow-up-short"></i></a>
 
-<!-- Vendor JS Files -->
-<script src="/assets/vendor/apexcharts/apexcharts.min.js"></script>
-<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="/assets/vendor/chart.js/chart.umd.js"></script>
-<script src="/assets/vendor/echarts/echarts.min.js"></script>
-<script src="/assets/vendor/quill/quill.js"></script>
-<script src="/assets/vendor/simple-datatables/simple-datatables.js"></script>
-<script src="/assets/vendor/tinymce/tinymce.min.js"></script>
-<script src="/assets/vendor/php-email-form/validate.js"></script>
+	<!-- Vendor JS Files -->
+	<script src="/assets/vendor/apexcharts/apexcharts.min.js"></script>
+	<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="/assets/vendor/chart.js/chart.umd.js"></script>
+	<script src="/assets/vendor/echarts/echarts.min.js"></script>
+	<script src="/assets/vendor/quill/quill.js"></script>
+	<script src="/assets/vendor/simple-datatables/simple-datatables.js"></script>
+	<script src="/assets/vendor/tinymce/tinymce.min.js"></script>
+	<script src="/assets/vendor/php-email-form/validate.js"></script>
 
-<!-- Template Main JS File -->
-<script src="/assets/js/main.js"></script>
+	<!-- Template Main JS File -->
+	<script src="/assets/js/main.js"></script>
 </body>
 </html>

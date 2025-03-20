@@ -42,6 +42,7 @@
 	src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
 <script
 	src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js'></script>
+	
 <style>
 #calendar {
 	width: 100%;
@@ -135,7 +136,7 @@
 			<h1>Profile</h1>
 			<nav>
 				<ol class="breadcrumb">
-					<li class="breadcrumb-item"><a href="index.html">Home</a></li>
+					<li class="breadcrumb-item"><a href="/">Home</a></li>
 					<li class="breadcrumb-item">Users</li>
 					<li class="breadcrumb-item active">Profile</li>
 				</ol>
@@ -143,17 +144,15 @@
 		</div>
 		<!-- End Page Title -->
 
-		<section class="section profile">
+		<section class="section profile" th:object="${loginUser}">
 			<div class="row">
 				<div class="col-xl-3">
 					<div class="card">
 						<div
 							class="card-body profile-card pt-4 d-flex flex-column align-items-center">
 
-							<img src="assets/img/profile-img.jpg" alt="Profile"
-								class="rounded-circle">
-							<h2>Kevin Anderson</h2>
-							<h3>Web Designer</h3>
+							<h2 th:text="*{username}">아이디</h2>
+							<h3	th:text="*{level}">급수</h3>
 							<div class="social-links mt-2">
 								<a href="#" class="twitter"><i class="bi bi-twitter"></i></a> <a
 									href="#" class="facebook"><i class="bi bi-facebook"></i></a> <a
@@ -173,20 +172,16 @@
 
 							<!-- 그룹 추가되는 부분 -->
 							<div class="group-container" id="groupContainer">
-								<button id="addGroupBtn"
-									style="border: none; background: none; font-size: 22px; cursor: pointer;">+</button>
+								<button id="addGroupBtn" style="border: none; background: none; font-size: 22px; cursor: pointer;">+</button>
 							</div>
 
 							<!-- 입력창 (초기에는 숨김) -->
-							<div id="popup" class="popup">
-								<input type="text" id="groupInput" placeholder="그룹명을 입력하세요" />
-								<button id="confirmAddBtn">추가</button>
-							</div>
-
-							<div id="extra-widget">
-								<p>여기에 새로운 기능을 추가하세요.</p>
-
-							</div>
+							<form action="api/project" method="post" enctype="multipart/form-data">
+								<div id="popup" class="popup">
+									<input type="text" id="groupInput" name="projectName" placeholder="그룹명을 입력하세요" />
+									<button id="confirmAddBtn" type="submit">추가</button>
+								</div>
+							</form>			
 						</div>
 					</div>
 					<div class="card">
@@ -202,7 +197,7 @@
 
 const addGroupBtn = document.getElementById("addGroupBtn");
 const popup = document.getElementById("popup");
-const confirmAddBtn = document.getElementById("confirmAddBtn");
+
 const groupInput = document.getElementById("groupInput");
 const groupContainer = document.getElementById("groupContainer");
 
@@ -224,33 +219,6 @@ addGroupBtn.addEventListener("click", (event) => {
   event.stopPropagation(); // 이 클릭 이벤트가 부모로 전파되지 않도록 막기
 });
 
-// 그룹 추가 버튼 클릭 시
-confirmAddBtn.addEventListener("click", () => {
-  const groupName = groupInput.value.trim();
-  if (groupName === "") return; // 빈 값 방지
-
-  // 새로운 그룹 박스 생성
-  const groupBox = document.createElement("div");
-  groupBox.classList.add("group-box");
-  groupBox.textContent = groupName;
-
-  // 색상 순서대로 적용
-  groupBox.style.background = colors[colorIndex];
-  groupBox.style.color = "white"; // 글자색 흰색 유지
-
-  // 다음 색상으로 변경 (배열을 순환하도록 설정)
-  colorIndex = (colorIndex + 1) % colors.length;
-
-  // 그룹을 추가하고 버튼을 오른쪽으로 밀어냄
-  groupContainer.insertBefore(groupBox, addGroupBtn);
-
-  // 입력창 위치 업데이트
-  updatePopupPosition();
-
-  // 입력창 초기화 및 숨김
-  groupInput.value = "";
-  popup.style.display = "none"; // ✅ 추가 후 입력창 자동 숨김
-});
 
 // 입력창 위치 업데이트 함수
 function updatePopupPosition() {
