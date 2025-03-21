@@ -71,13 +71,11 @@ public class UserController {
 
         if (!user.getPassword().equals(password)) {
             model.addAttribute("loginError", "비밀번호가 틀렸습니다.");
-            return "home"; // 메인페이지에서 메시지 보여주기
+            return "home"; 
         }
-
         session.setAttribute("loginUser", user);
-        return "redirect:/";  // 로그인 성공 → 레벨 테스트 페이지로 이동
+        return "redirect:/";  
     }
-
 
 
     @PostMapping("/logout")
@@ -85,6 +83,7 @@ public class UserController {
         session.invalidate(); // 세션 날리기
         return "redirect:/"; // 홈으로 이동
     }
+
 
 
 }
