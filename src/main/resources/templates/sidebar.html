@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<div th:fragment="sidebarFragment">
+<!-- ======= Sidebar ======= -->
+<aside id="sidebar" class="sidebar">
+
+  <ul class="sidebar-nav" id="sidebar-nav">
+  
+      <li class="nav-item">
+      <a class="nav-link collapsed" href="/leveltest/level">
+        <i class="bi bi-book"></i>
+        <span>회독</span>
+      </a>
+    </li><!-- End Contact Page Nav -->
+    
+        <li class="nav-item">
+      <a class="nav-link collapsed" href="/leveltest/level">
+        <i class="bi bi-layout-text-window-reverse"></i>
+        <span>레벨테스트</span>
+      </a>
+    </li><!-- End Contact Page Nav -->
+
+
+ <li class="nav-item">
+  <a class="nav-link " data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
+    <i class="bi bi-menu-button-wide"></i><span>게시판</span><i class="bi bi-chevron-down ms-auto"></i>
+  </a>
+<ul id="components-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+
+  <li>
+    <a th:href="@{/posts/list(category='FREE')}" class="active">
+      <i class="bi bi-circle"></i><span>자유게시판</span>
+    </a>
+  </li>
+  <li>
+    <a th:href="@{/posts/list(category='QUESTION')}">
+      <i class="bi bi-circle"></i><span>질문게시판</span>
+    </a>
+  </li>
+  <li>
+    <a th:href="@{/posts/list(category='DATA')}">
+      <i class="bi bi-circle"></i><span>자료게시판</span>
+    </a>
+  </li>
+
+</ul>
+
+</li><!-- End Components Nav -->
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/leveltest/level">
+        <i class="bi bi-mic"></i>
+        <span>회화연습</span>
+      </a>
+    </li><!-- End Contact Page Nav -->
+    
+        <li class="nav-item">
+      <a class="nav-link collapsed" href="/game">
+        <i class="bi bi-controller"></i>
+        <span>단어게임</span>
+      </a>
+    </li><!-- End Contact Page Nav -->
+    
+        <li class="nav-item">
+      <a class="nav-link collapsed" href="/calendar/mypage">
+        <i class="bi bi-person"></i>
+        <span>마이페이지</span>
+      </a>
+    </li><!-- End Contact Page Nav -->
+
+  </ul>
+
+</aside><!-- End Sidebar-->
+
+</body>
+</html>

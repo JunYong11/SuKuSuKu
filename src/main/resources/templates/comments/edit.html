@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>댓글 수정</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f1f3f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .edit-container {
+            width: 400px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #4c6ef5;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ced4da;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 10px 0;
+            border-radius: 20px;
+            border: none;
+            background-color: #5c7cfa;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: #4c6ef5;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #868e96;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="edit-container">
+    <h2>댓글 수정하기</h2>
+
+    <form th:action="@{'/comments/edit/' + ${comment.id}}" method="post">
+        <textarea name="content" th:text="${comment.content}" required></textarea>
+        <button type="submit" class="btn">수정 완료</button>
+    </form>
+
+    <a th:href="@{'/posts/view/' + ${comment.post.id}}" class="back-link">← 돌아가기</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title th:text="${categoryName}">게시판</title>
+
+    <!-- 공통 CSS -->
+    <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/assets/css/style.css" rel="stylesheet">
+
+    <style>
+        .main {
+            margin-left: 250px; /* 사이드바 너비 */
+            padding: 20px;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .pagetitle {
+            margin-bottom: 20px;
+        }
+
+        .section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .table th {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Header -->
+<div th:replace="~{header.html}"></div>
+
+<!-- Sidebar -->
+<div th:replace="~{sidebar.html}"></div>
+
+<!-- Main Content -->
+<main id="main" class="main">
+
+    <!-- 페이지 타이틀 -->
+    <div class="pagetitle">
+        <h1 th:text="${categoryName}">게시판</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">홈</a></li>
+                <li class="breadcrumb-item active" th:text="${categoryName}">게시판</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- 게시글 기능 섹션 -->
+    <section class="section">
+        <div class="actions mb-3">
+        
+<div class="actions mb-3 d-flex justify-content-between align-items-center">
+<!-- 왼쪽: 게시판 선택 + 정렬 (라벨과 셀렉트 한 줄로 나열) -->
+    <div class="d-flex align-items-center gap-4">
+
+        <!-- 게시판 선택 -->
+        <div class="d-flex align-items-center">
+            <select id="category" class="form-select form-select-sm" onchange="moveToCategory()">
+                <option value="FREE" th:selected="${category.toString()} == 'FREE'">자유게시판</option>
+                <option value="QUESTION" th:selected="${category.toString()} == 'QUESTION'">질문게시판</option>
+                <option value="DATA" th:selected="${category.toString()} == 'DATA'">자료게시판</option>
+            </select>
+        </div>
+
+        <!-- 정렬 -->
+        <div class="d-flex align-items-center">
+            <select id="sort" class="form-select form-select-sm" onchange="changeSort()">
+                <option value="recent" th:selected="${sort == 'recent'}">최신순</option>
+                <option value="oldest" th:selected="${sort == 'oldest'}">오래된순</option>
+                <option value="views" th:selected="${sort == 'views'}">조회수순</option>
+            </select>
+        </div>
+
+    </div>
+    </div>
+            <a th:href="@{/posts/create}" class="btn btn-primary">글쓰기</a>
+        </div>
+
+        <!-- 게시글 목록 테이블 -->
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>조회수</th>
+                    <th>작성일</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="post : ${posts}">
+                    <td th:text="${post.id}"></td>
+                    <td>
+                        <a th:href="@{'/posts/view/' + ${post.id}}" th:text="${post.title}">제목</a>
+                    </td>
+                    <td th:text="${post.author}"></td>
+                    <td th:text="${post.views}"></td>
+                    <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+<div class="pagination mt-3" th:if="${navi.totalPageCount > 0}">
+    <a th:href="@{/posts/list(category=${category}, page=${navi.startPageGroup - 1}, sort=${sort})}"
+       th:if="${navi.startPageGroup > 0}"
+       class="btn btn-outline-secondary btn-sm">이전</a>
+
+    <span th:each="i : ${#numbers.sequence(navi.startPageGroup, navi.endPageGroup)}">
+        <a th:href="@{/posts/list(category=${category}, page=${i}, sort=${sort})}"
+           th:text="${i + 1}"
+           th:classappend="${i == navi.currentPage} ? 'btn btn-primary btn-sm ms-1' : 'btn btn-outline-secondary btn-sm ms-1'">
+        </a>
+    </span>
+
+    <a th:href="@{/posts/list(category=${category}, page=${navi.endPageGroup + 1}, sort=${sort})}"
+       th:if="${navi.endPageGroup < navi.totalPageCount - 1}"
+       class="btn btn-outline-secondary btn-sm">다음</a>
+</div>
+
+</main>
+
+<!-- Footer -->
+<div th:replace="~{footer.html}"></div>
+
+<!-- Vendor JS -->
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/main.js"></script>
+
+<!-- 페이지 기능 스크립트 -->
+<script>
+function moveToCategory() {
+    const category = document.getElementById('category').value;
+    const sort = document.getElementById('sort').value; // 정렬 유지!
+    window.location.href = `/posts/list?category=${category}&sort=${sort}`;
+}
+
+function changeSort() {
+    const sort = document.getElementById('sort').value;
+    const category = document.getElementById('category').value; // 현재 선택된 카테고리!
+    window.location.href = `/posts/list?category=${category}&sort=${sort}`;
+}
+
+</script>
+
+</body>
+</html>

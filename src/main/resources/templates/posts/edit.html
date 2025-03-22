@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 수정</title>
+</head>
+<body>
+
+<h2>게시글 수정</h2>
+
+<form th:action="@{'/posts/' + ${post.id} + '/edit'}" method="post" enctype="multipart/form-data">
+
+    <!-- 카테고리 선택 -->
+    <label for="category">카테고리:</label>
+    <select id="category" name="category">
+        <option value="FREE" th:selected="${post.category == 'FREE'}">자유 게시판</option>
+        <option value="QUESTION" th:selected="${post.category == 'QUESTION'}">질문 게시판</option>
+        <option value="DATA" th:selected="${post.category == 'DATA'}">자료 게시판</option>
+    </select>
+    <br><br>
+
+    <!-- 제목 입력 -->
+    <label for="title">제목:</label>
+    <input type="text" id="title" name="title" th:value="${post.title}" required />
+    <br><br>
+
+    <!-- 내용 입력 -->
+    <label for="content">내용:</label><br>
+    <textarea id="content" name="content" rows="10" cols="50" required
+              th:text="${post.content}"></textarea>
+    <br><br>
+
+    <!-- 첨부 파일 -->
+    <label for="files">첨부파일:</label>
+    <input type="file" id="files" name="files" multiple />
+    <br><br>
+
+    <!-- 비밀글 체크 -->
+    <label for="secret">비밀글:</label>
+    <input type="checkbox" id="secret" name="secret" th:checked="${post.secret}" />
+    <br><br>
+
+    <!-- 제출 버튼 -->
+    <button type="submit">수정 완료</button>
+
+</form>
+
+</body>
+</html>
