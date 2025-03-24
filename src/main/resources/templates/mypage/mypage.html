@@ -172,20 +172,16 @@
 
 							<!-- 그룹 추가되는 부분 -->
 							<div class="group-container" id="groupContainer">
-								<button id="addGroupBtn"
-									style="border: none; background: none; font-size: 22px; cursor: pointer;">+</button>
+								<button id="addGroupBtn" style="border: none; background: none; font-size: 22px; cursor: pointer;">+</button>
 							</div>
 
 							<!-- 입력창 (초기에는 숨김) -->
-							<div id="popup" class="popup">
-								<input type="text" id="groupInput" placeholder="그룹명을 입력하세요" />
-								<button id="confirmAddBtn">추가</button>
-							</div>
-
-							<div id="extra-widget">
-								<p>여기에 새로운 기능을 추가하세요.</p>
-
-							</div>
+							<form action="api/project" method="post" enctype="multipart/form-data">
+								<div id="popup" class="popup">
+									<input type="text" id="groupInput" name="projectName" placeholder="그룹명을 입력하세요" />
+									<button id="confirmAddBtn" type="submit">추가</button>
+								</div>
+							</form>			
 						</div>
 					</div>
 					<div class="card">
@@ -201,7 +197,7 @@
 
 const addGroupBtn = document.getElementById("addGroupBtn");
 const popup = document.getElementById("popup");
-const confirmAddBtn = document.getElementById("confirmAddBtn");
+
 const groupInput = document.getElementById("groupInput");
 const groupContainer = document.getElementById("groupContainer");
 
@@ -223,33 +219,6 @@ addGroupBtn.addEventListener("click", (event) => {
   event.stopPropagation(); // 이 클릭 이벤트가 부모로 전파되지 않도록 막기
 });
 
-// 그룹 추가 버튼 클릭 시
-confirmAddBtn.addEventListener("click", () => {
-  const groupName = groupInput.value.trim();
-  if (groupName === "") return; // 빈 값 방지
-
-  // 새로운 그룹 박스 생성
-  const groupBox = document.createElement("div");
-  groupBox.classList.add("group-box");
-  groupBox.textContent = groupName;
-
-  // 색상 순서대로 적용
-  groupBox.style.background = colors[colorIndex];
-  groupBox.style.color = "white"; // 글자색 흰색 유지
-
-  // 다음 색상으로 변경 (배열을 순환하도록 설정)
-  colorIndex = (colorIndex + 1) % colors.length;
-
-  // 그룹을 추가하고 버튼을 오른쪽으로 밀어냄
-  groupContainer.insertBefore(groupBox, addGroupBtn);
-
-  // 입력창 위치 업데이트
-  updatePopupPosition();
-
-  // 입력창 초기화 및 숨김
-  groupInput.value = "";
-  popup.style.display = "none"; // ✅ 추가 후 입력창 자동 숨김
-});
 
 // 입력창 위치 업데이트 함수
 function updatePopupPosition() {

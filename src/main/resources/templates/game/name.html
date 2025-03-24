@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>너의 이름은 - 한자 게임</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Nunito|Poppins" rel="stylesheet">
+  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
+  <link href="/assets/css/style.css" rel="stylesheet" />
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; background-color: #0b0c1c; color: #fff; overflow-x: hidden; }
+
+    #introScreen, #gameScreen {
+      display: none;
+      width: 100%;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-image: url('/assets/img/nameback.webp');
+      background-size: cover;
+      background-position: center;
+    }
+
+    #introScreen.active, #gameScreen.active { display: flex; }
+
+    #introScreen h1 {
+      font-size: 9rem;
+      color: #ffffff;
+      margin-bottom: 60px;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+      opacity: 0;
+      transform: translateY(-50px);
+      animation: slideDown 1.2s ease-out forwards;
+    }
+
+    @keyframes slideDown {
+      0% { opacity: 0; transform: translateY(-50px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .level-buttons { display: flex; gap: 20px; }
+    .level-buttons button {
+      padding: 15px 30px; font-size: 1.2rem; color: #fff;
+      background: linear-gradient(145deg, #d8b4fe, #fbcfe8);
+      border: none; border-radius: 30px; cursor: pointer;
+      box-shadow: 0 5px 15px rgba(255, 192, 203, 0.4); transition: 0.3s;
+    }
+
+    .level-buttons button:hover {
+      background: linear-gradient(145deg, #fbcfe8, #d8b4fe);
+      box-shadow: 0 5px 20px rgba(255, 192, 203, 0.6);
+    }
+
+    #gameScreen h1 { font-size: 2.5rem; color: #ffffff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.8); margin-bottom: 20px; }
+
+    .top-controls {
+      display: flex; justify-content: center; align-items: center;
+      gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+
+    .check-controls button {
+      padding: 10px 20px; font-size: 14px; color: #fff;
+      background: linear-gradient(145deg, #FF6F61, #DE4463);
+      border: none; border-radius: 8px; cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 99, 71, 0.6);
+    }
+
+    .check-controls button:hover {
+      background: linear-gradient(145deg, #DE4463, #FF6F61);
+    }
+
+    #gameInfo { font-size: 16px; }
+
+    #puzzleContainer {
+      position: relative; width: 400px; height: 400px; margin-bottom: 20px;
+    }
+
+    #backgroundImage {
+      width: 100%; height: 100%; object-fit: cover;
+      position: absolute; top: 0; left: 0; z-index: 0;
+    }
+
+    #puzzleCanvas {
+      position: absolute; top: 0; left: 0; z-index: 1;
+      width: 100%; height: 100%; border-radius: 10px;
+    }
+
+    .input-controls {
+      display: flex; gap: 10px; margin-top: 10px;
+    }
+
+    .input-controls input {
+      padding: 10px; width: 200px; border-radius: 8px;
+      background: rgba(255, 255, 255, 0.95); color: #6B0F1A;
+      border: 1px solid #E0BBE4;
+    }
+
+    .input-controls button {
+      padding: 10px 20px; background: linear-gradient(145deg, #FBCFE8, #E0BBE4);
+      color: #6B0F1A; border-radius: 8px; border: none;
+    }
+
+    #resultModal {
+      display: none; position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%); background: #333; padding: 30px;
+      color: #fff; z-index: 1000; border-radius: 10px;
+    }
+
+    /* 툴팁 스타일 */
+    #tooltip {
+      display: none; position: absolute; background: rgba(0, 0, 0, 0.8);
+      color: #fff; padding: 6px 10px; border-radius: 5px;
+      font-size: 14px; pointer-events: none; z-index: 2000;
+    }
+    
+  </style>
+</head>
+
+<body>
+  <div th:replace="~{header.html}"></div>
+  <div th:replace="~{sidebar.html}"></div>
+
+  <div id="introScreen" class="active">
+    <h1>君の名は</h1>
+    <div class="level-buttons">
+      <button onclick="startGameFromIntro(4)">초급 (4x4)</button>
+      <button onclick="startGameFromIntro(6)">중급 (6x6)</button>
+      <button onclick="startGameFromIntro(8)">고급 (8x8)</button>
+    </div>
+  </div>
+
+  <div id="gameScreen">
+    <div class="top-controls">
+      <div class="check-controls">
+        <div id="gameInfo">남은 기회: 3</div>
+        <button onclick="tryFinalAnswer()">정답 맞히기</button>
+      </div>
+    </div>
+
+    <div id="puzzleContainer">
+      <img id="backgroundImage" src="/assets/img/background1.jpg" alt="퍼즐 이미지">
+      <canvas id="puzzleCanvas" width="400" height="400"></canvas>
+    </div>
+
+    <div class="input-controls">
+      <input type="text" id="userInput" placeholder="한자음을 입력해주세요" onkeyup="handleKey(event)">
+      <button onclick="submitAnswer()">입력하기</button>
+    </div>
+
+    <div id="resultModal">
+      <p id="resultText">결과 표시</p>
+      <button onclick="restartGame()">다시하기</button>
+    </div>
+
+    <!-- 툴팁 요소 -->
+    <div id="tooltip"></div>
+  </div>
+
+  <script>
+    let gridSize = 4;
+    let remainingChances = 3;
+    let answer = "호랑이";
+    let isGameOver = false;
+
+    let kanjiList = [];
+    const canvas = document.getElementById('puzzleCanvas');
+    const ctx = canvas.getContext('2d');
+
+    async function startGameFromIntro(size) {
+      document.getElementById('introScreen').classList.remove('active');
+      document.getElementById('gameScreen').classList.add('active');
+      await startGame(size);
+    }
+
+    const imageDataList = [
+      { img: "name1.jpg", answer: "짱구" },
+      { img: "name2.jpg", answer: "탄지로" },
+      { img: "name3.jpg", answer: "네즈코" },
+      { img: "name4.jpg", answer: "아냐" },
+      { img: "name5.jpg", answer: "뚱이" },
+      { img: "name6.jpg", answer: "사토루" },
+      { img: "name7.jpg", answer: "카카시" },
+      { img: "name8.jpg", answer: "토토로" },
+      { img: "name9.jpg", answer: "동동이" },
+      { img: "name10.jpg", answer: "나루토" }
+    ];
+
+    async function startGame(size) {
+      gridSize = size;
+      remainingChances = 3;
+      isGameOver = false;
+
+      document.getElementById('resultModal').style.display = 'none';
+      document.getElementById('gameInfo').innerText = `남은 기회: ${remainingChances}`;
+
+      const randomIndex = Math.floor(Math.random() * imageDataList.length);
+      const selectedImage = imageDataList[randomIndex];
+      document.getElementById('backgroundImage').src = `/assets/img/namegame/${selectedImage.img}`;
+      answer = selectedImage.answer;
+
+      await fetchKanjiData(gridSize);
+      initPuzzle();
+    }
+
+    async function fetchKanjiData(size) {
+      let level = size === 4 ? 1 : size === 6 ? 2 : 3;
+
+      try {
+        const response = await fetch(`/api/name/puzzle?level=${level}`);
+        const data = await response.json();
+
+        kanjiList = data.map(item => ({
+          kanji: item.kanji,
+          answer: item.answer,
+          meaning: item.meaning,
+          visible: true
+        }));
+      } catch (error) {
+        console.error("한자 불러오기 실패", error);
+      }
+    }
+
+    function initPuzzle() {
+      const blockSize = canvas.width / gridSize;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      kanjiList.forEach((block, index) => {
+        block.row = Math.floor(index / gridSize);
+        block.col = index % gridSize;
+      });
+
+      redrawBlocks();
+    }
+
+    function redrawBlocks() {
+      const blockSize = canvas.width / gridSize;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      kanjiList.forEach(block => {
+        if (block.visible) {
+          ctx.fillStyle = '#FFF1F1';
+          ctx.fillRect(block.col * blockSize, block.row * blockSize, blockSize, blockSize);
+
+          ctx.strokeStyle = '#E0BBE4';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(block.col * blockSize, block.row * blockSize, blockSize, blockSize);
+
+          ctx.fillStyle = '#6B0F1A';
+          ctx.font = `${blockSize / 2}px Poppins`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(block.kanji, block.col * blockSize + blockSize / 2, block.row * blockSize + blockSize / 2);
+        }
+      });
+    }
+
+    function submitAnswer() {
+      if (isGameOver) return;
+
+      const userInput = document.getElementById('userInput').value.trim();
+      let anyBlockRemoved = false;
+
+      kanjiList.forEach(block => {
+        if (block.answer === userInput && block.visible) {
+          block.visible = false;
+          anyBlockRemoved = true;
+        }
+      });
+
+      if (anyBlockRemoved) {
+        redrawBlocks();
+        const remainingBlocks = kanjiList.filter(b => b.visible).length;
+        if (remainingBlocks === 0) {
+          revealFullImage();
+        }
+      } 
+      document.getElementById('userInput').value = '';
+    }
+
+    function tryFinalAnswer() {
+      if (isGameOver) return;
+
+      const finalAnswer = prompt("너의 이름은?");
+
+      if (finalAnswer === null || finalAnswer.trim() === "") {
+        return;
+      }
+
+      if (finalAnswer === answer) {
+        showResult("정답입니다! 축하합니다!");
+        revealFullImage();
+      } else {
+        remainingChances--;
+        if (remainingChances > 0) {
+          alert(`틀렸습니다! 남은 기회 ${remainingChances}번`);
+          document.getElementById('gameInfo').innerText = `남은 기회: ${remainingChances}`;
+        } else {
+          showResult(`실패! 정답은 "${answer}"입니다.`);
+          revealFullImage();
+        }
+      }
+    }
+
+    function showResult(msg) {
+      isGameOver = true;
+      document.getElementById('resultText').innerText = msg;
+      document.getElementById('resultModal').style.display = 'block';
+    }
+
+    function revealFullImage() {
+      kanjiList.forEach(block => block.visible = false);
+      redrawBlocks();
+    }
+
+    function restartGame() {
+      document.getElementById('resultModal').style.display = 'none';
+      document.getElementById('gameScreen').classList.remove('active');
+      document.getElementById('introScreen').classList.add('active');
+    }
+
+    function handleKey(event) {
+      if (event.key === 'Enter') {
+        submitAnswer();
+      }
+    }
+
+    canvas.addEventListener('mousemove', showKanjiMeaningTooltip);
+    canvas.addEventListener('mouseout', hideTooltip);
+
+    function showKanjiMeaningTooltip(event) {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+      const blockSize = canvas.width / gridSize;
+
+      const hoveredBlock = kanjiList.find(block => {
+        return block.visible &&
+          mouseX >= block.col * blockSize &&
+          mouseX < (block.col + 1) * blockSize &&
+          mouseY >= block.row * blockSize &&
+          mouseY < (block.row + 1) * blockSize;
+      });
+
+      if (hoveredBlock) {
+        showTooltip(hoveredBlock.meaning, event.pageX, event.pageY);
+      } else {
+        hideTooltip();
+      }
+    }
+
+    function showTooltip(text, x, y) {
+      const tooltip = document.getElementById('tooltip');
+      tooltip.style.left = (x + 10) + 'px';
+      tooltip.style.top = (y + 10) + 'px';
+      tooltip.innerText = text;
+      tooltip.style.display = 'block';
+    }
+
+    function hideTooltip() {
+      const tooltip = document.getElementById('tooltip');
+      tooltip.style.display = 'none';
+    }
+
+    window.onload = () => {
+      document.getElementById('introScreen').classList.add('active');
+    };
+  </script>
+
+  <script src="/assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="/assets/vendor/echarts/echarts.min.js"></script>
+  <script src="/assets/vendor/quill/quill.js"></script>
+  <script src="/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="/assets/vendor/php-email-form/validate.js"></script>
+  <script src="/assets/js/main.js"></script>
+</body>
+</html>

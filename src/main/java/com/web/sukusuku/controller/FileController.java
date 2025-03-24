@@ -4,15 +4,20 @@ import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.nio.charset.StandardCharsets;
 import java.net.URI;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.web.sukusuku.model.Post;
 import com.web.sukusuku.model.UploadFile;
+import com.web.sukusuku.repository.PostRepository;
 import com.web.sukusuku.service.FileService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,66 +28,73 @@ import lombok.RequiredArgsConstructor;
 public class FileController {
 
     private final FileService fileService;
+    private final PostRepository postRepository;
 
+    @PostMapping("/upload")
+    public String uploadFile(@RequestParam("file") MultipartFile file,
+                             @RequestParam("postId") Long postId) throws IOException {
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("게시글 없음!"));
+
+        fileService.saveFile(file, post);
+
+        return "redirect:/posts/view/" + postId;
+    }
+
+    @GetMapping("/list/{postId}")
+    public String fileList(@PathVariable Long postId, Model model) {
+        List<UploadFile> files = fileService.getFilesByPost(postId);
+        model.addAttribute("files", files);
+        return "posts/fileList"; // → templates/posts/fileList.html
+    }
+    
     @GetMapping("/download/{fileId}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) throws IOException {
+    public ResponseEntity<Resource> download(@PathVariable Long fileId) throws IOException {
+        UploadFile file = fileService.getFile(fileId);
+        UrlResource resource = new UrlResource("file:" + file.getFilePath());
 
-        UploadFile file = fileService.getFileById(fileId);
+        String encodedFileName = java.net.URLEncoder.encode(file.getOriginalFileName(), "UTF-8");
 
-        // 파일 경로 확인!
-        System.out.println("file.getFilePath() = " + file.getFilePath());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
+                .body(resource);
+    }
+    
+    @GetMapping("/{fileId}")
+    public ResponseEntity<Resource> viewImage(@PathVariable Long fileId) throws MalformedURLException {
+
+        UploadFile file = fileService.getFile(fileId);
+
+        if (file == null) {
+            throw new RuntimeException("파일이 존재하지 않습니다!");
+        }
 
         Path path = Paths.get(file.getFilePath());
 
-        try {
-            Resource resource = new UrlResource(path.toUri());
+        Resource resource = new UrlResource(path.toUri());
 
-            if (!resource.exists() || !resource.isReadable()) {
-                throw new RuntimeException("파일이 존재하지 않거나 읽을 수 없습니다!");
-            }
-
-            String encodedFilename = URLEncoder.encode(file.getOriginalFileName(), StandardCharsets.UTF_8);
-
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFilename + "\"")
-                    .body(resource);
-
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("잘못된 파일 경로입니다.", e);
+        if (!resource.exists() || !resource.isReadable()) {
+            throw new RuntimeException("이미지를 찾을 수 없거나 읽을 수 없습니다!");
         }
+
+        String contentType = "image/jpeg"; // 기본값
+        String filename = file.getOriginalFileName().toLowerCase();
+
+        if (filename.endsWith(".png")) {
+            contentType = "image/png";
+        } else if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) {
+            contentType = "image/jpeg";
+        } else if (filename.endsWith(".gif")) {
+            contentType = "image/gif";
+        }
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, contentType)
+                .body(resource);
     }
 
-//    @GetMapping("/download/{fileId}")
-//    public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) throws IOException {
-//
-//        UploadFile file = fileService.getFileById(fileId);
-//
-//        // 절대경로 확인 (디버깅)
-//        String filePath = file.getFilePath();
-//        System.out.println("file.getFilePath() = " + filePath);
-//
-//        // 절대경로일 것!
-//        Path path = Paths.get(filePath);
-//
-//        // path가 어떤 타입인지 확인
-//        System.out.println("Path 객체 타입 = " + path.getClass());
-//
-//        try {
-//            Resource resource = new UrlResource(path.toUri());
-//
-//            if (!resource.exists() || !resource.isReadable()) {
-//                throw new RuntimeException("파일이 존재하지 않거나 읽을 수 없습니다!");
-//            }
-//
-//            String encodedFilename = URLEncoder.encode(file.getOriginalFileName(), StandardCharsets.UTF_8);
-//
-//            return ResponseEntity.ok()
-//                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFilename + "\"")
-//                    .body(resource);
-//
-//        } catch (MalformedURLException e) {
-//            throw new RuntimeException("잘못된 파일 경로입니다.", e);
-//        }
-//    }
+
 }
+
 

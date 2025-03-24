@@ -3,116 +3,112 @@ package com.web.sukusuku.controller;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import com.web.sukusuku.dto.CommentCreateDto;
-import com.web.sukusuku.dto.CommentResponseDto;
-import com.web.sukusuku.dto.CommentUpdateDto;
 import com.web.sukusuku.model.Comment;
 import com.web.sukusuku.model.User;
 import com.web.sukusuku.service.CommentService;
 
 import jakarta.servlet.http.HttpSession;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
-@RequestMapping("/posts/{postId}/comments")
+@RequestMapping("/comments")
 public class CommentController {
 
     private final CommentService commentService;
 
-    //댓글 리스트 조회
-    @GetMapping
-    public ResponseEntity<List<Comment>> getComments(@PathVariable Long postId) {
-        List<Comment> comments = commentService.getCommentsByPostId(postId);
-        return ResponseEntity.ok(comments);
+    // 댓글 생성
+    @PostMapping("/create")
+    public String createComment(@RequestParam Long postId,
+                                @RequestParam String content,
+                                HttpSession session) {
+
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/users/login";
+        }
+
+        commentService.createComment(postId, content, loginUser.getUsername());
+        return "redirect:/posts/view/" + postId;
     }
 
-    // 댓글생성
-    @PostMapping
-    public ResponseEntity<CommentResponseDto> createComment(
-    		@PathVariable Long postId,
-    		@RequestBody CommentCreateDto dto,
-    		HttpSession session) {
-        
-        // 테스트용 임시 로그인 유저 추가 (나중에 삭제하고 실제 로그인으로)
-        User tempUser = new User();
-        tempUser.setUsername("테스트유저");
-        session.setAttribute("loginUser", tempUser);
+    // 대댓글 생성
+    @PostMapping("/reply")
+    public String createReply(@RequestParam Long postId,
+                              @RequestParam Long parentId,
+                              @RequestParam String content,
+                              HttpSession session) {
+
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/users/login";
+        }
+
+        commentService.createReply(postId, parentId, content, loginUser.getUsername());
+        return "redirect:/posts/view/" + postId;
+    }
+
+    // 댓글 수정 폼 이동
+    @GetMapping("/edit/{id}")
+    public String editCommentForm(@PathVariable Long id, Model model, HttpSession session) {
+        User loginUser = (User) session.getAttribute("loginUser");
+
+        Comment comment = commentService.getCommentById(id);
+        if (!comment.getAuthor().equals(loginUser.getUsername())) {
+            return "redirect:/posts/list"; // 권한 없음
+        }
+
+        model.addAttribute("comment", comment);
+        return "comments/edit"; // 수정 페이지로 이동
+    }
+
+    // 댓글 수정 처리
+    @PostMapping("/edit/{id}")
+    public String updateComment(@PathVariable Long id,
+                                @RequestParam String content,
+                                HttpSession session) {
+        User loginUser = (User) session.getAttribute("loginUser");
+
+        Comment comment = commentService.getCommentById(id);
+        if (comment == null) {
+            return "redirect:/posts/list?error=commentNotFound";
+        }
+
+        // 권한 확인
+        if (!comment.getAuthor().equals(loginUser.getUsername())) {
+            return "redirect:/posts/list?error=permissionDenied";
+        }
+
+        commentService.updateComment(id, content, loginUser.getUsername());
+
+        // 해당 게시글 상세보기로 이동
+        return "redirect:/posts/view/" + comment.getPost().getId();
+    }
+
+    // 댓글 삭제 처리
+    @PostMapping("/delete/{id}")
+    public String deleteComment(@PathVariable Long id, HttpSession session) {
 
         User loginUser = (User) session.getAttribute("loginUser");
 
         if (loginUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return "redirect:/users/login";  // 로그인 안 돼있으면 튕기기
         }
 
-        // username, postId 주입!
-        dto.setPostId(postId);
-        dto.setUsername(loginUser.getUsername());
-        
-    	Comment comment = commentService.saveComment(dto);
-        CommentResponseDto response = new CommentResponseDto(
-                comment.getCommentId(),
-                comment.getContent(),
-                comment.getUsername(),
-                comment.getPostId(),
-                comment.getCreatedAt()
-        );
-        return ResponseEntity.ok(response);
-    }
-
-    // 댓글 삭제
-    @DeleteMapping("/{commentId}")
-    public ResponseEntity<?> deleteComment(
-    		@PathVariable Long commentId,
-    		@PathVariable Long postId,
-    		HttpSession session) {
-
-        // 임시 로그인 유저
-        User tempUser = new User();
-        tempUser.setUsername("테스트유저");
-        session.setAttribute("loginUser", tempUser);
-
-//        User loginUser = (User) session.getAttribute("loginUser");
-//
-//        if (loginUser == null) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다!");
-//        }
-//
-//        commentService.deleteCommentByUser(commentId, loginUser.getUsername());
-        commentService.deleteCommentByUser(commentId, tempUser.getUsername());
-
-        return ResponseEntity.ok("댓글 삭제 완료!");
-    }
-    // 댓글 업데이트
-    @PutMapping("/{commentId}")
-    public ResponseEntity<?> updateComment(
-    		@PathVariable Long commentId,
-    		@PathVariable Long postId,
-    		@RequestBody CommentUpdateDto dto,                               
-    		HttpSession session) {
-
-    	// 로그인 유저 확인
-        User loginUser = (User) session.getAttribute("loginUser");
-
-        if (loginUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요!");
+        Comment comment = commentService.getCommentById(id);
+        if (comment == null) {
+            return "redirect:/posts/list?error=commentNotFound";
         }
 
-        // 수정 후 댓글 다시 조회
-        Comment updatedComment = commentService.updateComment(commentId, dto, loginUser.getUsername());
-        // DTO로 변환해서 응답
-        CommentResponseDto response = new CommentResponseDto(
-                updatedComment.getCommentId(),
-                updatedComment.getContent(),
-                updatedComment.getUsername(),
-                updatedComment.getPostId(),
-                updatedComment.getUpdatedAt() // 업데이트된 시간 반환
-        );
-        return ResponseEntity.ok(response);
-    }
+        if (!comment.getAuthor().equals(loginUser.getUsername())) {
+            return "redirect:/posts/list?error=permissionDenied";
+        }
 
-    
+        commentService.deleteComment(id);
+
+        return "redirect:/posts/view/" + comment.getPost().getId();
+    }
 }

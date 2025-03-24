@@ -14,10 +14,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.web.sukusuku.dto.PostCreateDto;
 import com.web.sukusuku.dto.PostUpdateDto;
 import com.web.sukusuku.model.Category;
 import com.web.sukusuku.model.Post;
 import com.web.sukusuku.model.UploadFile;
+import com.web.sukusuku.model.User;
 import com.web.sukusuku.repository.PostRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -40,56 +42,71 @@ public class PostServiceImpl implements PostService {
 
         return postRepository.findByCategory(category, pageable);
     }
-
+    	
     private Sort getSort(String sort) {
-        return switch (sort) {
-            case "old" -> Sort.by("createdAt").ascending();
-            case "popular" -> Sort.by("views").descending();
-            default -> Sort.by("createdAt").descending();
-        };
+        if (sort == null) sort = "recent"; // 기본값 세팅
+
+        switch (sort.toLowerCase()) {
+            case "views":
+                return Sort.by(Sort.Direction.DESC, "views");
+            case "oldest":
+                return Sort.by(Sort.Direction.ASC, "createdAt");
+            case "recent":
+            default:
+                return Sort.by(Sort.Direction.DESC, "createdAt");
+        }
     }
 
-    @Override
-    public Post savePost(Post post, List<MultipartFile> files) throws IOException {
 
+
+    @Override
+    @Transactional
+    public Post savePost(Post post, List<MultipartFile> files) throws IOException {
 
         List<UploadFile> uploadFiles = new ArrayList<>();
 
         for (MultipartFile file : files) {
             if (!file.isEmpty()) {
-                UploadFile uploadFile = fileService.storeFile(file);
-                uploadFile.setPost(post); // 연관 관계 세팅
+                UploadFile uploadFile = fileService.saveFile(file, post);
+
+                if (uploadFile == null) {
+                    throw new RuntimeException("파일 업로드에 실패했습니다.");
+                }
+
+                uploadFile.setPost(post);
                 uploadFiles.add(uploadFile);
             }
         }
-
+        
         post.setFiles(uploadFiles);
+
         return postRepository.save(post);
     }
+
     
     @Override
     public Post readPost(Long postId) {
         System.out.println("읽어오는 postId: " + postId);
 
-        Post post = postRepository.findById(postId)
+        return postRepository.findById(postId)
             .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
-
-        post.setViews(post.getViews() + 1);
-        return postRepository.save(post);
     }
 
+
     @Override
+    @Transactional
     public void updatePost(Long postId, PostUpdateDto request) {
         Post post = postRepository.findById(postId)
-            .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
 
-        post.setCategory(request.getCategory());
         post.setTitle(request.getTitle());
         post.setContent(request.getContent());
+        post.setCategory(request.getCategory());
         post.setSecret(request.isSecret());
 
         postRepository.save(post);
     }
+
 
     @Override
     public void removePost(Long postId) {
@@ -120,5 +137,36 @@ public class PostServiceImpl implements PostService {
                 .build();
     }
 
+    @Override
+    @Transactional
+    public void increaseViews(Post post) {
+        post.setViews(post.getViews() + 1);
+        postRepository.save(post);
+    }
+    @Override
+    @Transactional
+    public void createPost(PostCreateDto postForm, List<MultipartFile> files, User user) throws IOException {
+    	 Post post = postForm.toEntity(user.getUsername());
+
+        // 첨부파일 처리
+        List<UploadFile> uploadFiles = new ArrayList<>();
+
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    UploadFile uploadFile = fileService.saveFile(file, post);
+                    uploadFile.setPost(post);  // 연관관계 주입
+                    uploadFiles.add(uploadFile);
+                }
+            }
+        }
+
+        post.setFiles(uploadFiles);
+
+        postRepository.save(post);
+    }
+
+
 
 }
+	

@@ -7,13 +7,19 @@ import com.web.sukusuku.dto.CommentUpdateDto;
 import com.web.sukusuku.model.Comment;
 
 public interface CommentService {
-    Comment saveComment(CommentCreateDto commentCreateDto);
-
-	void deleteCommentByUser(Long commentId, String username);
 
 	List<Comment> getCommentsByPostId(Long postId);
+
+	void createReply(Long postId, Long parentId, String content, String author);
+
+	void createComment(Long postId, String content, String author);
+
+	Comment getCommentById(Long id);
+
+	void deleteComment(Long id);
+
+	void updateComment(Long id, String content, String username);
 	
-	Comment updateComment(Long commentId, CommentUpdateDto dto, String username);
 
 
 }

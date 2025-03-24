@@ -1,47 +1,49 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>게시글 수정하기</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>게시글 수정</title>
 </head>
 <body>
 
-<div class="container my-5">
-    <h2>글 수정하기</h2>
+<h2>게시글 수정</h2>
 
-    <form action="/posts/{postId}/edit" method="post">
-        <input type="hidden" name="_method" value="put">
+<form th:action="@{'/posts/' + ${post.id} + '/edit'}" method="post" enctype="multipart/form-data">
 
-        <input type="hidden" name="postId" th:value="${post.id}">
+    <!-- 카테고리 선택 -->
+    <label for="category">카테고리:</label>
+    <select id="category" name="category">
+        <option value="FREE" th:selected="${post.category == 'FREE'}">자유 게시판</option>
+        <option value="QUESTION" th:selected="${post.category == 'QUESTION'}">질문 게시판</option>
+        <option value="DATA" th:selected="${post.category == 'DATA'}">자료 게시판</option>
+    </select>
+    <br><br>
 
-        <label>카테고리:
-            <select name="category">
-                <option value="자유" th:selected="${post.category.name() == '자유'}">자유게시판</option>
-                <option value="질문" th:selected="${post.category.name() == '질문'}">질문게시판</option>
-                <option value="자료" th:selected="${post.category.name() == '자료'}">자료게시판</option>
-            </select>
-        </label>
-        <br><br>
+    <!-- 제목 입력 -->
+    <label for="title">제목:</label>
+    <input type="text" id="title" name="title" th:value="${post.title}" required />
+    <br><br>
 
-        <label>제목:
-            <input type="text" name="title" th:value="${post.title}">
-        </label>
-        <br><br>
+    <!-- 내용 입력 -->
+    <label for="content">내용:</label><br>
+    <textarea id="content" name="content" rows="10" cols="50" required
+              th:text="${post.content}"></textarea>
+    <br><br>
 
-        <label>내용:
-            <textarea name="content" rows="10" cols="50" th:text="${post.content}"></textarea>
-        </label>
-        <br><br>
+    <!-- 첨부 파일 -->
+    <label for="files">첨부파일:</label>
+    <input type="file" id="files" name="files" multiple />
+    <br><br>
 
-        <label>비밀글:
-            <input type="checkbox" name="secret" th:checked="${post.secret}">
-        </label>
-        <br><br>
+    <!-- 비밀글 체크 -->
+    <label for="secret">비밀글:</label>
+    <input type="checkbox" id="secret" name="secret" th:checked="${post.secret}" />
+    <br><br>
 
-        <button type="submit" class="btn btn-primary">수정 완료</button>
-    </form>
-</div>
+    <!-- 제출 버튼 -->
+    <button type="submit">수정 완료</button>
+
+</form>
 
 </body>
 </html>

@@ -56,6 +56,6 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-tasks.withType(JavaCompile) {
-	options.compilerArgs << "-parameters"  // ✅ 이거 추가!
+tasks.withType(JavaCompile) {	
+	options.compilerArgs << "-parameters"
 }

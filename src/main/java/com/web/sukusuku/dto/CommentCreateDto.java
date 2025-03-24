@@ -3,6 +3,7 @@ package com.web.sukusuku.dto;
 import java.time.LocalDateTime;
 
 import com.web.sukusuku.model.Comment;
+import com.web.sukusuku.model.Post;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,11 +23,12 @@ public class CommentCreateDto {
     private String username;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    public Comment toEntity() {
+    public Comment toEntity(Post post) {
         return Comment.builder()
                 .content(this.content)
-                .postId(this.postId)
-                .username(this.username)
+                .post(post)  // ✅ Post 객체를 넘겨줘야 함
+                .author(this.username)
                 .build();
     }
+
 }

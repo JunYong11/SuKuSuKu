@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.web.sukusuku.dto.CommentCreateDto;
 import com.web.sukusuku.dto.CommentUpdateDto;
 import com.web.sukusuku.model.Comment;
+import com.web.sukusuku.model.Post;
 import com.web.sukusuku.repository.CommentRepository;
+import com.web.sukusuku.repository.PostRepository;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,50 +22,66 @@ import com.web.sukusuku.repository.CommentRepository;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
 
     @Override
-    public Comment saveComment(CommentCreateDto commentCreateDto) {
-        Comment comment = commentCreateDto.toEntity(); // DTO -> 엔티티 변환
-        commentRepository.save(comment); // DB에 저장
-        log.info("댓글 저장 완료! ID: {}", comment.getCommentId());
-		return comment;
+    public void createComment(Long postId, String content, String author) {
+        Post post = postRepository.findById(postId).orElseThrow();
+
+        Comment comment = Comment.builder()
+                .post(post)
+                .content(content)
+                .author(author)
+                .build();
+
+        commentRepository.save(comment);
     }
 
-	@Override
-	public void deleteCommentByUser(Long commentId, String username) {
-	    Comment comment = commentRepository.findById(commentId)
-	            .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
+    @Override
+    public void createReply(Long postId, Long parentId, String content, String author) {
+        Post post = postRepository.findById(postId).orElseThrow();
+        Comment parent = commentRepository.findById(parentId).orElseThrow();
 
-	        if (!comment.getUsername().equals(username)) {
-	            throw new RuntimeException("댓글 삭제 권한이 없습니다.");
-	        }
+        Comment reply = Comment.builder()
+                .post(post)
+                .parent(parent)
+                .content(content)
+                .author(author)
+                .build();
 
-	        commentRepository.delete(comment);
-	}
+        commentRepository.save(reply);
+    }
 
-	@Override
-	public List<Comment> getCommentsByPostId(Long postId) {
-		  return commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
-	}
+    @Override
+    public List<Comment> getCommentsByPostId(Long postId) {
+        return commentRepository.findByPostIdAndParentIsNull(postId);
+    }
 
-	// 수정과 저장만 담당
-	@Transactional
-	@Override
-	public Comment updateComment(Long commentId, CommentUpdateDto dto, String username) {
-	    Comment comment = commentRepository.findById(commentId)
-	        .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
+    @Override
+    @Transactional
+    public void deleteComment(Long id) {
+        commentRepository.deleteById(id);
+    }
+    @Override
+    @Transactional
+    public void updateComment(Long id, String content, String username) {
+        Comment comment = commentRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("댓글 없음"));
 
-	    // 작성자 검증
-	    if (!comment.getUsername().equals(username)) {
-	        throw new RuntimeException("댓글 수정 권한이 없습니다.");
-	    }
+        if (!comment.getAuthor().equals(username)) {
+            throw new RuntimeException("수정 권한 없음");
+        }
 
-	    // 내용 수정 + 수정 시간 업데이트
-	    comment.setUpdatedAt(LocalDateTime.now());
-	    comment.setContent(dto.getContent());
-	    // 수정된 걸 리턴
-	    return commentRepository.save(comment);
-	}
+        comment.setContent(content);
+        comment.setUpdatedAt(LocalDateTime.now());
+        commentRepository.save(comment);
+    }
+
+    @Override
+    public Comment getCommentById(Long id) {
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
+    }
 
 
 }

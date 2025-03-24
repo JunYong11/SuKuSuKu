@@ -11,4 +11,5 @@ public class PageNavigationDto {
     private int startPageGroup;  // 시작 페이지
     private int endPageGroup;    // 끝 페이지
     private int totalPageCount;  // 전체 페이지 수
+    
 }
