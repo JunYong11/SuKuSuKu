@@ -23,10 +23,10 @@
   }
 
   .game-select-title {
-    font-size: 50px;
+    font-size: 70px;
     font-weight: 700;
     margin-bottom: 50px;
-    color: #4154f1;
+    color: rgb(64, 0, 64);
     text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
     letter-spacing: 2px;
     animation: fadeIn 1s ease-in-out;
@@ -129,7 +129,7 @@
   <div th:replace="~{sidebar.html}"></div>
 
   <main id="main" class="main">
-    <h1 class="game-select-title">일본어 학습 게임</h1>
+    <h1 class="game-select-title">일본어 학습용 게임</h1>
 
     <div class="game-cards">
       <!-- 게임 1 -->
@@ -137,18 +137,18 @@
         <div class="game-image" style="background-image: url('/assets/img/game1.jpg');"></div>
         <div class="game-overlay">
           <h3>칸지노 아메</h3>
-          <p>비 내리는 일본어 단어의 뜻을 입력해 점수를 올려보세요!</p>
+          <p>비 내리는 일본어 단어의 뜻을 입력해 점수를 올리는 게임입니다</p>
           <button onclick="location.href='/game/rain'">게임 하러가기</button>
         </div>
       </div>
 
       <!-- 게임 2 -->
       <div class="game-card">
-        <div class="game-image" style="background-image: url('/assets/img/game2.jpg');"></div>
+        <div class="game-image" style="background-image: url('/assets/img/game2.png');"></div>
         <div class="game-overlay">
-          <h3>Chill하다</h3>
-          <p>77777777777777777777</p>
-          <button onclick="location.href='/'">게임 하러가기</button>
+          <h3>너의 이름은</h3>
+          <p>한자를 맞춰 퍼즐을 없애가며 캐릭터를 맞추는 게임입니다</p>
+          <button onclick="location.href='/game/name'">게임 하러가기</button>
         </div>
       </div>
     </div>

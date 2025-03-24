@@ -9,6 +9,10 @@ public class GameController {
 	public String getMethodrain() {
 		return "game/rain";
 	}
+	@GetMapping("/game/name")
+	public String getMethodname() {
+		return "game/name";
+	}
 	@GetMapping("/game")
 	public String getMethodGame() {
 		return "game/main";

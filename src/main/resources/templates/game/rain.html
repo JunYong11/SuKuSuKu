@@ -23,38 +23,35 @@
       text-align: center;
     }
 
-    .game-title {
+    #gameTitle {
       font-size: 100px;
       font-weight: 700;
-      color: #f8a5c2 !important;
       text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5), 0 0 25px rgba(255, 255, 255, 0.2);
       margin-bottom: 20px;
       animation: fadeInAndBounce 2s ease-out forwards;
       background: -webkit-linear-gradient(#f8a5c2, #f7b7da);
       -webkit-background-clip: text;
       color: transparent;
+      cursor: pointer;
     }
+    #gameTitle {
+  color: #f8a5c2;
+}
+    
 
     @keyframes fadeInAndBounce {
-      0% {
-        opacity: 0;
-        transform: translateY(-50px);
-      }
+      0% { opacity: 0; transform: translateY(-50px); }
+      60% { opacity: 1; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
 
-      60% {
-        opacity: 1;
-        transform: translateY(10px);
-      }
-
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .canvas-wrapper,
+    .answer-wrap {
+      display: none;
     }
 
     .canvas-wrapper {
       position: relative;
-      display: none;
       width: 600px;
       height: 400px;
       margin: 0 auto;
@@ -82,15 +79,8 @@
       z-index: 5;
     }
 
-    #timer {
-      top: 10px;
-      right: 15px;
-    }
-
-    #scoreBoard {
-      top: 10px;
-      left: 15px;
-    }
+    #timer { top: 10px; right: 15px; }
+    #scoreBoard { top: 10px; left: 15px; }
 
     #startBtn,
     #retryBtn {
@@ -120,7 +110,6 @@
 
     .answer-wrap {
       margin-top: 20px;
-      display: none;
       justify-content: center;
       align-items: center;
     }
@@ -183,41 +172,15 @@
     }
 
     @keyframes bounceIn {
-      0% {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-
-      60% {
-        opacity: 1;
-        transform: scale(1.1);
-      }
-
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    /* 비 내리는 애니메이션 */
-    @keyframes pinkRain {
-      0% {
-        top: -20px;
-        opacity: 1;
-      }
-
-      100% {
-        top: 100%;
-        opacity: 0.5;
-      }
+      0% { opacity: 0; transform: scale(0.8); }
+      60% { opacity: 1; transform: scale(1.1); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
     .pink-rain {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       pointer-events: none;
       z-index: 0;
       overflow: hidden;
@@ -225,10 +188,14 @@
 
     .drop {
       position: absolute;
-      width: 2px;
-      height: 20px;
+      width: 2px; height: 20px;
       background-color: rgba(255, 105, 180, 0.7);
       animation: pinkRain linear;
+    }
+
+    @keyframes pinkRain {
+      0% { top: -20px; opacity: 1; }
+      100% { top: 100%; opacity: 0.5; }
     }
 
     #meaningPopup {
@@ -256,12 +223,13 @@
 
   <main id="main" class="main">
     <div class="game-container">
-      <h2 class="game-title">漢字の雨</h2>
+      <h2 id="gameTitle" class="game-title">漢字の雨</h2>
       <div class="level-select">
         <button class="level-btn" onclick="selectLevel('easy')">쉬움</button>
         <button class="level-btn" onclick="selectLevel('normal')">보통</button>
         <button class="level-btn" onclick="selectLevel('hard')">어려움</button>
       </div>
+
       <div class="canvas-wrapper">
         <div id="meaningPopup"></div>
         <canvas id="gameCanvas" width="600" height="400"></canvas>
@@ -270,10 +238,10 @@
         <button id="startBtn">게임 시작</button>
         <button id="retryBtn">다시하기</button>
       </div>
+
       <div class="answer-wrap">
         <input type="text" id="answerInput" placeholder="한글 뜻을 입력하세요!" />
         <button onclick="submitAnswer()">제출</button>
-        
       </div>
     </div>
   </main>
@@ -281,7 +249,6 @@
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
-
     let words = [], score = 0, timer = 60;
     let gameInterval, wordInterval, timerInterval;
     let wordList = [];
@@ -297,13 +264,13 @@
     const scoreBoard = document.getElementById("scoreBoard");
 
     document.addEventListener("DOMContentLoaded", () => {
-      startBtn.style.display = "none";
-      retryBtn.style.display = "none";
-      scoreBoard.innerText = `점수: ${score}`;
-
       const answerInput = document.getElementById("answerInput");
       answerInput.addEventListener("keyup", function (event) {
         if (event.key === "Enter") submitAnswer();
+      });
+
+      document.getElementById("gameTitle").addEventListener("click", () => {
+        location.reload();
       });
     });
 
@@ -317,50 +284,41 @@
           answerWrap.style.display = 'flex';
           startBtn.style.display = 'inline-block';
         })
-        .catch(err => {
-          console.error("데이터 불러오기 실패:", err);
-        });
+        .catch(err => console.error("데이터 불러오기 실패:", err));
     }
 
     startBtn.addEventListener("click", startGame);
     retryBtn.addEventListener("click", resetGame);
 
     function startGame() {
-      startBtn.style.display = "none";
-      retryBtn.style.display = "none";
       score = 0; timer = 60; words = [];
       updateScore();
       timerDisplay.innerText = `남은 시간: ${timer}초`;
+
+      startBtn.style.display = "none";
+      retryBtn.style.display = "none";
+
       timerInterval = setInterval(updateTimer, 1000);
       wordInterval = setInterval(addWord, 2000);
       gameInterval = setInterval(updateGame, 1000 / 60);
     }
 
     function resetGame() {
-    	  // 초기화
-    	  levelSelect.style.display = 'block';
-    	  canvasWrapper.style.display = 'none';
-    	  answerWrap.style.display = 'none';
-    	  
-    	  // 버튼 상태 초기화
-    	  startBtn.style.display = 'none';
-    	  retryBtn.style.display = 'none';
+      clearInterval(gameInterval);
+      clearInterval(wordInterval);
+      clearInterval(timerInterval);
 
-    	  // 점수, 타이머 초기화
-    	  score = 0;
-    	  timer = 60;
-    	  words = [];
-    	  wordList = [];
+      score = 0; timer = 60; words = []; wordList = [];
 
-    	  ctx.clearRect(0, 0, canvas.width, canvas.height);
+      levelSelect.style.display = 'block';
+      canvasWrapper.style.display = 'none';
+      answerWrap.style.display = 'none';
+      startBtn.style.display = 'none';
+      retryBtn.style.display = 'none';
 
-    	  clearInterval(gameInterval);
-    	  clearInterval(wordInterval);
-    	  clearInterval(timerInterval);
-
-    	  isPaused = false;
-    	}
-
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      isPaused = false;
+    }
 
     function updateTimer() {
       timer--;
@@ -374,29 +332,23 @@
     }
 
     function addWord() {
-    	  if (!wordList.length) return;
+      if (!wordList.length) {
+        clearInterval(wordInterval);
+        return;
+      }
 
-    	  const randomIndex = Math.floor(Math.random() * wordList.length);
-    	  const randomWord = wordList[randomIndex];
+      const randomIndex = Math.floor(Math.random() * wordList.length);
+      const randomWord = wordList[randomIndex];
 
-    	  ctx.font = "30px Arial";
-    	  const textWidth = ctx.measureText(randomWord.kanji).width;
+      ctx.font = "30px Arial";
+      const textWidth = ctx.measureText(randomWord.kanji).width;
 
-    	  const padding = 10;
-    	  const maxX = canvas.width - textWidth - padding;
-    	  const minX = padding;
-    	  const x = Math.random() * (maxX - minX) + minX;
+      const padding = 10;
+      const x = Math.random() * (canvas.width - textWidth - padding * 2) + padding;
 
-    	  words.push({
-    	    ...randomWord,
-    	    x: x,
-    	    y: 0
-    	  });
-
-    	  wordList.splice(randomIndex, 1);
-    	}
-
-
+      words.push({ ...randomWord, x: x, y: 0 });
+      wordList.splice(randomIndex, 1);
+    }
 
     function updateGame() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -410,70 +362,48 @@
     }
 
     function submitAnswer() {
-    	  const answerInput = document.getElementById("answerInput");
-    	  const input = answerInput.value.trim();
+      const answerInput = document.getElementById("answerInput");
+      const input = answerInput.value.trim().replace(/\s+/g, '').replace(/[·.,]/g, '');
 
-    	  // 공백, 특수문자 제거 함수
-    	  function cleanText(text) {
-    	    return text.replace(/\s+/g, '')     // 공백 제거
-    	               .replace(/[·.,]/g, '');   // 특수문자 제거
-    	  }
+      if (input.length === 0) return answerInput.value = "";
 
-    	  const cleanedInput = cleanText(input);
+      const index = words.findIndex(word => {
+        const meanings = word.meaning.split('·').map(item => item.trim().replace(/\s+/g, ''));
+        return meanings.some(mean => mean.includes(input));
+      });
 
-    	  if (cleanedInput.length === 0) {
-    	    answerInput.value = "";
-    	    return;
-    	  }
+      if (index !== -1) {
+        score += 10;
+        updateScore();
+        words.splice(index, 1);
+      }
 
-    	  const index = words.findIndex(word => {
-    	    const meanings = word.meaning.split('·').map(item => cleanText(item)); // '·' 기준으로 나눔
-
-    	    return meanings.some(mean => {
-    	      if (mean.length === 1) {
-    	        // 한 글자 정답일 경우 완전 일치만 인정
-    	        return mean === cleanedInput;
-    	      } else {
-    	        // 두 글자 이상 정답일 경우 부분 포함 허용
-    	        return mean.includes(cleanedInput);
-    	      }
-    	    });
-    	  });
-
-    	  if (index !== -1) {
-    	    score += 10;
-    	    updateScore();
-    	    words.splice(index, 1);
-    	  }
-
-    	  answerInput.value = "";
-    	}
-
-
-
+      answerInput.value = "";
+    }
 
     function updateScore() {
       scoreBoard.innerText = `점수: ${score}`;
     }
 
-    canvas.addEventListener("mousemove", function (e) {
+    canvas.addEventListener("mousemove", (e) => {
       const rect = canvas.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
       let hoveringWord = null;
+
       words.forEach(word => {
         const textWidth = ctx.measureText(word.kanji).width;
-        if (mouseX >= word.x && mouseX <= word.x + textWidth && mouseY >= word.y - 30 && mouseY <= word.y) hoveringWord = word;
+        if (mouseX >= word.x && mouseX <= word.x + textWidth && mouseY >= word.y - 30 && mouseY <= word.y) {
+          hoveringWord = word;
+        }
       });
+
       if (hoveringWord) {
         if (!isPaused) pauseGame();
         meaningPopup.style.display = "block";
-        const canvasLeft = canvasWrapper.offsetLeft;
-        const canvasTop = canvasWrapper.offsetTop;
         meaningPopup.innerText = hoveringWord.meaning;
-        meaningPopup.style.left = `${hoveringWord.x + 30}px`; 
-        meaningPopup.style.top = `${hoveringWord.y - 15}px`; 
-
+        meaningPopup.style.left = `${hoveringWord.x + 30}px`;
+        meaningPopup.style.top = `${hoveringWord.y - 15}px`;
       } else {
         if (isPaused) resumeGame();
         meaningPopup.style.display = "none";
@@ -488,10 +418,12 @@
     }
 
     function resumeGame() {
-      isPaused = false;
-      timerInterval = setInterval(updateTimer, 1000);
-      wordInterval = setInterval(addWord, 2000);
-      gameInterval = setInterval(updateGame, 1000 / 60);
+      if (isPaused) {
+        isPaused = false;
+        timerInterval = setInterval(updateTimer, 1000);
+        wordInterval = setInterval(addWord, 2000);
+        gameInterval = setInterval(updateGame, 1000 / 60);
+      }
     }
 
     const rainContainer = document.querySelector('.pink-rain');
@@ -505,12 +437,11 @@
       setTimeout(() => rainContainer.removeChild(drop), speed * 1000);
     }
     setInterval(createDrop, 100);
-    
-    document.getElementById("gameTitle").addEventListener("click", () => {
-    	  location.reload();
-    	});
-
   </script>
-</body>
 
+  <!-- 필요한 라이브러리만 남김 -->
+  <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/assets/js/main.js"></script>
+
+</body>
 </html>
