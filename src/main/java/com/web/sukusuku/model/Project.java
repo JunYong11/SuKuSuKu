@@ -28,7 +28,7 @@ public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)  // project_id가 자동 증가하도록 설정
     @Column(name = "project_id")
-    private Integer projectId;
+    private Long projectId;
 
     @Column(name = "project_name", nullable = false)
     private String projectName;
@@ -37,9 +37,4 @@ public class Project {
     @JoinColumn(name = "username", referencedColumnName = "username")
     private User user;
 
-    @Column(name = "content", nullable = false)
-    private String content;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
 }
