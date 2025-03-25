@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>글쓰기</title>
+
+    <!-- CSS 공통 스타일 -->
+    <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/assets/css/style.css" rel="stylesheet">
+
+    <style>
+        .main {
+            margin-left: 250px; /* sidebar 너비와 맞춤 */
+            padding: 20px;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .form-section {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-title {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <div th:replace="~{header.html}"></div>
+
+    <!-- Sidebar -->
+    <div th:replace="~{sidebar.html}"></div>
+
+    <!-- Main Content -->
+    <main id="main" class="main">
+
+        <!-- 페이지 타이틀 -->
+        <div class="pagetitle">
+            <h1>글쓰기</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">홈</a></li>
+                    <li class="breadcrumb-item"><a href="/posts/list">게시판</a></li>
+                    <li class="breadcrumb-item active">글쓰기</li>
+                </ol>
+            </nav>
+        </div>
+
+        <!-- 글쓰기 폼 -->
+        <section class="section form-section">
+            <h2 class="form-title">새 글 작성</h2>
+
+            <form th:action="@{/posts/create}" method="post" enctype="multipart/form-data">
+                
+                <!-- 카테고리 선택 -->
+                <div class="mb-3">
+                    <label for="category" class="form-label">카테고리</label>
+                    <select id="category" name="category" class="form-select" required>
+                        <option value="FREE" selected>자유 게시판</option>
+                        <option value="QUESTION">질문 게시판</option>
+                        <option value="DATA">자료 게시판</option>
+                    </select>
+                </div>
+
+                <!-- 제목 입력 -->
+                <div class="mb-3">
+                    <label for="title" class="form-label">제목</label>
+                    <input type="text" id="title" name="title" class="form-control" required />
+                </div>
+
+                <!-- 내용 입력 -->
+                <div class="mb-3">
+                    <label for="content" class="form-label">내용</label>
+                    <textarea id="content" name="content" rows="10" class="form-control" required></textarea>
+                </div>
+
+                <!-- 첨부 파일 -->
+                <div class="mb-3">
+                    <label for="files" class="form-label">첨부파일</label>
+                    <input type="file" id="files" name="files" multiple class="form-control" />
+                </div>
+
+                <!-- 비밀글 체크 -->
+                <div class="form-check mb-4">
+                    <input type="checkbox" id="secret" name="secret" class="form-check-input" />
+                    <label for="secret" class="form-check-label">비밀글</label>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">등록</button>
+                    <a th:href="@{/posts/list}" class="btn btn-secondary ms-2">취소</a>
+                </div>
+
+            </form>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{footer.html}"></div>
+
+    <!-- JS -->
+    <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/main.js"></script>
+
+</body>
+
+</html>
