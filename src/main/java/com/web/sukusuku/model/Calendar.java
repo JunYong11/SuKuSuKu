@@ -9,15 +9,19 @@ import java.time.LocalDateTime;
 @Table(name = "calendar")
 @Data
 @NoArgsConstructor
-@ToString(exclude = {"user"})
+@ToString(exclude = {"user","project"})
 public class Calendar {
 
     @Id
     @Column(name = "calendar_id")
-    private Integer calendarId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // project_id가 자동 증가하도록 설정
+    private Long calendarId;
 
-    private String title;
-    private String content;
+    @Column(name = "schedule")
+    private String schedule;
+    
+    @Column(name = "memo")
+    private String memo;
 
     @Column(name = "start_date", nullable = false)
     private LocalDateTime startDate;
@@ -25,7 +29,18 @@ public class Calendar {
     @Column(name = "end_date", nullable = false)
     private LocalDateTime endDate;
 
+    @Column(name = "calendar_check", nullable = false)
+    private boolean check;
+
     @ManyToOne
     @JoinColumn(name = "username", referencedColumnName = "username")
     private User user;
+    
+    @ManyToOne
+    @JoinColumn(name = "project_id", referencedColumnName = "project_id")
+    private Project project;
+
+    public void setCompleted(boolean check) {
+        this.check = check;
+    }
 }

@@ -4,28 +4,38 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "comment")
 @Data
 @NoArgsConstructor
-@ToString(exclude = {"user", "post"})
-public class Comment {
-
+@AllArgsConstructor
+@Builder
+@Table(name = "comment")
+public class Comment{
     @Id
-    @Column(name = "comment_id")
-    private Integer commentId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="comment_id")
+    private Long id;
 
+    @Column(nullable = false)
     private String content;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @Column(name = "username") 
+    private String author;
 
-    @ManyToOne
-    @JoinColumn(name = "username")
-    private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
     private Post post;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")  // 부모 댓글 (null이면 부모 댓글)
+    private Comment parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    private List<Comment> children = new ArrayList<>();
+
+    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }

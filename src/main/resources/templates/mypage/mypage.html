@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+<title>Components / Cards - NiceAdmin Bootstrap Template</title>
+<meta content="" name="description">
+<meta content="" name="keywords">
+<!-- jQuery CDN 추가 -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Favicons -->
+<link href="/assets/img/favicon.png" rel="icon">
+<link href="/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+<!-- Google Fonts -->
+<link href="https://fonts.g.assets.com" rel="preconnect">
+<link
+	href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+	rel="stylesheet">
+
+<!-- Vendor CSS Files -->
+<link href="/assets/vendor/bootstrap/css/bootstrap.min.css"
+	rel="stylesheet">
+<link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css"
+	rel="stylesheet">
+<link href="/assets/vendor/boxicons/css/boxicons.min.css"
+	rel="stylesheet">
+<link href="/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+<link href="/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+<link href="/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+<link href="/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+<!-- Template Main CSS File -->
+<link href="/assets/css/style.css" rel="stylesheet">
+
+<!--   -->
+<link
+	href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css'
+	rel='stylesheet' />
+<script
+	src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+<script
+	src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js'></script>
+
+
+
+<!-- ========================================== style ============================================ -->
+
+
+<style>
+#calendar {
+	width: 100%;
+	font-size: 0.8rem;
+}
+
+.fc-daygrid-day:hover .add-event-btn {
+	display: block;
+}
+
+.add-event-btn {
+	display: none;
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	background: #007bff;
+	color: white;
+	border: none;
+	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+	text-align: center;
+	cursor: pointer;
+	font-size: 14px;
+	line-height: 18px;
+}
+
+.form-control {
+	margin-bottom: 10px;
+}
+
+.group-container {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap; /* 자동 줄바꿈 */
+	gap: 10px;
+	margin-top: 10px;
+	position: relative; /* 입력창 위치 조정을 위해 필요 */
+}
+
+.group-box {
+	padding: 5px 10px;
+	border-radius: 5px;
+	font-size: 14px;
+	display: flex;
+	align-items: center;
+	font-weight: bold; /* 글자 볼드 처리 */
+}
+
+/* 입력창을 + 버튼 아래에 위치 */
+.popup {
+	display: none;
+	position: absolute;
+	top: 40px; /* + 버튼 아래에 위치 */
+	left: 0;
+	background: white;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+	white-space: nowrap; /* 가로 너비 유지 */
+}
+
+.container {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 0px 20px 20px 20px;
+}
+
+.project-box {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 130px;
+	height: 20px;
+	border-radius: 5px;
+	background-color: lightblue;
+	font-weight: bold;
+	text-align: center;
+	font-size: 15px;
+	margin: 10px;
+}
+
+/* 추가 버튼 스타일 */
+#confirmAddBtn {
+	background-color: #007bff; /* 파란색 배경 */
+	color: white; /* 흰색 글자 */
+	border: none;
+	padding: 5px 10px;
+	border-radius: 5px;
+	cursor: pointer;
+	font-weight: bold; /* 글자 볼드 */
+	font-size: 14px;
+}
+
+#confirmAddBtn:hover {
+	background-color: #0056b3; /* 버튼에 마우스 올리면 어두운 파란색 */
+}
+
+.table-container {
+	width: 100%;
+	overflow-x: auto; /* 화면이 작아질 경우 가로 스크롤 */
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse; /* 이중선 제거 */
+}
+
+th {
+	border: none; /* 제목 부분 테두리 제거 */
+	background-color: #f0f0f0; /* 배경색 추가 (선택 사항) */
+	padding: 10px;
+	text-align: center; /* 제목 가운데 정렬 */
+}
+
+td {
+	border: 1px solid #000; /* 데이터 셀만 테두리 유지 */
+	padding: 10px;
+	text-align: center; /* 데이터도 가운데 정렬 */
+}
+
+.addGroupBtn {
+	/* 배경색을 부드러운 그라디언트로 설정 */
+	background: linear-gradient(135deg, #4facfe, #00f2fe);
+	height: 40px;
+	margin: 10px;
+	/* 둥근 모서리 */
+	border-radius: 25px;
+	/* 테두리 없애기 */
+	border: none;
+	/* 글꼴 크기 및 색상 설정 */
+	font-size: 14px;
+	font-weight: bold;
+	color: white;
+	/* 커서를 포인터로 변경 */
+	cursor: pointer;
+	/* 부드러운 애니메이션 효과 */
+	transition: all 0.3s ease-in-out;
+	/* 그림자 추가로 버튼이 떠 있는 느낌 */
+	box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* 마우스를 올렸을 때 효과 */
+.addGroupBtn:hover {
+	/* 색을 좀 더 밝게 변경 */
+	background: linear-gradient(135deg, #3b82f6, #06b6d4);
+	/* 그림자를 더 강하게 */
+	box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* 버튼 클릭 시 효과 */
+.addGroupBtn:active {
+	/* 약간 작아지는 효과 */
+	transform: scale(0.95);
+}
+/* 카드 기본 스타일 */
+.project-card {
+	position: relative; /* 삭제 버튼 위치를 절대값으로 배치하기 위해 설정 */
+	background: #f0f0f0;
+	border-radius: 5px;
+	transition: background 0.3s ease-in-out;
+}
+
+/* 마우스 오버 시 배경색 변경 */
+.project-card:hover {
+	background: #e0e0e0;
+}
+
+/* 삭제 버튼 스타일 */
+.delete-btn {
+	position: absolute;
+	left: 10px; /* 오른쪽 끝으로 이동 */
+	top: 10px; /* 위쪽 끝으로 이동 */
+	background: transparent;
+	border: none;
+	font-size: 14px;
+	color: red;
+	cursor: pointer;
+	opacity: 0; /* 기본 상태에서는 숨김 */
+	transition: opacity 0.3s ease-in-out;
+	top: 10px;
+}
+
+/* 마우스를 올렸을 때만 삭제 버튼 보이게 */
+.project-card:hover .delete-btn {
+	opacity: 1;
+}
+
+.schedule-container {
+	position: relative; /* 삭제 버튼을 상대적으로 배치하기 위해 설정 */
+}
+
+.delete-events-btn {
+	display: none; /* 기본적으로 버튼 숨기기 */
+	position: absolute;
+	left: 0; /* td의 오른쪽 끝에 위치 */
+	top: 50%;
+	transform: translateY(-50%); /* 세로 중앙에 배치 */
+	background-color: transparent;
+	border: none;
+	font-size: 18px;
+	color: red;
+	cursor: pointer;
+	transition: opacity 0.3s ease;
+}
+
+.schedule-container:hover .delete-events-btn {
+	display: block; /* 커서가 할일에 올라가면 삭제 버튼 보이기 */
+	opacity: 1;
+}
+
+.achievement-container {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 20px;
+}
+
+.achievement-bar {
+	position: relative;
+	width: 200px;
+	height: 10px;
+	background-color: #f3f3f3;
+	border-radius: 10px;
+	box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.achievement-fill {
+	height: 100%;
+	background-color: #87CEEB; /* 초록색 (완료된 비율 표시) */
+	border-radius: 10px;
+	transition: width 0.3s ease; /* 변화 애니메이션 */
+}
+
+.achievement-percentage {
+	font-size: 14px;
+	font-weight: bold;
+	color: #333;
+}
+</style>
+
+</head>
+<!-- ========================================== body ============================================ -->
+<body>
+	<div th:replace="~{header.html}"></div>
+	<div th:replace="~{sidebar.html}"></div>
+
+	<main id="main" class="main">
+
+		<div class="pagetitle">
+			<h1>MyPage</h1>
+			<nav>
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="/">Home</a></li>
+					<li class="breadcrumb-item active"><a href="/mypage">Profile</a></li>
+				</ol>
+			</nav>
+		</div>
+
+		<section class="section profile" th:object="${loginUser}">
+			<div class="row">
+				<div class="col-xl-3">
+					<div class="card">
+						<div
+							class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+							<i class="bi bi-person-circle"
+								style="font-size: 140px; margin: 0;"></i>
+							<h2 th:text="*{name}">이름</h2>
+							<h2 th:text="*{username}">아이디</h2>
+							<h3 th:text="*{level}">급수</h3>
+							<div class="social-links mt-2">
+								<a href="#" class="twitter"><i class="bi bi-twitter"></i></a> <a
+									href="#" class="facebook"><i class="bi bi-facebook"></i></a> <a
+									href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+								<a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+							</div>
+						</div>
+					</div>
+
+					<div class="card">
+						<div class="card-body pb-0">
+							<h5 class="card-title">
+								Website Traffic <span>| Today</span>
+							</h5>
+							<div id="trafficChart" style="min-height: 400px;" class="echart"></div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 추가 위젯 (오른쪽) -->
+				<div class="col-xl-8">
+					<div class="card">
+						<div class="card-body"
+							style="display: flex; align-items: center; justify-content: space-between;">
+							<h5 class="card-title" style="font-size: 20px; margin: 0;">Project</h5>
+							<button class="addGroupBtn" id="addGroupBtn">새로만들기</button>
+						</div>
+						<!-- 그룹 추가되는 부분 -->
+						<div class="container">
+							<!-- 프로젝트 리스트 표시 -->
+							<div class="card project-card" th:each="project : ${projects}">
+								<div class="card-body">
+									<!-- 삭제 버튼 -->
+									<form action="/mypage/deleteProject" method="post"
+										style="display: inline;">
+										<input type="hidden" name="projectId"
+											th:value="${project.projectId}" />
+										<button class="delete-btn" type="submit">✖</button>
+										<!-- 삭제 버튼 클릭 시 전송 -->
+									</form>
+									<div class="project-box">
+										<span th:text="${project.projectName}">프로젝트</span>
+									</div>
+									<div
+										style="border-bottom: 1px solid black; width: 100%; margin-bottom: 15px;"></div>
+									<!-- 리스트 간격 조정 -->
+
+									<div th:each="event : ${events}">
+										<th:block
+											th:if="${project.projectName == event.project.projectName}">
+											<li th:text="${event.schedule}" style="margin-bottom: 10px;">프로젝트</li>
+											<!-- 항목 간격 조정 -->
+										</th:block>
+									</div>
+
+									<span th:id="'project-achievement-' + ${project.projectId}"
+										class="achievement-percentage" style="margin-top: 15px;">0%</span>
+									<!-- 달성률 상단 간격 조정 -->
+									<div class="achievement-bar"
+										style="margin-top: 10px; width: 100%; background-color: #ddd; height: 10px; border-radius: 5px;">
+										<div th:id="'achievement-fill-' + ${project.projectId}"
+											class="achievement-fill"
+											style="width: 0%; transition: width 0.5s ease;"></div>
+										<!-- 달성률 막대 간격 조정 -->
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+
+						<!-- 입력창 (초기에는 숨김) -->
+						<div id="groupContainer">
+							<!-- 여기에 + 버튼이나 팝업을 포함하는 콘텐츠를 넣으면 됩니다 -->
+							<div id="popup" class="popup">
+								<form action="/mypage/project" method="post"
+									enctype="multipart/form-data">
+									<input type="text" id="groupInput" name="projectName"
+										placeholder="그룹명을 입력하세요" />
+									<button id="confirmAddBtn" type="submit">추가</button>
+								</form>
+							</div>
+						</div>
+
+					</div>
+					<div class="card">
+						<div class="card-body">
+							<div id='calendar'></div>
+						</div>
+					</div>
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title" style="font-size: 20px; margin: 0;">Schedule</h5>
+							<div class="table-container">
+								<table>
+									<tr>
+										<th scope="col">할일</th>
+										<th scope="col">project</th>
+										<th scope="col">날짜</th>
+										<th scope="col">메모</th>
+										<th scope="col">완료</th>
+									</tr>
+									<tr th:each="calendar : ${events}">
+										<td>
+											<div class="schedule-container">
+												<form action="/mypage/deleteCalendar" method="post"
+													style="display: inline;">
+													<span th:text="${calendar.schedule}">할일</span> <input
+														type="hidden" name="calendarId"
+														th:value="${calendar.calendarId}" />
+													<button class="delete-events-btn" type="submit" title="삭제">✖</button>
+												</form>
+											</div>
+										</td>
+										<td th:text="${calendar.project.projectName}">project</td>
+										<td
+											th:text="${#temporals.format(calendar.endDate, 'yyyy-MM-dd')}">종료
+											날짜</td>
+										<td th:text="${calendar.memo}">메모</td>
+										<td><input type="checkbox" class="completion-checkbox"
+											th:data-username="${loginUser.username}"
+											th:data-calendar-id="${calendar.calendarId}"
+											th:checked="${calendar.check}" /></td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+
+	<!-- ========================================== modal ============================================ -->
+
+	<!-- 일정 입력 모달 -->
+
+	<div class="modal fade" id="eventModal" tabindex="-1"
+		aria-labelledby="eventModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">새 일정 추가</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+
+				<div class="modal-body">
+
+					<!-- 시작 날짜 선택 -->
+
+					<p>
+						<strong>선택한 날짜:</strong> <span id="selectedDate"></span>
+					</p>
+
+					<input type="text" id="schedule" class="form-control"
+						placeholder="할일"> <label for="project" class="form-label">Project</label>
+					<input type="hidden" id="selectedDateInput"> <select
+						id="projectId" class="form-control">
+						<option value="">-- 프로젝트 선택 --</option>
+						<!-- 서버에서 가져온 프로젝트 목록을 여기 삽입할 예정 -->
+					</select> <input type="text" id="memo" class="form-control" placeholder="메모">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">닫기</button>
+					<button type="button" class="btn btn-primary" id="saveEvent">저장</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div th:replace="~{footer.html}"></div>
+
+	<!-- ========================================== script ============================================ -->
+
+	<script>
+	document.querySelectorAll('.completion-checkbox').forEach(checkbox => {
+	    checkbox.addEventListener('change', function() {
+	        let calendarId = this.getAttribute('data-calendar-id'); // 일정 ID 가져오기
+	        let isChecked = this.checked; // 체크 여부 확인 (true / false)
+	        let username = this.getAttribute('data-username'); // 사용자 이름 가져오기
+
+
+	        // 서버로 체크 상태 업데이트 요청
+	        fetch('/mypage/api/updateCompletionStatus', {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json'
+	            },
+	            body: JSON.stringify({
+	                calendarId: calendarId,
+	                completed: isChecked
+	            })
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	            if (data.success) {
+	                console.log(`스케줄 ID ${calendarId}의 완료 상태가 ${isChecked}로 변경됨`);
+	                
+	                console.log(username);
+	                
+	                updateUserAchievement(username)
+	                
+	            } else {
+	                console.error('업데이트 실패:', data.message);
+	            }
+	        })
+	        .catch(error => {
+	            console.error('오류 발생:', error);
+	        });
+	        
+	       
+	    });
+	});
+	
+	// ✅ 사용자별 프로젝트 달성률 업데이트 요청 함수
+	function updateUserAchievement(username) {
+    fetch('/mypage/api/updateUserAchievement', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username: username })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("백엔드 응답:", data);
+
+        if (data.userAchievements) {
+            console.log("달성률 업데이트 완료:", data.userAchievements);
+
+            // 각 프로젝트 ID별로 달성률 업데이트
+            data.userAchievements.forEach(project => {
+                let achievementElement = document.querySelector(`#project-achievement-${project.projectId}`);
+                let achievementBar = achievementElement?.parentElement?.querySelector(".achievement-fill");
+
+                if (achievementElement && achievementBar) {
+                    console.log(`업데이트 대상: ${project.projectId}, 달성률: ${project.achievementRate}`);
+
+                    // 1️⃣ 퍼센트 텍스트 업데이트
+                    achievementElement.textContent = `${project.achievementRate.toFixed(1)}%`;
+
+                    // 2️⃣ 막대 너비 업데이트
+                    achievementBar.style.width = `${project.achievementRate}%`;
+                } else {
+                    console.warn(`해당 ID를 가진 요소를 찾을 수 없음: #project-achievement-${project.projectId}`);
+                }
+            });
+        } else {
+            console.error('프로젝트 달성률 업데이트 실패:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('오류 발생:', error);
+    });
+}
+	</script>
+
+
+	<script>
+	let calendar;  // 전역 변수로 선언
+	
+	document.addEventListener('DOMContentLoaded', function () {
+		
+	    var calendarEl = document.getElementById('calendar');
+	    
+	    let username = document.querySelector('.completion-checkbox')?.getAttribute('data-username');
+	    if (username) {
+	        updateUserAchievement(username); // ✅ 마이페이지 로드 시에도 달성률 업데이트
+	    }
+	    
+	   	calendar = new FullCalendar.Calendar(calendarEl, {
+	        expandRows: true,
+	        initialView: 'dayGridMonth',
+	        locale: 'ko',
+	        selectable: true,
+	        dayMaxEvents: true,
+	        
+
+	        // 서버에서 일정 데이터 가져오기
+	        events: "/mypage/events", // 백엔드 API 호출
+
+
+	        dateClick: function (info) {
+	            document.getElementById('selectedDate').innerText = info.dateStr;
+	            document.getElementById('selectedDateInput').value = info.dateStr;
+	            let eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+	            eventModal.show();
+	        },
+	        dayCellDidMount: function (info) {
+	            let btn = document.createElement('button');
+	            btn.textContent = '+';
+	            btn.classList.add('add-event-btn');
+	            btn.onclick = function (event) {
+	                event.stopPropagation();
+	                document.getElementById('selectedDate').innerText = info.dateStr;
+	                document.getElementById('selectedDateInput').value = info.dateStr;
+	                let eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+	                eventModal.show();
+	            };
+	            info.el.style.position = 'relative';
+	            info.el.appendChild(btn);
+	        }
+	    });
+
+	    calendar.render();
+
+	    // 사이드바 토글 이벤트 감지 후 캘린더 리렌더링
+	    function resizeCalendar() {
+	        setTimeout(() => {
+	            calendar.updateSize();
+	        }, 300); // 애니메이션이 끝날 시간 고려해서 약간의 딜레이
+	    }
+
+	    // 사이드바 버튼 클릭 감지 (부트스트랩 기반)
+	    let sidebarBtn = document.querySelector('.toggle-sidebar-btn');
+		if (sidebarBtn) {
+    		sidebarBtn.addEventListener('click', resizeCalendar);
+		}
+		
+		$('#eventModal').on('show.bs.modal', function () {
+		    console.log('모달이 열렸습니다!');  // 모달 열렸을 때 로그 찍기
+
+		    // 서버에서 프로젝트 목록을 가져오는 API 호출
+		    fetch('/mypage/modal/projects')
+		        .then(response => response.json())  // JSON 형식으로 응답받기
+		        .then(data => {
+		            console.log('프로젝트 데이터:', data);  // 데이터가 잘 받아졌는지 확인
+		            const projectId = document.getElementById('projectId');
+		            projectId.innerHTML = '<option value="">-- 프로젝트 선택 --</option>';  // 초기 옵션
+
+		            // 받아온 프로젝트 데이터를 select 요소에 동적으로 추가
+		            data.forEach(project => {
+		                const option = document.createElement('option');
+		                option.value = project.projectId;  // 프로젝트 ID
+		                option.textContent = project.projectName;  // 프로젝트 이름
+		                projectId.appendChild(option);
+		            });
+		        })
+		        .catch(error => {
+		            console.error('Error loading projects:', error);
+		        });
+		});
+	});
+
+
+    </script>
+
+	<script>
+	document.getElementById('saveEvent').addEventListener('click', function() {
+	    let formData = {
+	        selectDate: document.getElementById('selectedDateInput').value,
+	        schedule: document.getElementById('schedule').value,
+	        memo: document.getElementById('memo').value,
+	        projectId: document.getElementById("projectId").value
+	    };
+
+	    fetch('/mypage/api/savecalendar', {
+	        method: 'POST',
+	        headers: {
+	            'Content-Type': 'application/json'
+	        },
+	        body: JSON.stringify(formData)
+	    })
+    	.then(response => response.json())
+    	.then(data => {
+    		if (data.redirectUrl) {
+    	        window.location.href = data.redirectUrl;  // 백엔드에서 받은 URL로 이동
+    	    }
+	    })
+	    .catch(error => {
+	        console.error('Error:', error);
+	    });
+	});
+
+	// 폼 전송 시 입력값 확인
+	  const form = popup.querySelector('form');
+	  form.addEventListener('submit', function(event) {
+	    // 입력값이 비어 있으면 전송을 막음
+	    if (!groupInput.value.trim()) {
+	      event.preventDefault(); // 폼 전송 막기
+	      alert("그룹명을 입력하세요.");
+	    }
+	  });
+	
+	  
+	  document.addEventListener("DOMContentLoaded", () => {
+          echarts.init(document.querySelector("#trafficChart")).setOption({
+            tooltip: {
+              trigger: 'item'
+            },
+            legend: {
+              top: '5%',
+              left: 'center'
+            },
+            series: [{
+              name: 'Access From',
+              type: 'pie',
+              radius: ['40%', '70%'],
+              avoidLabelOverlap: false,
+              label: {
+                show: false,
+                position: 'center'
+              },
+              emphasis: {
+                label: {
+                  show: true,
+                  fontSize: '18',
+                  fontWeight: 'bold'
+                }
+              },
+              labelLine: {
+                show: false
+              },
+              data: [{
+                  value: 1048,
+                  name: 'Search Engine'
+                },
+                {
+                  value: 735,
+                  name: 'Direct'
+                },
+                {
+                  value: 580,
+                  name: 'Email'
+                },
+                {
+                  value: 484,
+                  name: 'Union Ads'
+                },
+                {
+                  value: 300,
+                  name: 'Video Ads'
+                }
+              ]
+            }]
+          });
+        });
+	</script>
+
+	<script>
+
+const addGroupBtn = document.getElementById("addGroupBtn");
+const popup = document.getElementById("popup");
+const groupInput = document.getElementById("groupInput");
+const groupContainer = document.getElementById("groupContainer");
+
+// 더 예쁜 색상 배열로 변경
+const colors = [
+  "#FFB6C1", // 연한 핑크
+  "#FFD700", // 금색
+  "#32CD32", // 라임 그린
+  "#00BFFF", // 딥 스카이 블루
+  "#FF6347", // 토마토
+  "#8A2BE2"  // 블루 바이올렛
+];
+let colorIndex = 0;
+
+// + 버튼 클릭 시 입력창 표시 (위치 동기화)
+addGroupBtn.addEventListener("click", (event) => {
+  popup.style.display = "block";
+  updatePopupPosition();
+  event.stopPropagation(); // 이 클릭 이벤트가 부모로 전파되지 않도록 막기
+});
+
+
+// 입력창 위치 업데이트 함수
+function updatePopupPosition() {
+  popup.style.left = `${addGroupBtn.offsetLeft}px`; // + 버튼 위치에 맞춰 이동
+}
+
+//바깥 영역 클릭 시 팝업 닫기
+window.addEventListener("click", (event) => {
+  // 팝업과 + 버튼 외부를 클릭했을 경우에만 팝업을 숨김
+  if (!groupContainer.contains(event.target)) {
+    popup.style.display = "none";
+  }
+});
+
+// 팝업 내부 클릭 시 이벤트 전파를 막아서 팝업이 사라지지 않도록 함
+popup.addEventListener("click", (event) => {
+  event.stopPropagation(); // 팝업 클릭 이벤트가 바깥으로 전파되지 않도록 막음
+})
+
+    window.onload = function() {
+        const projectBoxes = document.querySelectorAll(".project-box");
+
+        projectBoxes.forEach((box, index) => {
+            // 색상을 순환적으로 적용 (색상 개수보다 프로젝트가 많을 경우 반복됨)
+            box.style.backgroundColor = colors[index % colors.length];
+        });
+    };
+
+	</script>
+
+
+	<a href="#"
+		class="back-to-top d-flex align-items-center justify-content-center"><i
+		class="bi bi-arrow-up-short"></i></a>
+
+	<!-- Vendor JS Files -->
+	<script src="/assets/vendor/apexcharts/apexcharts.min.js"></script>
+	<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="/assets/vendor/chart.js/chart.umd.js"></script>
+	<script src="/assets/vendor/echarts/echarts.min.js"></script>
+	<script src="/assets/vendor/quill/quill.js"></script>
+	<script src="/assets/vendor/simple-datatables/simple-datatables.js"></script>
+	<script src="/assets/vendor/tinymce/tinymce.min.js"></script>
+	<script src="/assets/vendor/php-email-form/validate.js"></script>
+
+	<!-- Template Main JS File -->
+	<script src="/assets/js/main.js"></script>
+
+
+
+
+
+</body>
+</html>

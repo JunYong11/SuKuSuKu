@@ -1,15 +1,19 @@
 package com.web.sukusuku.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 public class HomeController {
 
 	
-//	@GetMapping("/")
-//	public String getMethodName() {
-//		return "example";
-//	}
+	@GetMapping("/")
+	public String getMethodName() {
+		
+		return "home";
+	}
 	
 }
