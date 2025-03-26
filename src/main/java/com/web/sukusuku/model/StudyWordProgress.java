@@ -5,7 +5,11 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "study_word_progress")
+@Table(
+        name = "study_word_progress",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"username", "word_id"})
+        })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

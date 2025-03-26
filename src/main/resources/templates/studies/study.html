@@ -126,7 +126,7 @@
       <div class="card-body">
         <!-- 상단 제목(예: Frame 1)과 우측 '레벨 선택' -->
         <div class="d-flex justify-content-end align-items-center mt-3">
-           <button class="btn btn-secondary" onclick="stopStudy()">공부 그만하기</button>
+           <button type="button" class="btn btn-secondary" onclick="stopStudy()">공부 그만하기</button>
         </div>
 
         <hr />
@@ -160,12 +160,13 @@
       </form><!-- /.card -->
 </section><!-- /.section -->
   <script th:inline="javascript">
+
     let words = /*[[${words}]]*/ [];
     let chapterId =/*[[${chapterId}]]*/[];
     let index = 0;
-
-    let totalWordsCount = words.length;
-    let knownWordsCount = /*[[${knownWordsCount} ?: 0]]*/[]; // 안다로 체크한 단어 수
+    let cumulativeWords = /*[[${cumulativeWords}]]*/ 0;  // 전체 누적 단어 수
+    let knownWordsCount = /*[[${knownWordsCount} ?: 0]]*/ 0;  // 안다 개수 초기값
+    // let knownWordsCount = /*[[${knownWordsCount} ?: 0]]*/[]; // 안다로 체크한 단어 수
 
     window.onload = () => {
       updateProgress();  // 초기값 세팅
@@ -177,6 +178,11 @@
         reloadWords();  // 다시 모른다 리스트 가져오기
         return;
       }
+      // if (words.length === 0) {
+      //   alert("이 챕터를 모두 학습했습니다!");
+      //   window.location.href = "/studies/levelChoice";
+      //   return;
+      // }
 
       const word = words[index];
       document.getElementById('kanji').innerText = word.kanji;
@@ -195,8 +201,8 @@
     }
 
     function know() {
-      knownWordsCount++;
       updateProgressRequest("안다");
+      knownWordsCount++;
     }
 
     function dontKnow() {
@@ -210,40 +216,89 @@
         body: JSON.stringify({
           wordId: words[index].wordId,
           status: status,
-          chapterId: chapterId
+          chapterId: chapterId,
+          cumulativeWords : cumulativeWords // 여기에 전체 단어 갯수 넣으면 돌거 같은데?!
         })
-      }).then(() => {
-        index++;
-        updateProgress();
-        showWord();
-      });
+      }).then(response => response.json()) // ✅ 서버에서 최신 knownWordsCount 반환 받음!
+        .then(data => {
+          knownWordsCount = data;
+          
+          // 먼저 진행률 화면 업데이트
+          updateProgress();
+          
+          // 모든 단어를 학습했는지 확인
+          if (knownWordsCount === cumulativeWords) {
+            // 약간의 지연을 주어 사용자가 진행률 업데이트를 볼 수 있게 함
+            setTimeout(() => {
+              const isReset = confirm("🎉 챕터의 모든 단어를 학습했습니다! 다시 학습하시겠습니까?");
+              
+              if (isReset) {
+                // 사용자가 확인을 누르면 리셋 API 호출
+                fetch(`/studies/resetChapter?chapterId=${chapterId}`, {
+                  method: 'POST'
+                }).then(() => {
+                  alert("챕터가 리셋되었습니다. 다시 학습합니다.");
+                  window.location.reload();// 페이지 새로고침
+                  reloadWords(); // 단어 다시 로드
+                });
+              } else {
+                // 사용자가 취소를 누르면 레벨 선택 페이지로 이동
+                alert("학습을 완료했습니다!");
+                window.location.href = "/studies/levelChoice";
+              }
+            }, 100); // 100ms 지연으로 UI 업데이트가 보이도록 함
+            return;
+          }
+          
+          // 아직 모든 단어를 학습하지 않은 경우
+          index++;
+          showWord();
+        });
     }
 
     function reloadWords() {
       fetch(`/studies/remainingWords?chapterId=${chapterId}`)
-              .then(response => response.json())
-              .then(data => {
-                words = data;
-                index = 0;
-                totalWordsCount = words.length;  // 업데이트 필요할 경우 (전체 단어 수가 바뀌는 경우)
-                updateProgress();
-
-                if (words.length === 0) {
-                  alert("이 챕터를 모두 학습했습니다!");
-                  window.location.href = "/studies/levelChoice";
-                } else {
-                  showWord();
-                }
-              });
+        .then(response => response.json())
+        .then(data => {
+          console.log("받은 데이터:", data); // 데이터 확인용 로그
+          console.log("데이터 길이:", data.length); // 길이 확인용 로그
+          
+          words = shuffleArray(data);
+          index = 0;
+          totalWordsCount = cumulativeWords;
+          
+          updateProgress();
+          
+          if (words.length === 0) {
+            alert("🎉 이 챕터를 모두 학습했습니다!");
+            window.location.href = "/studies/levelChoice";
+            // 이 부분은 필요하지 않을 수 있습니다.
+            // 모든 단어를 완료하면 서버에서 이미 리셋했기 때문입니다.
+            // 하지만 방어적 코딩으로 남겨둘 수 있습니다:
+            //alert("모든 단어를 다시 학습합니다!");
+            //window.location.reload(); // 또는 적절한 대응 로직
+            return;
+          /*} else {
+            alert("모른다 단어를 다시 학습합니다!");
+            showWord();
+          }*/
+          }
+          
+          showWord();
+        });
+    }
+    function shuffleArray(array) {
+      return array.sort(() => Math.random() - 0.5);
     }
 
     function stopStudy() {
       alert("그만하기를 눌렀습니다!");
       window.location.href = "/studies/levelChoice";
+
     }
 
     function updateProgress() {
-      document.getElementById('progress').innerText = `${knownWordsCount} / ${totalWordsCount}`;
+      document.getElementById('progress').innerText = `${knownWordsCount} / ${cumulativeWords}`;
     }
   </script>
 

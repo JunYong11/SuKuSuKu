@@ -11,7 +11,7 @@ public interface StudyService {
     // 모든 레벨 가지고 오기
     List<Level> getAllLevels();
     //레벨에 맞는 챕터 목록을 가져오는 메서드(레벨id로 챕터 목록 갖고오기)
-    List<ChapterDto> getChaptersByLevelId(Integer levelId);
+    List<ChapterDto> getChaptersByLevelId(Integer levelId, User user);
 
 //    //챕터에서 나갔던 그 상태의 정보 불러오기 (user 정보와 챕터Id로 학습하던 정보 불러오기)
 //        //!! user 말고 username이면 될거 같은데?!
@@ -35,10 +35,15 @@ public interface StudyService {
     // --------------- 3월 18일
    // 제일 처음 시작 할 때(!! 맞는 지모르겟음)
     void startStudy(User user, Integer levelId, Integer chapterId);
-    // 챕터 중간에 나갔다가 들어와서 다시 공부할떄(!! 이것도 맞는지 ㅁ모르겟음 )
-    List<WordDto> getRemainingWordsByChapter(User user, Integer chapterId);
 
-    void updateWordProgress(User user, WordProgressRequestDto dto);
+    // 한 챕터에서 단어수 == 안다 수 가 아니면 실행(챕터 중간에 나갔다가 들어와서 다시 공부할떄 or 학습 중 다 안다를 안 했을 때 모르다 했더 ㄴ단어 불러옴)
+    List<WordDto> getRemainingWordsByChapter(User user, Integer chapterId);
+    // 단어 안다,모른다 정보
+    int updateWordProgress(User user, WordProgressRequestDto dto);
+    // 누적 단어 갯수 구하기 위해 첫번째 챕터id 찾기
+    int getStartChapterId(int levelId, int chapterId, int chapterRange);
+    // 챕터 리셋
+    void resetChapterProgress(User user, Integer chapterId);
 
 
 }

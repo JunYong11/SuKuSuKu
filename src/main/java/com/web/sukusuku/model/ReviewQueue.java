@@ -15,6 +15,7 @@ public class ReviewQueue {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "queue_id", nullable = false, updatable = false)
     private Long queueId;
 
     @ManyToOne
