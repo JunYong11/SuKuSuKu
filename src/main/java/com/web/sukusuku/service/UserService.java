@@ -16,6 +16,9 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    public void updateUser(User user) {
+        userRepository.save(user);
+    }
     // 회원가입 메서드
     public void register(User user) {
         // 아이디 중복 확인 (있다면 예외)

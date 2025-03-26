@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.web.sukusuku.model.User;
 import com.web.sukusuku.service.UserService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,11 +53,10 @@ public class UserController {
     public String login(@RequestParam("username") String username,
                         @RequestParam("password") String password,
                         Model model,
-                        HttpServletRequest request) {
-
-        HttpSession session = request.getSession(true); // 기존 세션이 있으면 사용, 없으면 새로 생성
+                        HttpSession session) {
 
         if (session.getAttribute("loginUser") != null) {
+            // 이미 로그인된 상태
             return "redirect:/home";
         }
 
@@ -66,25 +64,18 @@ public class UserController {
 
         if (optionalUser.isEmpty()) {
             model.addAttribute("loginError", "존재하지 않는 아이디입니다.");
-            return "home";
+            return "home"; // 메인페이지에서 메시지 보여주기
         }
 
         User user = optionalUser.get();
 
         if (!user.getPassword().equals(password)) {
             model.addAttribute("loginError", "비밀번호가 틀렸습니다.");
-            return "home";
+            return "home"; 
         }
-
-        // 기존 세션 무효화 후 새 세션 생성
-        session.invalidate();
-        session = request.getSession(true);
         session.setAttribute("loginUser", user);
-
-        return "redirect:/";
+        return "redirect:/";  
     }
-
-
 
 
     @PostMapping("/logout")
@@ -92,6 +83,7 @@ public class UserController {
         session.invalidate(); // 세션 날리기
         return "redirect:/"; // 홈으로 이동
     }
+
 
 
 }
