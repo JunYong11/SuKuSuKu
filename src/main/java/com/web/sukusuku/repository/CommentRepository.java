@@ -13,5 +13,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     // 게시글 기준으로 댓글 찾기
 	List<Comment> findByPostIdOrderByCreatedAtAsc(Long postId);
+	
+	List<Comment> findByPostIdAndParentIsNull(Long postId); // 부모 댓글만!
+	List<Comment> findByParentId(Long parentId);            // 대댓글 조회!
 
 }

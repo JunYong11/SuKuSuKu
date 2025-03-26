@@ -1,8 +1,10 @@
 package com.web.sukusuku.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.web.sukusuku.model.Category;
+import com.web.sukusuku.model.UploadFile;
 import com.web.sukusuku.model.User;
 
 import lombok.AllArgsConstructor;
@@ -23,4 +25,5 @@ public class PostViewDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private int views;
+    private List<UploadFile> files;
 }

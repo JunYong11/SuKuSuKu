@@ -6,11 +6,13 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.web.sukusuku.dto.PostCreateDto;
 import com.web.sukusuku.dto.PostUpdateDto;
 
 import com.web.sukusuku.model.Category;
 import com.web.sukusuku.model.Post;
 import com.web.sukusuku.model.UploadFile;
+import com.web.sukusuku.model.User;
 
 public interface PostService {
 
@@ -27,6 +29,10 @@ public interface PostService {
 	UploadFile storeFile(MultipartFile file) throws IOException;
 
 	Post savePost(Post post, List<MultipartFile> files) throws IOException;
+
+	void increaseViews(Post post);
+
+	void createPost(PostCreateDto postForm, List<MultipartFile> files, User user) throws IOException;
 
 	
 }

@@ -58,7 +58,7 @@ public class Post {
     }
     
     @Column(name = "is_secret", nullable = false)
-    private Boolean secret = false;
+    private boolean secret = false;
 
     @Column(name ="views",nullable = false)
     private int views;
@@ -74,5 +74,7 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "username") // 실제 DB에서 사용할 외래 키 이름
     private User user;
+
+	private String author;
 }
 	
