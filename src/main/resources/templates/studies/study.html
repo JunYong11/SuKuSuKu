@@ -65,10 +65,10 @@
   }
 
   .kanji-box {
-
     border-radius: 8px;
-    width: 200px;
-    height: 200px;
+    min-width: 350px;  /* 고정 너비 대신 최소 너비 설정 */
+    min-height: 200px; /* 고정 높이 대신 최소 높이 설정 */
+    padding: 40px;     /* 내부 여백으로 공간 확보 */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -94,13 +94,24 @@
   }
 
   .kanji-box .small-text {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
   }
 
   .kanji-box .large-text {
-    font-size: 2rem;
+    font-size: 5rem;     /* 글자 크기 더 키움 */
     font-weight: bold;
-    margin: 8px 0;
+    margin: 25px 0;      /* 상하 여백 더 늘림 */
+    line-height: 1.2;    /* 줄 간격 조정 */
+  }
+
+  .hidden-text {
+    color: transparent;
+    user-select: none;
+  }
+  
+  .kanji-box .placeholder {
+    height: 1.2rem;
+    margin: 4px 0;
   }
 </style>
 
@@ -135,9 +146,9 @@
         <div class="row">
           <!-- 왼쪽: 한자 박스 -->
           <div class="kanji-box">
-          <div class="small-text" id="hiragana">히라가나 보기</div>
+          <div class="small-text placeholder" id="hiragana"></div>
           <div class="large-text" id="kanji">漢字</div>
-          <div class="small-text" id="meaning">뜻 보기</div>
+          <div class="small-text placeholder" id="meaning"></div>
         </div>
 
           <div class="d-flex flex-column align-items-center">
@@ -186,18 +197,32 @@
 
       const word = words[index];
       document.getElementById('kanji').innerText = word.kanji;
-      document.getElementById('hiragana').innerText = "히라가나 보기";
-      document.getElementById('meaning').innerText = "뜻 보기";
+      document.getElementById('hiragana').innerText = "";
+      document.getElementById('hiragana').classList.add('placeholder');
+      document.getElementById('meaning').innerText = "";
+      document.getElementById('meaning').classList.add('placeholder');
     }
 
     function toggleHiragana() {
       const elem = document.getElementById('hiragana');
-      elem.innerText = (elem.innerText === "히라가나 보기") ? words[index].hiragana : "히라가나 보기";
+      if (elem.innerText === "") {
+        elem.innerText = words[index].hiragana;
+        elem.classList.remove('placeholder');
+      } else {
+        elem.innerText = "";
+        elem.classList.add('placeholder');
+      }
     }
 
     function toggleMeaning() {
       const elem = document.getElementById('meaning');
-      elem.innerText = (elem.innerText === "뜻 보기") ? words[index].meaning : "뜻 보기";
+      if (elem.innerText === "") {
+        elem.innerText = words[index].meaning;
+        elem.classList.remove('placeholder');
+      } else {
+        elem.innerText = "";
+        elem.classList.add('placeholder');
+      }
     }
 
     function know() {
