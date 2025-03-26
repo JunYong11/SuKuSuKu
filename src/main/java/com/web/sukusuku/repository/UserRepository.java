@@ -1,5 +1,4 @@
 package com.web.sukusuku.repository;
-<<<<<<< HEAD
 import com.web.sukusuku.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -14,14 +13,8 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     // 혹시 level 기준으로 찾고 싶으면 예시로!
     List<User> findByLevel(String level);
-=======
-
-import com.web.sukusuku.model.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface UserRepository extends JpaRepository<User, String> {
 
     boolean existsByUsername(String username);
 
->>>>>>> origin/junyong
+
 }
