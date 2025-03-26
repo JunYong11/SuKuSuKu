@@ -220,26 +220,28 @@ public class PostController {
     }
     	
     @PostMapping("/{postId}/edit")
-    public String updatePost(@PathVariable("postId") Long postId,
-                             @ModelAttribute PostUpdateDto request,
-                             HttpSession session) {
-
+    public String updatePost(
+        @PathVariable("postId") Long postId,
+        @ModelAttribute("request") PostUpdateDto request,
+        @RequestParam(value = "files", required = false) List<MultipartFile> files,
+        HttpSession session
+    ) throws IOException {
         User loginUser = (User) session.getAttribute("loginUser");
-
         if (loginUser == null) {
             return "redirect:/users/login";
         }
 
         Post post = postService.getPostById(postId);
-
         if (!post.getAuthor().equals(loginUser.getUsername())) {
             return "redirect:/posts/list?error=permissionDenied";
         }
 
-        postService.updatePost(postId, request); // 수정 처리
+        // 파일 업데이트까지 포함
+        postService.updatePost(postId, request, files);
 
         return "redirect:/posts/view/" + postId;
     }
+
 
 
 
@@ -280,7 +282,36 @@ public class PostController {
                 .body(resource);
     }
     
+    @PostMapping("/{id}/check-password")
+    public ResponseEntity<?> checkPassword(
+            @PathVariable("id") Long id,
+            @RequestParam("inputPassword") String inputPassword,
+            HttpSession session) {
+
+        System.out.println("🔍 checkPassword 요청 도착! postId: " + id);
+
+        Post post = postService.getPostById(id);
+
+        if (post == null) {
+            System.out.println("❌ 게시글을 찾을 수 없음!");
+            return ResponseEntity.status(404).build();
+        }
+
+        String dbPassword = post.getSecretPassword() != null ? post.getSecretPassword().trim() : "";
+        String input = inputPassword != null ? inputPassword.trim() : "";
+
+        System.out.println("입력한 비밀번호: [" + input + "]");
+        System.out.println("DB 비밀번호: [" + dbPassword + "]");
+
+        if (dbPassword.equals(input)) {
+            session.setAttribute("canViewPost_" + id, true);
+            return ResponseEntity.status(302)
+                    .header("Location", "/posts/view/" + id)
+                    .build();
+        } else {
+            return ResponseEntity.ok().build(); // 틀림
+        }
+    }
 
 
-
-}
+    }

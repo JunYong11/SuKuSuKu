@@ -18,13 +18,13 @@
 
 <body>
 
-<!-- ✅ Header -->
+<!-- Header -->
 <div th:replace="~{header.html}"></div>
 
-<!-- ✅ Sidebar -->
+<!-- Sidebar -->
 <div th:replace="~{sidebar.html}"></div>
 
-<!-- ✅ Main content -->
+<!-- Main Content -->
 <main id="main" class="main">
 
   <!-- 게시글 상세보기 -->
@@ -42,23 +42,23 @@
       <div class="card-body" style="min-height: 300px;">
         <p th:text="${post.content}">게시글 내용</p>
 
-       <!-- ✅ 첨부 이미지 보여주기 -->
-<div th:if="${!#lists.isEmpty(post.files)}" class="mt-3">
-  <div th:each="file : ${post.files}">
-    <img th:if="${file.originalFileName.toLowerCase().endsWith('.png')
-                 or file.originalFileName.toLowerCase().endsWith('.jpg')
-                 or file.originalFileName.toLowerCase().endsWith('.jpeg')
-                 or file.originalFileName.toLowerCase().endsWith('.gif')}"
-         th:src="@{/posts/files/{fileId}(fileId=${file.id})}"
-         th:alt="${file.originalFileName}"
-         style="max-width: 500px; height: auto; display: block; margin-bottom: 10px;" />
-  </div>
-</div>
-
+        <!-- 첨부 이미지 보여주기 -->
+        <div th:if="${!#lists.isEmpty(post.files)}" class="mt-3">
+          <div th:each="file : ${post.files}">
+            <img th:if="${file.originalFileName.toLowerCase().endsWith('.png')
+                         or file.originalFileName.toLowerCase().endsWith('.jpg')
+                         or file.originalFileName.toLowerCase().endsWith('.jpeg')
+                         or file.originalFileName.toLowerCase().endsWith('.gif')}"
+                 th:src="@{/posts/files/{fileId}(fileId=${file.id})}"
+                 th:alt="${file.originalFileName}"
+                 style="max-width: 500px; height: auto; display: block; margin-bottom: 10px;" />
+          </div>
+        </div>
       </div>
 
       <div class="card-footer d-flex justify-content-end">
         <a th:href="@{/posts/{postId}/edit(postId=${post.id})}" class="btn btn-primary btn-sm">수정</a>
+        <!-- 게시글 삭제도 POST 방식 -->
         <form th:action="@{/posts/delete/{postId}(postId=${post.id})}" method="post" style="display:inline;">
           <button type="submit" class="btn btn-sm btn-danger">삭제</button>
         </form>
@@ -104,13 +104,34 @@
         <h5 th:text="'댓글 목록 (' + ${#lists.size(comments)} + ')'">댓글 목록</h5>
       </div>
       <div class="card-body">
+        <!-- 댓글 반복 -->
         <div th:each="comment : ${comments}" class="comment-card border p-3 rounded mb-3">
           <strong th:text="${comment.author}">작성자</strong>
-          <p th:text="${comment.content}">댓글 내용</p>
+          <div>
+            <!-- 기존 내용: span -->
+            <span th:id="'comment-text-' + ${comment.id}" th:text="${comment.content}"></span>
+            <!-- 수정 모드: textarea (초기엔 숨김) -->
+            <textarea th:id="'comment-edit-' + ${comment.id}" class="form-control d-none">[[${comment.content}]]</textarea>
+          </div>
 
-          <div class="mb-2">
-            <a th:href="@{/comments/edit/{id}(id=${comment.id})}" class="btn btn-sm btn-outline-primary">수정</a>
-            <a th:href="@{/comments/delete/{id}(id=${comment.id})}" class="btn btn-sm btn-outline-danger">삭제</a>
+          <!-- 댓글 수정/저장/삭제 버튼 -->
+          <div class="mb-2 mt-2">
+            <button type="button" class="btn btn-sm btn-outline-primary"
+                    th:onclick="|toggleEdit(${comment.id})|">
+              수정
+            </button>
+
+            <!-- 저장 버튼 (처음엔 d-none) -->
+            <button type="button" class="btn btn-sm btn-outline-success d-none"
+                    th:id="'save-btn-' + ${comment.id}"
+                    th:onclick="|saveComment(${comment.id})|">
+              저장
+            </button>
+
+            <!-- 댓글 삭제 (POST) -->
+            <form th:action="@{/comments/delete/{id}(id=${comment.id})}" method="post" style="display:inline-block;">
+              <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
+            </form>
           </div>
 
           <!-- 대댓글 작성 -->
@@ -119,18 +140,36 @@
             <input type="hidden" name="postId" th:value="${post.id}"/>
             <div class="d-flex">
               <input type="text" name="content" class="form-control form-control-sm me-2" placeholder="대댓글 입력..." required/>
-              <button type="submit" class="btn btn-sm btn-secondary">대댓글 등록</button>
+              <button type="submit" class="btn btn-sm btn-secondary">등록</button>
             </div>
           </form>
 
           <!-- 대댓글 리스트 -->
           <div th:each="reply : ${comment.children}" class="reply-card border p-2 bg-light rounded mb-2">
             <strong th:text="${reply.author}">작성자</strong>
-            <p th:text="${reply.content}">대댓글 내용</p>
+            <div>
+              <span th:id="'comment-text-' + ${reply.id}" th:text="${reply.content}"></span>
+              <textarea th:id="'comment-edit-' + ${reply.id}" class="form-control d-none">[[${reply.content}]]</textarea>
+            </div>
 
             <div class="mt-1">
-              <a th:href="@{/comments/edit/{id}(id=${reply.id})}" class="btn btn-sm btn-outline-primary">수정</a>
-              <a th:href="@{/comments/delete/{id}(id=${reply.id})}" class="btn btn-sm btn-outline-danger">삭제</a>
+              <!-- 수정 버튼 -->
+              <button type="button" class="btn btn-sm btn-outline-primary"
+                      th:onclick="|toggleEdit(${reply.id})|">
+                수정
+              </button>
+
+              <!-- 저장 버튼 -->
+              <button type="button" class="btn btn-sm btn-outline-success d-none"
+                      th:id="'save-btn-' + ${reply.id}"
+                      th:onclick="|saveComment(${reply.id})|">
+                저장
+              </button>
+
+              <!-- 대댓글 삭제 (POST) -->
+              <form th:action="@{/comments/delete/{id}(id=${reply.id})}" method="post" style="display:inline-block;">
+                <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
+              </form>
             </div>
           </div>
         </div>
@@ -138,14 +177,65 @@
     </div>
   </section>
 
+  <!-- 목록으로 이동 버튼 -->
+  <div class="d-flex justify-content-end mb-5">
+    <a th:href="@{/posts/list}" class="btn btn-secondary">← 목록으로</a>
+  </div>
+
 </main>
 
-<!-- ✅ Footer -->
+<!-- Footer -->
 <div th:replace="~{footer.html}"></div>
 
-<!-- ✅ 스크립트 순서 중요! -->
+<!-- Scripts -->
 <script src="https://cdn.tiny.cloud/1/w46cam1ez6lhmvwwsdbw7doafu19aw217qb1hzg43gznmfbj/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 <script src="/assets/js/main.js"></script>
+
+<script>
+/**
+ * 댓글/대댓글 수정 모드로 전환
+ */
+function toggleEdit(commentId) {
+  const textEl = document.getElementById(`comment-text-${commentId}`);
+  const inputEl = document.getElementById(`comment-edit-${commentId}`);
+  const saveBtn = document.getElementById(`save-btn-${commentId}`);
+
+  // textarea에 현재 내용을 세팅
+  inputEl.value = textEl.textContent.trim();
+
+  // span 감춤, textarea/저장 버튼 표시
+  textEl.classList.add("d-none");
+  inputEl.classList.remove("d-none");
+  saveBtn.classList.remove("d-none");
+}
+
+/**
+ * 댓글/대댓글 저장
+ */
+function saveComment(commentId) {
+  const textEl = document.getElementById(`comment-text-${commentId}`);
+  const inputEl = document.getElementById(`comment-edit-${commentId}`);
+  const saveBtn = document.getElementById(`save-btn-${commentId}`);
+
+  const content = inputEl.value.trim();
+
+  fetch(`/comments/edit-api/${commentId}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ content })
+  }).then(res => {
+    if (res.ok) {
+      // 성공 시 화면만 업데이트
+      textEl.textContent = content;
+      textEl.classList.remove("d-none");
+      inputEl.classList.add("d-none");
+      saveBtn.classList.add("d-none");
+    } else {
+      alert("수정 실패");
+    }
+  });
+}
+</script>
 
 </body>
 </html>

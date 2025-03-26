@@ -23,7 +23,8 @@ public class PostCreateDto {
     private String category;   // 자유게시판 / 질문게시판 / 자료게시판
 
     private Boolean secret = false;
-
+    private String secretPassword;
+    
     public Post toEntity(String author) {
         try {
             // Category가 Enum이기 때문에, 문자열 값을 Enum으로 변환해야 함
@@ -33,6 +34,7 @@ public class PostCreateDto {
                     .content(this.content)
                     .category(cat)  // 카테고리 값 매핑
                     .secret(this.secret != null ? this.secret : false)  // 기본값 처리
+                    .secretPassword(this.secret != null && this.secret ? this.secretPassword : null)
                     .views(0)  // 기본 조회수
                     .author(author)  // 세션에서 받은 작성자 이름
                     .build();

@@ -20,7 +20,7 @@ public interface PostService {
 
     Post readPost(Long postId);
 
-    void updatePost(Long postId, PostUpdateDto request);
+    void updatePost(Long postId, PostUpdateDto request, List<MultipartFile> files) throws IOException;
 
     void removePost(Long postId);
 
@@ -33,6 +33,8 @@ public interface PostService {
 	void increaseViews(Post post);
 
 	void createPost(PostCreateDto postForm, List<MultipartFile> files, User user) throws IOException;
+
+	void updatePost(Long postId, PostUpdateDto request);
 
 	
 }

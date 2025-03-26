@@ -90,11 +90,16 @@
                     <input type="file" id="files" name="files" multiple class="form-control" />
                 </div>
 
-                <!-- 비밀글 체크 -->
-                <div class="form-check mb-4">
-                    <input type="checkbox" id="secret" name="secret" class="form-check-input" />
-                    <label for="secret" class="form-check-label">비밀글</label>
-                </div>
+                <!-- 비밀글 체크 및 비밀번호 -->
+				<div class="form-check mb-4">
+  					<input type="checkbox" id="secret" name="secret" class="form-check-input" onchange="togglePasswordInput()" />
+  				  	<label for="secret" class="form-check-label">비밀글</label>
+				</div>
+				<div class="mb-3" id="secret-password-field" hidden>
+    				<label for="secretPassword" class="form-label">비밀번호</label>
+  				    <input type="password" id="secretPassword" name="secretPassword" class="form-control" />
+				</div>
+
 
                 <!-- 버튼 -->
                 <div class="d-flex justify-content-end">
@@ -113,6 +118,14 @@
     <!-- JS -->
     <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/js/main.js"></script>
+<script>
+function togglePasswordInput() {
+    const isSecret = document.getElementById('secret').checked;
+    const passwordField = document.getElementById('secret-password-field');
+    passwordField.hidden = !isSecret;
+}
+
+</script>
 
 </body>
 

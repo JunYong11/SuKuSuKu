@@ -59,7 +59,7 @@ public class Post {
     
     @Column(name = "is_secret", nullable = false)
     private boolean secret = false;
-
+    private String secretPassword;
     @Column(name ="views",nullable = false)
     private int views;
 
