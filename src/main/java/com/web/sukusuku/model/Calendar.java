@@ -15,7 +15,7 @@ public class Calendar {
     @Id
     @Column(name = "calendar_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)  // project_id가 자동 증가하도록 설정
-    private Integer calendarId;
+    private Long calendarId;
 
     @Column(name = "schedule")
     private String schedule;
@@ -29,6 +29,9 @@ public class Calendar {
     @Column(name = "end_date", nullable = false)
     private LocalDateTime endDate;
 
+    @Column(name = "calendar_check", nullable = false)
+    private boolean check;
+
     @ManyToOne
     @JoinColumn(name = "username", referencedColumnName = "username")
     private User user;
@@ -36,4 +39,8 @@ public class Calendar {
     @ManyToOne
     @JoinColumn(name = "project_id", referencedColumnName = "project_id")
     private Project project;
+
+    public void setCompleted(boolean check) {
+        this.check = check;
+    }
 }

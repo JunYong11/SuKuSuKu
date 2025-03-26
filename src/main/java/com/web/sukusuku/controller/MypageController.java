@@ -85,6 +85,16 @@ public class MypageController {
 		return "redirect:/mypage";
 	}
 	
+	// 스케줄 삭제
+	@PostMapping("/deleteCalendar")
+	public String calendarDelet(
+			@ModelAttribute Calendar calendar) {
+		
+		myPageService.removeCalendar(calendar.getCalendarId());
+
+		return "redirect:/mypage";
+	}
+	
 	// 모달 호출시 프로젝트 불러오기
 	@GetMapping("/modal/projects")
     @ResponseBody

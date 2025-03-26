@@ -59,5 +59,25 @@ public class MyPageService {
 		return calendarRepository.save(calendar);
 	}
 
+	// 스케줄 삭제
+	public void removeCalendar(Long calendarId) {
+		Optional<Calendar> optionalCalenar = calendarRepository.findById(calendarId);
+		Calendar calendar = optionalCalenar.get();
+		
+		calendarRepository.delete(calendar);
+	}
+
+	 public boolean updateCompletionStatus(Long calendarId, boolean completed) {
+	        Optional<Calendar> optionalCalendar = calendarRepository.findById(calendarId);
+	        
+	        if (optionalCalendar.isPresent()) {
+	            Calendar calendar = optionalCalendar.get();
+	            calendar.setCompleted(completed); // 완료 상태 변경
+	            calendarRepository.save(calendar);
+	            return true;
+	        }
+	        return false;
+	    }
+
 	
 }

@@ -370,16 +370,21 @@ td {
 									<!-- 리스트 간격 조정 -->
 
 									<div th:each="event : ${events}">
-										<th:block th:if="${project.projectName == event.project.projectName}">
+										<th:block
+											th:if="${project.projectName == event.project.projectName}">
 											<li th:text="${event.schedule}" style="margin-bottom: 10px;">프로젝트</li>
 											<!-- 항목 간격 조정 -->
 										</th:block>
 									</div>
 
-									<span class="achievement-percentage" style="margin-top: 15px;">70%</span>
+									<span th:id="'project-achievement-' + ${project.projectId}"
+										class="achievement-percentage" style="margin-top: 15px;">0%</span>
 									<!-- 달성률 상단 간격 조정 -->
-									<div class="achievement-bar" style="margin-top: 10px;">
-										<div class="achievement-fill" style="width: 70%;"></div>
+									<div class="achievement-bar"
+										style="margin-top: 10px; width: 100%; background-color: #ddd; height: 10px; border-radius: 5px;">
+										<div th:id="'achievement-fill-' + ${project.projectId}"
+											class="achievement-fill"
+											style="width: 0%; transition: width 0.5s ease;"></div>
 										<!-- 달성률 막대 간격 조정 -->
 									</div>
 								</div>
@@ -422,8 +427,13 @@ td {
 									<tr th:each="calendar : ${events}">
 										<td>
 											<div class="schedule-container">
-												<span th:text="${calendar.schedule}">할일</span>
-												<button class="delete-events-btn" type="button" title="삭제">✖</button>
+												<form action="/mypage/deleteCalendar" method="post"
+													style="display: inline;">
+													<span th:text="${calendar.schedule}">할일</span> <input
+														type="hidden" name="calendarId"
+														th:value="${calendar.calendarId}" />
+													<button class="delete-events-btn" type="submit" title="삭제">✖</button>
+												</form>
 											</div>
 										</td>
 										<td th:text="${calendar.project.projectName}">project</td>
@@ -431,7 +441,10 @@ td {
 											th:text="${#temporals.format(calendar.endDate, 'yyyy-MM-dd')}">종료
 											날짜</td>
 										<td th:text="${calendar.memo}">메모</td>
-										<td><input type="checkbox"></td>
+										<td><input type="checkbox" class="completion-checkbox"
+											th:data-username="${loginUser.username}"
+											th:data-calendar-id="${calendar.calendarId}"
+											th:checked="${calendar.check}" /></td>
 									</tr>
 								</table>
 							</div>
@@ -441,6 +454,7 @@ td {
 			</div>
 		</section>
 	</main>
+
 
 	<!-- ========================================== modal ============================================ -->
 
@@ -485,12 +499,100 @@ td {
 	<!-- ========================================== script ============================================ -->
 
 	<script>
+	document.querySelectorAll('.completion-checkbox').forEach(checkbox => {
+	    checkbox.addEventListener('change', function() {
+	        let calendarId = this.getAttribute('data-calendar-id'); // 일정 ID 가져오기
+	        let isChecked = this.checked; // 체크 여부 확인 (true / false)
+	        let username = this.getAttribute('data-username'); // 사용자 이름 가져오기
+
+
+	        // 서버로 체크 상태 업데이트 요청
+	        fetch('/mypage/api/updateCompletionStatus', {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json'
+	            },
+	            body: JSON.stringify({
+	                calendarId: calendarId,
+	                completed: isChecked
+	            })
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	            if (data.success) {
+	                console.log(`스케줄 ID ${calendarId}의 완료 상태가 ${isChecked}로 변경됨`);
+	                
+	                console.log(username);
+	                
+	                updateUserAchievement(username)
+	                
+	            } else {
+	                console.error('업데이트 실패:', data.message);
+	            }
+	        })
+	        .catch(error => {
+	            console.error('오류 발생:', error);
+	        });
+	        
+	       
+	    });
+	});
+	
+	// ✅ 사용자별 프로젝트 달성률 업데이트 요청 함수
+	function updateUserAchievement(username) {
+    fetch('/mypage/api/updateUserAchievement', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username: username })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("백엔드 응답:", data);
+
+        if (data.userAchievements) {
+            console.log("달성률 업데이트 완료:", data.userAchievements);
+
+            // 각 프로젝트 ID별로 달성률 업데이트
+            data.userAchievements.forEach(project => {
+                let achievementElement = document.querySelector(`#project-achievement-${project.projectId}`);
+                let achievementBar = achievementElement?.parentElement?.querySelector(".achievement-fill");
+
+                if (achievementElement && achievementBar) {
+                    console.log(`업데이트 대상: ${project.projectId}, 달성률: ${project.achievementRate}`);
+
+                    // 1️⃣ 퍼센트 텍스트 업데이트
+                    achievementElement.textContent = `${project.achievementRate.toFixed(1)}%`;
+
+                    // 2️⃣ 막대 너비 업데이트
+                    achievementBar.style.width = `${project.achievementRate}%`;
+                } else {
+                    console.warn(`해당 ID를 가진 요소를 찾을 수 없음: #project-achievement-${project.projectId}`);
+                }
+            });
+        } else {
+            console.error('프로젝트 달성률 업데이트 실패:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('오류 발생:', error);
+    });
+}
+	</script>
+
+
+	<script>
 	let calendar;  // 전역 변수로 선언
 	
 	document.addEventListener('DOMContentLoaded', function () {
 		
 	    var calendarEl = document.getElementById('calendar');
-	   
+	    
+	    let username = document.querySelector('.completion-checkbox')?.getAttribute('data-username');
+	    if (username) {
+	        updateUserAchievement(username); // ✅ 마이페이지 로드 시에도 달성률 업데이트
+	    }
 	    
 	   	calendar = new FullCalendar.Calendar(calendarEl, {
 	        expandRows: true,

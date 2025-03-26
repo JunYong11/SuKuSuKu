@@ -1,11 +1,13 @@
 package com.web.sukusuku.controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import com.web.sukusuku.dto.CompletionStatusRequest;
+import com.web.sukusuku.dto.UserAchievementDto;
 import com.web.sukusuku.model.Calendar;
 import com.web.sukusuku.model.CalendarCreateDto;
 import com.web.sukusuku.model.Project;
@@ -52,7 +56,7 @@ public class MyPageRestController {
 		calendar.setEndDate(calendarCreateDto.getSelectDate().atTime(23,59,59));
 		calendar.setMemo(calendarCreateDto.getMemo());
 		calendar.setSchedule(calendarCreateDto.getSchedule());
-		
+		calendar.setCheck(false);
 		
 		Calendar resultCalendar = myPageService.saveCalendar(calendar);
 		
@@ -64,6 +68,71 @@ public class MyPageRestController {
 
 		return ResponseEntity.ok(response);
 	}
+	
+	// 스케줄 상태 체크
+	@PostMapping("/updateCompletionStatus")
+    public ResponseEntity<Map<String, Object>> updateCompletionStatus(@RequestBody CompletionStatusRequest request) {
+        boolean success = myPageService.updateCompletionStatus(request.getCalendarId(), request.isCompleted());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", success);
+        
+        if (success) {
+            return ResponseEntity.ok(response);
+        } else {
+            response.put("message", "업데이트 실패");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+	
+	@PostMapping("/updateUserAchievement")
+	public ResponseEntity<Map<String, Object>> updateUserAchievement(
+	        @RequestBody Map<String, Object> requestData) {
+	    
+	    String username = (String) requestData.get("username");
+	    
+	    List<Project> findProjects = myPageService.findByUserName_Project(username);
+	    List<Calendar> findCalendars = myPageService.findByUserName_Calendar(username);
+	    
+	    List<UserAchievementDto> userAchievements = new ArrayList<UserAchievementDto>();
+	    
+	    for (int i = 0; i < findProjects.size(); i++) {
+	        int result_count = 0;
+	        int true_count = 0;
+	        
+	        for (int j = 0; j < findCalendars.size(); j++) {
+	            if (findProjects.get(i).getProjectId() == findCalendars.get(j).getProject().getProjectId()) {
+	                result_count++;
+	                if (findCalendars.get(j).isCheck()) {
+	                    true_count++;
+	                }
+	            }
+	        }
+	        
+	        // 달성률 계산
+	        double achievementRate = 0;
+	        if (result_count > 0) {
+	            achievementRate = (double) true_count / result_count * 100;
+	        }
+
+	        // DTO에 설정
+	        UserAchievementDto achievement = new UserAchievementDto();
+	        achievement.setResultcount((long) result_count);
+	        achievement.setTruecount((long) true_count);
+	        achievement.setProjectId(findProjects.get(i).getProjectId());
+	        achievement.setAchievementRate(achievementRate); // 달성률 추가
+	        
+	        userAchievements.add(achievement);
+	    }
+	    
+	    log.info("userAchievements: {}", userAchievements);
+	    
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("userAchievements", userAchievements);
+	  
+	    return ResponseEntity.ok(response);
+	}
+
 	
 
 	

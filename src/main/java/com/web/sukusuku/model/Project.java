@@ -2,6 +2,7 @@ package com.web.sukusuku.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
@@ -19,6 +20,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "project")
+@ToString
 @Getter
 @Setter
 @NoArgsConstructor
