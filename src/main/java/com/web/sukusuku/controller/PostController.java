@@ -154,47 +154,54 @@ public class PostController {
     
     @GetMapping("/view/{postId}")
     public String viewPost(@PathVariable("postId") Long postId, Model model, HttpSession session) {
-
         Post post = postService.readPost(postId);
 
-        
         if (post == null) {
             return "redirect:/posts/list";
         }
 
         User loginUser = (User) session.getAttribute("loginUser");
         boolean isAuthor = loginUser != null && post.getAuthor().equals(loginUser.getUsername());
-        
-        List<Comment> comments = commentService.getCommentsByPostId(postId);
 
-        // ✅ 비밀글일 경우 접근 제어
-        if (post.isSecret() && !isAuthor) {
-            return "redirect:/posts/list?error=permissionDenied";
+        // 비밀글 접근 제어: 권한이 없으면 비밀번호 입력 페이지로 리다이렉트
+        boolean canViewPost = session.getAttribute("canViewPost_" + postId) != null && (boolean) session.getAttribute("canViewPost_" + postId);
+        if (post.isSecret() && !isAuthor && !canViewPost) {
+            return "redirect:/posts/view-password/" + postId;  // 비밀번호 입력 페이지로 리다이렉트
         }
 
-        // ✅ 조회수 증가 (옵션)
-        postService.increaseViews(post);
+        // 댓글과 대댓글 처리
+        List<Comment> comments = commentService.getCommentsByPostId(postId);
+        for (Comment comment : comments) {
+            boolean isCommentAuthor = loginUser != null && comment.getAuthor() != null && comment.getAuthor().equals(loginUser.getUsername());
+            comment.setIsAuthor(isCommentAuthor ? Boolean.TRUE : Boolean.FALSE);
 
-        // ✅ DTO 변환
+            for (Comment reply : comment.getChildren()) {
+                boolean isReplyAuthor = loginUser != null && reply.getAuthor() != null && reply.getAuthor().equals(loginUser.getUsername());
+                reply.setIsAuthor(isReplyAuthor ? Boolean.TRUE : Boolean.FALSE);
+            }
+        }
+
         PostViewDto response = PostViewDto.builder()
-            .id(post.getId())
-            .category(post.getCategory())
-            .title(post.getTitle())
-            .content(post.getContent())
-            .author(post.getAuthor())
-            .createdAt(post.getCreatedAt())
-            .updatedAt(post.getUpdatedAt())
-            .views(post.getViews())
-            .files(post.getFiles())
-            .build();
+                .id(post.getId())
+                .category(post.getCategory())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .author(post.getAuthor())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .views(post.getViews())
+                .files(post.getFiles())
+                .build();
 
-        model.addAttribute("loginUser", loginUser);
         model.addAttribute("post", response);
         model.addAttribute("comments", comments);
         model.addAttribute("isAuthor", isAuthor);
+        model.addAttribute("loginUser", loginUser);
 
-        return "posts/view";
+        return "posts/view";  // 게시글 상세보기 페이지로 이동
     }
+
+
 
 
     // 수정 폼 보여주기

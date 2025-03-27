@@ -25,6 +25,17 @@ public class Comment{
     @Column(name = "username") 
     private String author;
 
+    @Transient
+    private Boolean isAuthor;
+
+    public void setIsAuthor(boolean isAuthor) {
+        this.isAuthor = isAuthor;
+    }
+    // isAuthor 조회
+    public Boolean isAuthor() {
+        return isAuthor;
+    }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;

@@ -56,13 +56,19 @@
         </div>
       </div>
 
-      <div class="card-footer d-flex justify-content-end">
-        <a th:href="@{/posts/{postId}/edit(postId=${post.id})}" class="btn btn-primary btn-sm">수정</a>
-        <!-- 게시글 삭제도 POST 방식 -->
-        <form th:action="@{/posts/delete/{postId}(postId=${post.id})}" method="post" style="display:inline;">
-          <button type="submit" class="btn btn-sm btn-danger">삭제</button>
-        </form>
-      </div>
+<div class="card-footer d-flex justify-content-end">
+<a th:if="${loginUser != null and post.author == loginUser.username}"
+   th:href="@{/posts/{postId}/edit(postId=${post.id})}"
+   class="btn btn-primary btn-sm">수정</a>
+
+<form th:if="${loginUser != null and post.author == loginUser.username}"
+      th:action="@{/posts/delete/{postId}(postId=${post.id})}" method="post" style="display:inline;">
+  <button type="submit" class="btn btn-sm btn-danger">삭제</button>
+</form>
+
+</div>
+
+
     </div>
   </section>
 
@@ -114,25 +120,24 @@
             <textarea th:id="'comment-edit-' + ${comment.id}" class="form-control d-none">[[${comment.content}]]</textarea>
           </div>
 
-          <!-- 댓글 수정/저장/삭제 버튼 -->
-          <div class="mb-2 mt-2">
-            <button type="button" class="btn btn-sm btn-outline-primary"
-                    th:onclick="|toggleEdit(${comment.id})|">
-              수정
-            </button>
+<!-- 댓글 수정/저장/삭제 버튼 -->
+<div class="mb-2 mt-2" th:if="${comment.isAuthor == true}">
+  <button type="button" class="btn btn-sm btn-outline-primary"
+          th:onclick="|toggleEdit(${comment.id})|">
+    수정
+  </button>
 
-            <!-- 저장 버튼 (처음엔 d-none) -->
-            <button type="button" class="btn btn-sm btn-outline-success d-none"
-                    th:id="'save-btn-' + ${comment.id}"
-                    th:onclick="|saveComment(${comment.id})|">
-              저장
-            </button>
+  <button type="button" class="btn btn-sm btn-outline-success d-none"
+          th:id="'save-btn-' + ${comment.id}"
+          th:onclick="|saveComment(${comment.id})|">
+    저장
+  </button>
 
-            <!-- 댓글 삭제 (POST) -->
-            <form th:action="@{/comments/delete/{id}(id=${comment.id})}" method="post" style="display:inline-block;">
-              <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
-            </form>
-          </div>
+  <form th:action="@{/comments/delete/{id}(id=${comment.id})}" method="post" style="display:inline-block;">
+    <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
+  </form>
+</div>
+
 
           <!-- 대댓글 작성 -->
           <form th:action="@{/comments/reply}" method="post" class="mb-3">
@@ -152,7 +157,7 @@
               <textarea th:id="'comment-edit-' + ${reply.id}" class="form-control d-none">[[${reply.content}]]</textarea>
             </div>
 
-            <div class="mt-1">
+            <div class="mt-1"th:if="${reply.isAuthor == true}">
               <!-- 수정 버튼 -->
               <button type="button" class="btn btn-sm btn-outline-primary"
                       th:onclick="|toggleEdit(${reply.id})|">
