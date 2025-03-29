@@ -13,6 +13,10 @@
     .comment-card { margin-bottom: 15px; }
     .reply-card { margin-left: 30px; }
     .btn-sm { padding: 0.25rem 0.5rem; }
+    .post-content {
+  white-space: pre-wrap;
+}
+    
   </style>
 </head>
 
@@ -40,7 +44,7 @@
       </div>
 
       <div class="card-body" style="min-height: 300px;">
-        <p th:text="${post.content}">게시글 내용</p>
+     <div th:utext="${post.content}" class="post-content">게시글 내용</div>
 
         <!-- 첨부 이미지 보여주기 -->
         <div th:if="${!#lists.isEmpty(post.files)}" class="mt-3">
