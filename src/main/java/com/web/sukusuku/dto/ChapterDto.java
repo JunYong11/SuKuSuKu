@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-//@AllArgsConstructor
+@AllArgsConstructor
 @NoArgsConstructor
 public class ChapterDto {
     private Integer levelId;
@@ -16,13 +16,6 @@ public class ChapterDto {
     private Integer cumulativeWords; //누적 단어 갯수
     private Integer reviewCount; // 회독 횟수
 
-    public ChapterDto(Integer levelId, Integer chapterId, String chapterName, Integer cumulativeWords, Integer reviewCount) {
-        this.levelId = levelId;
-        this.chapterId = chapterId;
-        this.chapterName = chapterName;
-        this.cumulativeWords = cumulativeWords;
-        this.reviewCount = reviewCount;
-    }
 
     // Getter, Setter methods...
 }

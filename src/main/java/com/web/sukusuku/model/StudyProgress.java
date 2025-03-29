@@ -9,12 +9,21 @@ import java.time.LocalDateTime;
 @Table(name = "studyprogress")
 @Data
 @NoArgsConstructor
-@ToString(exclude = {"user"})
+@AllArgsConstructor
+@Builder
 public class StudyProgress {
 
    @Id
-   @Column(name = "progress_id")
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @Column(name = "progress_id", nullable = false)
    private Integer progressId;
+
+   @ManyToOne
+   @JoinColumn(name = "username", nullable = false)
+   private User user;
+
+   @Column(name = "id2", nullable = false)
+   private Integer chapterId;
 
    @Enumerated(EnumType.STRING)
    private Status status;
@@ -22,15 +31,8 @@ public class StudyProgress {
    @Column(name = "review_count", nullable = false)
    private Integer reviewCount;
 
-   @Column(name = "last_reviewed_at")
+//   @Column(name = "last_reviewed_at", nullable = false)
    private LocalDateTime lastReviewedAt;
-
-   @ManyToOne
-   @JoinColumn(name = "username")
-   private User user;
-
-   @Column(name = "id2", nullable = false)
-   private Integer id2;
 
    public enum Status {
       대기,

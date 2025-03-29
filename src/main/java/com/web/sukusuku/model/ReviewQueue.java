@@ -9,26 +9,32 @@ import java.time.LocalDateTime;
 @Table(name = "review_queue")
 @Data
 @NoArgsConstructor
-@ToString(exclude = {"user"})
+@AllArgsConstructor
+@Builder
 public class ReviewQueue {
 
     @Id
-    @Column(name = "queue_id")
-    private Integer queueId;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "review_status")
-    private ReviewStatus reviewStatus;
-
-    @Column(name = "added_at")
-    private LocalDateTime addedAt;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "queue_id", nullable = false, updatable = false)
+    private Long queueId;
 
     @ManyToOne
-    @JoinColumn(name = "username")
+    @JoinColumn(name = "username", nullable = false)
     private User user;
 
-    @Column(name = "id2", nullable = false)
-    private Integer id2;
+    @ManyToOne
+    @JoinColumn(name = "word_id", nullable = false)
+    private Word word;
+
+    @Enumerated(EnumType.STRING)
+    private ReviewStatus reviewStatus;
+
+    private LocalDateTime addedAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.addedAt = LocalDateTime.now();
+    }
 
     public enum ReviewStatus {
         대기,
