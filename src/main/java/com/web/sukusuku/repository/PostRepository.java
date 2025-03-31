@@ -21,7 +21,13 @@ public interface PostRepository  extends JpaRepository<Post, Long> {
             Category category2, String keyword2,
             Pageable pageable
         );
-
+    Page<Post> findByCategoryAndContentContaining(
+    		Category category, String keyword, Pageable pageable);
+    Page<Post> findByCategoryAndAuthorContaining(
+    		Category category, String keyword, Pageable pageable);
     // 카테고리별 게시글 목록 가져오기
     Page<Post> findByCategory(Category category, Pageable pageable);
+
+	Page<Post> findByCategoryAndTitleContaining(Category category, String keyword, Pageable pageable);
+
 }

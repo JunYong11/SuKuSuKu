@@ -32,23 +32,31 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
 
     @Override
-    public Page<Post> getPosts(Category category, String keyword, String sort, int page, int size) {
+    public Page<Post> getPosts(Category category, String keyword, String searchType, String sort, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, getSort(sort));
 
         if (keyword != null && !keyword.isEmpty()) {
-            return postRepository.findByCategoryAndTitleContainingOrCategoryAndContentContaining(
-                category, keyword, category, keyword, pageable);
+            switch (searchType) {
+                case "content":
+                    return postRepository.findByCategoryAndContentContaining(category, keyword, pageable);
+                case "author":
+                    return postRepository.findByCategoryAndAuthorContaining(category, keyword, pageable);
+                case "title":
+                default:
+                    return postRepository.findByCategoryAndTitleContaining(category, keyword, pageable);
+            }
         }
 
         return postRepository.findByCategory(category, pageable);
     }
+
     	
     private Sort getSort(String sort) {
         if (sort == null) sort = "recent"; // 기본값 세팅
 
         switch (sort.toLowerCase()) {
             case "views":
-                return Sort.by(Sort.Direction.DESC, "views");
+                return Sort.by(Sort.Direction.DESC, "views");	
             case "oldest":
                 return Sort.by(Sort.Direction.ASC, "createdAt");
             case "recent":
@@ -193,11 +201,7 @@ public class PostServiceImpl implements PostService {
         postRepository.save(post);
     }
 
-	@Override
-	public void updatePost(Long postId, PostUpdateDto request) {
-		// TODO Auto-generated method stub
-		
-	}
+
 
 }
 	

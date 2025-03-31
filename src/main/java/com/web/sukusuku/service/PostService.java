@@ -16,8 +16,6 @@ import com.web.sukusuku.model.User;
 
 public interface PostService {
 
-    Page<Post> getPosts(Category category, String keyword, String sort, int page, int size);
-
     Post readPost(Long postId);
 
     void updatePost(Long postId, PostUpdateDto request, List<MultipartFile> files) throws IOException;
@@ -34,7 +32,8 @@ public interface PostService {
 
 	void createPost(PostCreateDto postForm, List<MultipartFile> files, User user) throws IOException;
 
-	void updatePost(Long postId, PostUpdateDto request);
+	Page<Post> getPosts(Category category, String keyword, String searchType, String sort, int page, int size);
+
 
 	
 }

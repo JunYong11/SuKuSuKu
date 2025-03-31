@@ -22,6 +22,9 @@ public class User {
     private String email;
     private String level;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Post> posts = new ArrayList<>();
+    
     @Column(name = "user_role")
     private String userRole;
 

@@ -51,6 +51,7 @@ public class PostController {
     public String getPostList(@RequestParam(name = "category", required = false) Category category,
                               @RequestParam(name = "keyword", required = false) String keyword,
                               @RequestParam(name = "sort", required = false, defaultValue = "recent") String sort,
+                              @RequestParam(name = "searchType", required = false, defaultValue = "title") String searchType,
                               @RequestParam(name = "page", defaultValue = "0") int page,
                               @RequestParam(name = "size", defaultValue = "10") int size,
                               Model model,
@@ -62,7 +63,7 @@ public class PostController {
         }
 
         // ✅ 게시글 가져오기
-        Page<Post> posts = postService.getPosts(category, keyword, sort, page, size);
+        Page<Post> posts = postService.getPosts(category, keyword, searchType, sort, page, size);
 
         // ✅ 페이징 계산
         int totalPageCount = posts.getTotalPages();
@@ -118,10 +119,11 @@ public class PostController {
         @PathVariable Category category,
         @RequestParam(required = false) String keyword,
         @RequestParam(required = false, defaultValue = "recent") String sort,
+        @RequestParam(name = "searchType", required = false, defaultValue = "title") String searchType,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size) {
 
-        return ResponseEntity.ok(postService.getPosts(category, keyword, sort, page, size));
+        return ResponseEntity.ok(postService.getPosts(category, keyword, searchType, sort, page, size));
     }
 	
     @PostMapping("/create")
@@ -155,7 +157,7 @@ public class PostController {
     @GetMapping("/view/{postId}")
     public String viewPost(@PathVariable("postId") Long postId, Model model, HttpSession session) {
         Post post = postService.readPost(postId);
-
+        postService.increaseViews(post);
         if (post == null) {
             return "redirect:/posts/list";
         }
