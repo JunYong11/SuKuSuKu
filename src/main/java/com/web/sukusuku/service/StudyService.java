@@ -37,7 +37,7 @@ public interface StudyService {
     void startStudy(User user, Integer levelId, Integer chapterId);
 
     // 한 챕터에서 단어수 == 안다 수 가 아니면 실행(챕터 중간에 나갔다가 들어와서 다시 공부할떄 or 학습 중 다 안다를 안 했을 때 모르다 했더 ㄴ단어 불러옴)
-    List<WordDto> getRemainingWordsByChapter(User user, Integer chapterId);
+    List<WordDto> getRemainingWordsByChapter(User user,Integer chapterId);
     // 단어 안다,모른다 정보
     int updateWordProgress(User user, WordProgressRequestDto dto);
     // 누적 단어 갯수 구하기 위해 첫번째 챕터id 찾기

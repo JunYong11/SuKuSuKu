@@ -55,14 +55,14 @@
 		justify-content: center;
 	}
 
-	.nav-tabs {
+	.level-tab {
 		list-style: none;
-		padding: 0;
+		padding: 10px;
 		margin: 0;
-		border-bottom: 1px solid #ddd;
+		/*border-bottom: 1px solid #ddd;*/
 	}
 
-	.nav-tabs li {
+	.level-tab li {
 		margin: 0 10px;
 	}
 
@@ -197,7 +197,7 @@
 			<div class="container">
 				<!-- 레벨 선택 영역 -->
 				<div class="level-selection">
-					<ul class="nav-tabs flex-center" id="levelTabs" role="tablist">
+					<ul class="level-tab flex-center" id="levelTabs" role="tablist">
 						<li th:each="level : ${levels}">
 							<button class="level-button" th:attr="data-level-id=${level.levelId}">
 								<img th:src="@{'/assets/img/level/n' + ${level.levelId} + '.png'}" th:alt="${level.levelName}" class="level-image">
@@ -283,6 +283,7 @@
 			fetch(`/studies/levelChoice/api?levelId=${levelId}`)
 				.then(response => response.json())
 				.then(chapters => {
+					console.log(levelId)
 					const container = document.getElementById('chapters-container');
 
 					let html = `<h2>챕터 목록 - N${levelId}</h2><div class="row">`;

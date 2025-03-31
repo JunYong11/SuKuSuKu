@@ -144,8 +144,7 @@
 
 
 
-
-            <div class="d-flex flex-wrap justify-content-center gap-2 button-group">
+            <div id="controlButtons" class="d-flex flex-wrap justify-content-center gap-2 button-group">
               <button type="button" class="btn btn-primary" onclick="toggleMeaning()">뜻</button>
               <button type="button" class="btn btn-primary" onclick="toggleHiragana()">히라가나</button>
               <button type="button" class="btn btn-success" onclick="know()">안다</button>
@@ -156,6 +155,11 @@
           </div><!-- /.row -->
         </div><!-- /.card-body -->
       </form><!-- /.card -->
+
+      <div id="restartButton" style="display: none; text-align: center; margin-top: 1rem;">
+        <button class="btn btn-primary" onclick="window.location.reload()">다시 학습하기</button>
+        <button class="btn btn-secondary" onclick="window.location.href='/studies/levelChoice'">챕터 선택으로 돌아가기</button>
+      </div>
 </section><!-- /.section -->
   <script th:inline="javascript">
 
@@ -167,8 +171,9 @@
     // let knownWordsCount = /*[[${knownWordsCount} ?: 0]]*/[]; // 안다로 체크한 단어 수
 
     window.onload = () => {
-      updateProgress();  // 초기값 세팅
-      showWord();        // 첫 단어 보여주기
+      updateProgress();// 초기값 세팅
+      setTimeout(showWord() ,3   );
+         // 첫 단어 보여주기
     };
 
     function showWord() {
@@ -176,13 +181,7 @@
         reloadWords();  // 다시 모른다 리스트 가져오기
         return;
       }
-      // if (words.length === 0) {
-      //   alert("이 챕터를 모두 학습했습니다!");
-      //   window.location.href = "/studies/levelChoice";
-      //   return;
-      // }
-
-      const word = words[index];
+     const word = words[index];
       document.getElementById('kanji').innerText = word.kanji;
       document.getElementById('hiragana').innerText = "";
       document.getElementById('hiragana').classList.add('placeholder');
@@ -269,34 +268,33 @@
     }
 
     function reloadWords() {
+      // 재시도 횟수를 제한하거나 
+      // 사용자 상호작용 없이는 자동으로 호출되지 않도록 함
+      // 이미 reload가 진행 중인지 확인하는 플래그 추가
+      if (window.isReloading) return;
+      
+      window.isReloading = true;
+      
       fetch(`/studies/remainingWords?chapterId=${chapterId}`)
         .then(response => response.json())
         .then(data => {
-          console.log("받은 데이터:", data); // 데이터 확인용 로그
-          console.log("데이터 길이:", data.length); // 길이 확인용 로그
+          window.isReloading = false;
           
+          if (data.length === 0) {
+            // 서버에서 빈 배열을 받은 경우
+            alert("이 챕터의 모든 단어를 학습했습니다! 다른 챕터를 선택하거나 학습을 다시 시작하세요.");
+            window.location.href = "/studies/levelChoice";
+            return;
+          }
+
           words = shuffleArray(data);
           index = 0;
-          totalWordsCount = cumulativeWords;
-          
-          updateProgress();
-          
-          if (words.length === 0) {
-            alert("🎉 이 챕터를 모두 학습했습니다!");
-            window.location.href = "/studies/levelChoice";
-            // 이 부분은 필요하지 않을 수 있습니다.
-            // 모든 단어를 완료하면 서버에서 이미 리셋했기 때문입니다.
-            // 하지만 방어적 코딩으로 남겨둘 수 있습니다:
-            //alert("모든 단어를 다시 학습합니다!");
-            //window.location.reload(); // 또는 적절한 대응 로직
-            return;
-          /*} else {
-            alert("모른다 단어를 다시 학습합니다!");
-            showWord();
-          }*/
-          }
-          
           showWord();
+          updateProgress();
+        })
+        .catch(error => {
+          window.isReloading = false;
+          console.error('단어 불러오기 실패:', error);
         });
     }
     function shuffleArray(array) {

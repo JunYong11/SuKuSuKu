@@ -45,14 +45,6 @@ public String moveLevelChoicePage(Model model,HttpSession session) {
 	List<Level> levels = studyService.getAllLevels();
 	model.addAttribute("levels", levels);
 
-	// 테스트 유저정보
-	// 1️⃣ 임의의 User 객체 가져오기 (DB에서)
-	User user = userRepository.findById("user01")
-			.orElseThrow(() -> new RuntimeException("유저 없음!"));
-
-	// 2️⃣ 세션에 저장
-	session.setAttribute("loginUser", user);
-	// ------------- 임시 끝
 	User loginUser = (User) session.getAttribute("loginUser");
 
 	// 기본값: levelId 1 (N1)
@@ -72,14 +64,6 @@ public String moveLevelChoicePage(Model model,HttpSession session) {
 	public List<ChapterDto> levelChoiceApi(@RequestParam Integer levelId,
 										   HttpSession session) {
 		log.info("API levelId={}", levelId);
-		// 테스트 유저정보
-		// 1️⃣ 임의의 User 객체 가져오기 (DB에서)
-		User user = userRepository.findById("user01")
-				.orElseThrow(() -> new RuntimeException("유저 없음!"));
-
-		// 2️⃣ 세션에 저장
-		session.setAttribute("loginUser", user);
-		// ------------- 임시 끝
 
 		User loginUser = (User) session.getAttribute("loginUser");
 
@@ -129,22 +113,13 @@ public String moveLevelChoicePage(Model model,HttpSession session) {
 							 HttpSession session,
 							 Model model) {
 	log.info("컨:startStudy={}", levelId);
-		// 테스트 유저정보
-
-		// 1️⃣ 임의의 User 객체 가져오기 (DB에서)
-		User user = userRepository.findById("user01")
-				.orElseThrow(() -> new RuntimeException("유저 없음!"));
-
-		// 2️⃣ 세션에 저장
-		session.setAttribute("loginUser", user);
-		// ------------- 임시 끝
-
 
 		User loginUser = (User) session.getAttribute("loginUser");
 //		log.info("컨(startStudy):loginUser={}", loginUser);
 
 		studyService.startStudy(loginUser, levelId, chapterId);
-		List<WordDto> words = studyService.getRemainingWordsByChapter(loginUser, chapterId);
+		List<WordDto> words = studyService.getRemainingWordsByChapter(loginUser,chapterId);
+
 		log.info("컨(startStudy):words={}",words);
 		// 안다고 한 단어
 		int knownWordsCount = studyWordProgressRepository.countKnownWords(loginUser, chapterId);
@@ -166,8 +141,8 @@ public String moveLevelChoicePage(Model model,HttpSession session) {
 	public List<WordDto> getRemainingWords(@RequestParam Integer chapterId,
 										   HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
-//		log.info("컨(getRemainingWords)loginUser={}", loginUser);
-		return studyService.getRemainingWordsByChapter(loginUser, chapterId);
+		log.info("컨(getRemainingWords)loginUser={} chpater={}", loginUser,chapterId);
+		return studyService.getRemainingWordsByChapter(loginUser,chapterId);
 	}
 
 	@PostMapping("/studies/wordProgress")
