@@ -22,7 +22,7 @@ public class StudyProgress {
    @JoinColumn(name = "username", nullable = false)
    private User user;
 
-   @Column(name = "id2", nullable = false)
+   @Column(name = "chapter_id", nullable = false)
    private Integer chapterId;
 
    @Enumerated(EnumType.STRING)

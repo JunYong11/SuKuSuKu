@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Table(
         name = "study_word_progress",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"username", "word_id"})
+                @UniqueConstraint(columnNames = {"username",  "chapter_id","word_id"})
         })
 @Data
 @NoArgsConstructor
@@ -26,6 +26,9 @@ public class StudyWordProgress {
     @ManyToOne
     @JoinColumn(name = "word_id", nullable = false)
     private Word word;
+
+    @Column(name = "chapter_id", nullable = false)
+    private Integer chapterId;
 
     @Enumerated(EnumType.STRING)
     private Status status;

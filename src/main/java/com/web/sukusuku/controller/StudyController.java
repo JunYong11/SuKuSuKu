@@ -74,37 +74,6 @@ public String moveLevelChoicePage(Model model,HttpSession session) {
 
 
 
-// //✅ 전체 레벨 목록 + 기본 화면 (타임리프)
-//@GetMapping("/studies/levelChoice")
-//public String moveLevelChoicePage(@RequestParam(required = false) Integer levelId, Model model) {
-//	log.info("컨트롤러 levelId={}", levelId);
-//	List<Level> levels = studyService.getAllLevels();
-//	log.info("컨트롤러 levels: {}", levels);
-//	model.addAttribute("levels", levels);
-//
-//	if (levelId != null) {
-//		log.info("컨트롤러 levelId={}", levelId);
-//		List<ChapterDto> chapterDto = studyService.getChaptersByLevelId(levelId);
-//		log.info("chapterDto={}", chapterDto);
-//
-//		model.addAttribute("selectedLevelId", levelId);
-//		model.addAttribute("chapters", chapterDto);
-//	}
-//
-//	return "studies/levelChoice";
-//}
-// ============= user 임의 삽입
-//@GetMapping("/test-user")
-//@ResponseBody
-//public String testUser(HttpSession session) {
-//	User user = userRepository.findById("user01")
-//			.orElseThrow(() -> new RuntimeException("유저 없음!"));
-//
-//	session.setAttribute("loginUser", user);
-//
-//	return "세션에 user01 저장 완료!";
-//}
-
 // ==============================    study ====================================
 
 	@GetMapping("/studies/startStudy/{levelId}/{chapterId}")
@@ -123,6 +92,8 @@ public String moveLevelChoicePage(Model model,HttpSession session) {
 		log.info("컨(startStudy):words={}",words);
 		// 안다고 한 단어
 		int knownWordsCount = studyWordProgressRepository.countKnownWords(loginUser, chapterId);
+		log.info("[컨:startStudy]안다 카운트={}",knownWordsCount);
+
 		// 챕터별 누적 단어 갯수
 		// ✅ 누적 단어 수 구하기 (레벨ID, 챕터ID 기준 누적 범위 사용)
 		int startChapterId = studyService.getStartChapterId(levelId, chapterId, 5);  // 범위는 DEFAULT_CHAPTER_RANGE 값
@@ -163,7 +134,7 @@ public String moveLevelChoicePage(Model model,HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		studyService.resetChapterProgress(loginUser, chapterId);
 		return ResponseEntity.ok("챕터가 성공적으로 리셋되었습니다");
-	}
+		}
 	}
 
 
