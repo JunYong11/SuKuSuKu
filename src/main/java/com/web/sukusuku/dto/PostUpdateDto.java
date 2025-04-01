@@ -28,4 +28,6 @@ public class PostUpdateDto {
     private String content;
 
     private boolean secret;
+
+    private String secretPassword; 
 }

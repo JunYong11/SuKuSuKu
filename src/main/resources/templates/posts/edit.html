@@ -1,49 +1,173 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>게시글 수정</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>글수정</title>
+
+    <!-- CSS 공통 스타일 -->
+    <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/assets/css/style.css" rel="stylesheet">
+
+    <style>
+        .main {
+            margin-left: 250px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .form-section {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-title {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
+
 <body>
 
-<h2>게시글 수정</h2>
+<!-- Header -->
+<div th:replace="~{header.html}"></div>
 
-<form th:action="@{'/posts/' + ${post.id} + '/edit'}" method="post" enctype="multipart/form-data">
+<!-- Sidebar -->
+<div th:replace="~{sidebar.html}"></div>
 
-    <!-- 카테고리 선택 -->
-    <label for="category">카테고리:</label>
-    <select id="category" name="category">
-        <option value="FREE" th:selected="${post.category == 'FREE'}">자유 게시판</option>
-        <option value="QUESTION" th:selected="${post.category == 'QUESTION'}">질문 게시판</option>
-        <option value="DATA" th:selected="${post.category == 'DATA'}">자료 게시판</option>
-    </select>
-    <br><br>
+<!-- Main Content -->
+<main id="main" class="main">
 
-    <!-- 제목 입력 -->
-    <label for="title">제목:</label>
-    <input type="text" id="title" name="title" th:value="${post.title}" required />
-    <br><br>
+    <!-- 페이지 타이틀 -->
+    <div class="pagetitle">
+        <h1>글수정</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">홈</a></li>
+                <li class="breadcrumb-item"><a href="/posts/list">게시판</a></li>
+                <li class="breadcrumb-item active">글수정</li>
+            </ol>
+        </nav>
+    </div>
 
-    <!-- 내용 입력 -->
-    <label for="content">내용:</label><br>
-    <textarea id="content" name="content" rows="10" cols="50" required
-              th:text="${post.content}"></textarea>
-    <br><br>
+    <!-- 글수정 폼 -->
+    <section class="section form-section">
+        <h2 class="form-title">게시글 수정</h2>
 
-    <!-- 첨부 파일 -->
-    <label for="files">첨부파일:</label>
-    <input type="file" id="files" name="files" multiple />
-    <br><br>
+        <!-- ✅ form에 onsubmit 추가 -->
+        <form th:action="@{'/posts/' + ${post.id} + '/edit'}"
+              method="post" enctype="multipart/form-data" onsubmit="return beforeSubmit();">
 
-    <!-- 비밀글 체크 -->
-    <label for="secret">비밀글:</label>
-    <input type="checkbox" id="secret" name="secret" th:checked="${post.secret}" />
-    <br><br>
+            <!-- 카테고리 선택 -->
+            <div class="mb-3">
+                <label for="category" class="form-label">카테고리</label>
+                <select id="category" name="category" class="form-select" required>
+                    <option value="FREE" th:selected="${post.category == 'FREE'}">자유 게시판</option>
+                    <option value="QUESTION" th:selected="${post.category == 'QUESTION'}">질문 게시판</option>
+                    <option value="DATA" th:selected="${post.category == 'DATA'}">자료 게시판</option>
+                </select>
+            </div>
 
-    <!-- 제출 버튼 -->
-    <button type="submit">수정 완료</button>
+            <!-- 제목 입력 -->
+            <div class="mb-3">
+                <label for="title" class="form-label">제목</label>
+                <input type="text" id="title" name="title" class="form-control"
+                       th:value="${post.title}" required />
+            </div>
 
-</form>
+            <!-- ✅ 내용 입력 (required 제거) -->
+            <div class="mb-3">
+                <label for="content" class="form-label">내용</label>
+                <textarea id="content" name="content" rows="10" class="form-control"
+                          th:text="${post.content}"></textarea>
+            </div>
+
+            <!-- 첨부 파일 -->
+            <div class="mb-3">
+                <label for="files" class="form-label">첨부파일</label>
+                <input type="file" id="files" name="files" multiple class="form-control" />
+            </div>
+
+            <!-- 기존 파일 보여주기 -->
+            <div th:if="${!#lists.isEmpty(post.files)}" class="mb-3">
+                <p>기존 첨부파일</p>
+                <ul>
+                    <li th:each="file : ${post.files}">
+                        <a th:href="@{/files/download/{fileId}(fileId=${file.id})}"
+                           th:text="${file.originalFileName}">파일명</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 비밀글 체크 및 비밀번호 -->
+            <div class="form-check mb-4">
+                <input type="checkbox" id="secret" name="secret" class="form-check-input"
+                       th:checked="${post.secret}"
+                       onchange="togglePasswordInput()" />
+                <label for="secret" class="form-check-label">비밀글</label>
+            </div>
+            <div class="mb-3" id="secret-password-field"
+                 th:styleappend="${post.secret} ? '' : 'display:none;'">
+                <label for="secretPassword" class="form-label">비밀번호</label>
+                <input type="password" id="secretPassword" name="secretPassword" class="form-control"
+                       th:attr="value=${post.secretPassword}" />
+            </div>
+
+            <!-- 버튼 -->
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">수정하기</button>
+                <a th:href="@{/posts/list}" class="btn btn-secondary ms-2">취소</a>
+            </div>
+
+        </form>
+    </section>
+
+</main>
+
+<!-- Footer -->
+<div th:replace="~{footer.html}"></div>
+
+<!-- ✅ TinyMCE 먼저 로딩 -->
+<script src="https://cdn.tiny.cloud/1/w46cam1ez6lhmvwwsdbw7doafu19aw217qb1hzg43gznmfbj/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    tinymce.init({
+        selector: '#content',
+        plugins: 'link lists',
+        toolbar: 'undo redo | bold italic underline | bullist numlist | link | removeformat',
+        menubar: false,
+        branding: false,
+        placeholder: '내용을 입력하세요...',
+        content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }"
+    });
+
+    // ✅ 제출 전에 TinyMCE 내용을 textarea에 반영
+    function beforeSubmit() {
+        tinymce.triggerSave();
+        return true;
+    }
+</script>
+
+<!-- JS -->
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/main.js"></script>
+
+<script>
+    function togglePasswordInput() {
+        const isSecret = document.getElementById('secret').checked;
+        const passwordField = document.getElementById('secret-password-field');
+        if (isSecret) {
+            passwordField.style.display = 'block';
+        } else {
+            passwordField.style.display = 'none';
+        }
+    }
+</script>
 
 </body>
 </html>

@@ -21,6 +21,9 @@ public class User {
     private String name;
     private String email;
     private String level;
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Post> posts = new ArrayList<>();
 
     @Column(name = "user_role")
     private String userRole;
@@ -30,5 +33,8 @@ public class User {
 
     @Column(name = "update_date")
     private LocalDateTime updateDate;
+    
+    @Column(name = "profile_image")
+    private	String profileImage;
 
 }

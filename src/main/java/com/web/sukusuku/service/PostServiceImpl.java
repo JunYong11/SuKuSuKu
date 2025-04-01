@@ -32,23 +32,31 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
 
     @Override
-    public Page<Post> getPosts(Category category, String keyword, String sort, int page, int size) {
+    public Page<Post> getPosts(Category category, String keyword, String searchType, String sort, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, getSort(sort));
 
         if (keyword != null && !keyword.isEmpty()) {
-            return postRepository.findByCategoryAndTitleContainingOrCategoryAndContentContaining(
-                category, keyword, category, keyword, pageable);
+            switch (searchType) {
+                case "content":
+                    return postRepository.findByCategoryAndContentContaining(category, keyword, pageable);
+                case "author":
+                    return postRepository.findByCategoryAndAuthorContaining(category, keyword, pageable);
+                case "title":
+                default:
+                    return postRepository.findByCategoryAndTitleContaining(category, keyword, pageable);
+            }
         }
 
         return postRepository.findByCategory(category, pageable);
     }
+
     	
     private Sort getSort(String sort) {
         if (sort == null) sort = "recent"; // 기본값 세팅
 
         switch (sort.toLowerCase()) {
             case "views":
-                return Sort.by(Sort.Direction.DESC, "views");
+                return Sort.by(Sort.Direction.DESC, "views");	
             case "oldest":
                 return Sort.by(Sort.Direction.ASC, "createdAt");
             case "recent":
@@ -95,17 +103,44 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public void updatePost(Long postId, PostUpdateDto request) {
+    public void updatePost(Long postId, PostUpdateDto request, List<MultipartFile> files) throws IOException{
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
 
+        // 1) 기본 수정
         post.setTitle(request.getTitle());
         post.setContent(request.getContent());
         post.setCategory(request.getCategory());
+
+        // 비밀글 설정
         post.setSecret(request.isSecret());
 
-        postRepository.save(post);
+        // 비밀번호 처리
+        if (request.isSecret()) {
+            if (request.getSecretPassword() != null && !request.getSecretPassword().isEmpty()) {
+                post.setSecretPassword(request.getSecretPassword());
+            }
+        } else {
+            post.setSecretPassword(null);
+        }
+
+        // 2) 새로운 파일 업로드 처리
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    // 예: fileService.saveFile(file, post) 로 실제 파일 저장 + UploadFile 엔티티 생성
+                    UploadFile uploadFile = fileService.saveFile(file, post);
+
+                    // Post 엔티티와 파일 연관관계 설정 (예: post.addFile(uploadFile))
+                    post.addFile(uploadFile);
+                }
+            }
+        }
+
+        // 3) @Transactional로 인해 DB 반영 (Dirty Checking)
+        // postRepository.save(post); // 호출해도 상관없지만, 생략 가능
     }
+
 
 
     @Override
@@ -147,7 +182,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void createPost(PostCreateDto postForm, List<MultipartFile> files, User user) throws IOException {
     	 Post post = postForm.toEntity(user.getUsername());
-
+    	 post.setUser(user);
         // 첨부파일 처리
         List<UploadFile> uploadFiles = new ArrayList<>();
 

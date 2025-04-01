@@ -8,6 +8,7 @@ import lombok.Data;
 public class CalendarCreateDto {
 	
 	private LocalDate selectDate;
+	private Long projectId;
 	private String schedule;
 	private String memo;
 	

@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
+import com.web.sukusuku.dto.UserUpdateDto;
 import com.web.sukusuku.model.User;
 import com.web.sukusuku.service.UserService;
 
@@ -49,6 +51,7 @@ public class UserController {
         return "redirect:/";  // 성공하면 로그인 페이지로 이동
     }
     
+    // 로그인 
     @PostMapping("/login")
     public String login(@RequestParam("username") String username,
                         @RequestParam("password") String password,
@@ -57,7 +60,7 @@ public class UserController {
 
         if (session.getAttribute("loginUser") != null) {
             // 이미 로그인된 상태
-            return "redirect:/home";
+            return "redirect:/";
         }
 
         Optional<User> optionalUser = userService.findByUsername(username);
@@ -73,6 +76,7 @@ public class UserController {
             model.addAttribute("loginError", "비밀번호가 틀렸습니다.");
             return "home"; 
         }
+        
         session.setAttribute("loginUser", user);
         return "redirect:/";  
     }
@@ -84,6 +88,16 @@ public class UserController {
         return "redirect:/"; // 홈으로 이동
     }
 
-
+    // 유저 정보 수정
+    @PostMapping("/updateuser")
+    public String updateUser(
+    		@ModelAttribute UserUpdateDto userUpdateDto,
+    		@SessionAttribute(name = "loginUser", required = false) User loginUser) {
+    	
+    	userUpdateDto.setUsername(loginUser.getUsername());
+    	userService.mypageUpdateUser(userUpdateDto);
+    	
+    	return "redirect:/mypage";
+    }
 
 }

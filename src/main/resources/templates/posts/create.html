@@ -60,7 +60,8 @@
         <section class="section form-section">
             <h2 class="form-title">새 글 작성</h2>
 
-            <form th:action="@{/posts/create}" method="post" enctype="multipart/form-data">
+            <!-- ✅ 수정: onsubmit 속성 추가 -->
+            <form th:action="@{/posts/create}" method="post" enctype="multipart/form-data" onsubmit="return beforeSubmit();">
                 
                 <!-- 카테고리 선택 -->
                 <div class="mb-3">
@@ -81,7 +82,8 @@
                 <!-- 내용 입력 -->
                 <div class="mb-3">
                     <label for="content" class="form-label">내용</label>
-                    <textarea id="content" name="content" rows="10" class="form-control" required></textarea>
+                    <!-- ✅ 수정: required 제거 -->
+                    <textarea id="content" name="content" rows="10" class="form-control"></textarea>
                 </div>
 
                 <!-- 첨부 파일 -->
@@ -90,12 +92,15 @@
                     <input type="file" id="files" name="files" multiple class="form-control" />
                 </div>
 
-                <!-- 비밀글 체크 -->
+                <!-- 비밀글 체크 및 비밀번호 -->
                 <div class="form-check mb-4">
-                    <input type="checkbox" id="secret" name="secret" class="form-check-input" />
+                    <input type="checkbox" id="secret" name="secret" class="form-check-input" onchange="togglePasswordInput()" />
                     <label for="secret" class="form-check-label">비밀글</label>
                 </div>
-
+                <div class="mb-3" id="secret-password-field" hidden>
+                    <label for="secretPassword" class="form-label">비밀번호</label>
+                    <input type="password" id="secretPassword" name="secretPassword" class="form-control" />
+                </div>
                 <!-- 버튼 -->
                 <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary">등록</button>
@@ -110,9 +115,38 @@
     <!-- Footer -->
     <div th:replace="~{footer.html}"></div>
 
+    <!-- ✅ TinyMCE 스크립트 먼저! -->
+    <script src="https://cdn.tiny.cloud/1/w46cam1ez6lhmvwwsdbw7doafu19aw217qb1hzg43gznmfbj/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        tinymce.init({
+            selector: '#content',
+            plugins: 'link lists',
+            toolbar: 'undo redo | bold italic underline | bullist numlist | link | removeformat',
+            menubar: false,
+            branding: false,
+            placeholder: '내용을 입력하세요...',
+            content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }"
+        });
+
+        // ✅ 제출 전에 TinyMCE 내용 반영
+        function beforeSubmit() {
+            tinymce.triggerSave();
+            return true;
+        }
+    </script>
+
     <!-- JS -->
     <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/js/main.js"></script>
+
+    <!-- 비밀글 토글 -->
+    <script>
+        function togglePasswordInput() {
+            const isSecret = document.getElementById('secret').checked;
+            const passwordField = document.getElementById('secret-password-field');
+            passwordField.hidden = !isSecret;
+        }
+    </script>
 
 </body>
 

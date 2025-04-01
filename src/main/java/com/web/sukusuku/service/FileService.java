@@ -12,4 +12,5 @@ public interface FileService {
 	   List<UploadFile> getFilesByPost(Long postId);
 	   UploadFile getFile(Long fileId);
 	   void deleteFile(Long fileId);
+	   
 }

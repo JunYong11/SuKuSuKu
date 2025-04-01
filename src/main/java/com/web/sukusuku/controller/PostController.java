@@ -51,6 +51,7 @@ public class PostController {
     public String getPostList(@RequestParam(name = "category", required = false) Category category,
                               @RequestParam(name = "keyword", required = false) String keyword,
                               @RequestParam(name = "sort", required = false, defaultValue = "recent") String sort,
+                              @RequestParam(name = "searchType", required = false, defaultValue = "title") String searchType,
                               @RequestParam(name = "page", defaultValue = "0") int page,
                               @RequestParam(name = "size", defaultValue = "10") int size,
                               Model model,
@@ -62,7 +63,7 @@ public class PostController {
         }
 
         // ✅ 게시글 가져오기
-        Page<Post> posts = postService.getPosts(category, keyword, sort, page, size);
+        Page<Post> posts = postService.getPosts(category, keyword, searchType, sort, page, size);
 
         // ✅ 페이징 계산
         int totalPageCount = posts.getTotalPages();
@@ -118,10 +119,11 @@ public class PostController {
         @PathVariable Category category,
         @RequestParam(required = false) String keyword,
         @RequestParam(required = false, defaultValue = "recent") String sort,
+        @RequestParam(name = "searchType", required = false, defaultValue = "title") String searchType,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size) {
 
-        return ResponseEntity.ok(postService.getPosts(category, keyword, sort, page, size));
+        return ResponseEntity.ok(postService.getPosts(category, keyword, searchType, sort, page, size));
     }
 	
     @PostMapping("/create")
@@ -154,47 +156,54 @@ public class PostController {
     
     @GetMapping("/view/{postId}")
     public String viewPost(@PathVariable("postId") Long postId, Model model, HttpSession session) {
-
         Post post = postService.readPost(postId);
-
-        
+        postService.increaseViews(post);
         if (post == null) {
             return "redirect:/posts/list";
         }
 
         User loginUser = (User) session.getAttribute("loginUser");
         boolean isAuthor = loginUser != null && post.getAuthor().equals(loginUser.getUsername());
-        
-        List<Comment> comments = commentService.getCommentsByPostId(postId);
 
-        // ✅ 비밀글일 경우 접근 제어
-        if (post.isSecret() && !isAuthor) {
-            return "redirect:/posts/list?error=permissionDenied";
+        // 비밀글 접근 제어: 권한이 없으면 비밀번호 입력 페이지로 리다이렉트
+        boolean canViewPost = session.getAttribute("canViewPost_" + postId) != null && (boolean) session.getAttribute("canViewPost_" + postId);
+        if (post.isSecret() && !isAuthor && !canViewPost) {
+            return "redirect:/posts/view-password/" + postId;  // 비밀번호 입력 페이지로 리다이렉트
         }
 
-        // ✅ 조회수 증가 (옵션)
-        postService.increaseViews(post);
+        // 댓글과 대댓글 처리
+        List<Comment> comments = commentService.getCommentsByPostId(postId);
+        for (Comment comment : comments) {
+            boolean isCommentAuthor = loginUser != null && comment.getAuthor() != null && comment.getAuthor().equals(loginUser.getUsername());
+            comment.setIsAuthor(isCommentAuthor ? Boolean.TRUE : Boolean.FALSE);
 
-        // ✅ DTO 변환
+            for (Comment reply : comment.getChildren()) {
+                boolean isReplyAuthor = loginUser != null && reply.getAuthor() != null && reply.getAuthor().equals(loginUser.getUsername());
+                reply.setIsAuthor(isReplyAuthor ? Boolean.TRUE : Boolean.FALSE);
+            }
+        }
+
         PostViewDto response = PostViewDto.builder()
-            .id(post.getId())
-            .category(post.getCategory())
-            .title(post.getTitle())
-            .content(post.getContent())
-            .author(post.getAuthor())
-            .createdAt(post.getCreatedAt())
-            .updatedAt(post.getUpdatedAt())
-            .views(post.getViews())
-            .files(post.getFiles())
-            .build();
+                .id(post.getId())
+                .category(post.getCategory())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .author(post.getAuthor())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .views(post.getViews())
+                .files(post.getFiles())
+                .build();
 
-        model.addAttribute("loginUser", loginUser);
         model.addAttribute("post", response);
         model.addAttribute("comments", comments);
         model.addAttribute("isAuthor", isAuthor);
+        model.addAttribute("loginUser", loginUser);
 
-        return "posts/view";
+        return "posts/view";  // 게시글 상세보기 페이지로 이동
     }
+
+
 
 
     // 수정 폼 보여주기
@@ -220,26 +229,28 @@ public class PostController {
     }
     	
     @PostMapping("/{postId}/edit")
-    public String updatePost(@PathVariable("postId") Long postId,
-                             @ModelAttribute PostUpdateDto request,
-                             HttpSession session) {
-
+    public String updatePost(
+        @PathVariable("postId") Long postId,
+        @ModelAttribute("request") PostUpdateDto request,
+        @RequestParam(value = "files", required = false) List<MultipartFile> files,
+        HttpSession session
+    ) throws IOException {
         User loginUser = (User) session.getAttribute("loginUser");
-
         if (loginUser == null) {
             return "redirect:/users/login";
         }
 
         Post post = postService.getPostById(postId);
-
         if (!post.getAuthor().equals(loginUser.getUsername())) {
             return "redirect:/posts/list?error=permissionDenied";
         }
 
-        postService.updatePost(postId, request); // 수정 처리
+        // 파일 업데이트까지 포함
+        postService.updatePost(postId, request, files);
 
         return "redirect:/posts/view/" + postId;
     }
+
 
 
 
@@ -280,7 +291,36 @@ public class PostController {
                 .body(resource);
     }
     
+    @PostMapping("/{id}/check-password")
+    public ResponseEntity<?> checkPassword(
+            @PathVariable("id") Long id,
+            @RequestParam("inputPassword") String inputPassword,
+            HttpSession session) {
+
+        System.out.println("🔍 checkPassword 요청 도착! postId: " + id);
+
+        Post post = postService.getPostById(id);
+
+        if (post == null) {
+            System.out.println("❌ 게시글을 찾을 수 없음!");
+            return ResponseEntity.status(404).build();
+        }
+
+        String dbPassword = post.getSecretPassword() != null ? post.getSecretPassword().trim() : "";
+        String input = inputPassword != null ? inputPassword.trim() : "";
+
+        System.out.println("입력한 비밀번호: [" + input + "]");
+        System.out.println("DB 비밀번호: [" + dbPassword + "]");
+
+        if (dbPassword.equals(input)) {
+            session.setAttribute("canViewPost_" + id, true);
+            return ResponseEntity.status(302)
+                    .header("Location", "/posts/view/" + id)
+                    .build();
+        } else {
+            return ResponseEntity.ok().build(); // 틀림
+        }
+    }
 
 
-
-}
+    }

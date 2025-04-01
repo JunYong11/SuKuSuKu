@@ -83,5 +83,9 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
     }
 
+    @Transactional
+    public void increaseViews(Post post) {
+        post.setViews(post.getViews() + 1);
+    }
 
 }

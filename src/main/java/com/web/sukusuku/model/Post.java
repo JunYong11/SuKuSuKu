@@ -47,6 +47,9 @@ public class Post {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
     @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UploadFile> files = new ArrayList<>();
@@ -59,7 +62,7 @@ public class Post {
     
     @Column(name = "is_secret", nullable = false)
     private boolean secret = false;
-
+    private String secretPassword;
     @Column(name ="views",nullable = false)
     private int views;
 
