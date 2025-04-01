@@ -11,10 +11,9 @@
 <!-- jQuery CDN 추가 -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Favicons -->
-<link href="/assets/img/favicon.png" rel="icon">
-<link href="/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-
+  <!-- Favicons -->
+  <link href="/assets/img/logo.png" rel="icon">
+  <link href="/assets/img/logo.png" rel="apple-touch-icon">
 <!-- Google Fonts -->
 <link href="https://fonts.g.assets.com" rel="preconnect">
 <link
@@ -901,10 +900,10 @@ td {
                 if (achievementElement && achievementBar) {
                     console.log(`업데이트 대상: ${project.projectId}, 달성률: ${project.achievementRate}`);
 
-                    // 1️⃣ 퍼센트 텍스트 업데이트
+                    //1️⃣ 퍼센트 텍스트 업데이트
                     achievementElement.textContent = `${project.achievementRate.toFixed(1)}%`;
 
-                    // 2️⃣ 막대 너비 업데이트
+                    //2️⃣ 막대 너비 업데이트
                     achievementBar.style.width = `${project.achievementRate}%`;
                 } else {
                     console.warn(`해당 ID를 가진 요소를 찾을 수 없음: #project-achievement-${project.projectId}`);
@@ -993,6 +992,7 @@ td {
            .then(data => {
                if (data.success) {
                    profileImg.src = selectedProfile; // 프로필 이미지 변경
+                   document.getElementById("header-profile").src = selectedProfile;
                    profileModal.style.display = "none"; // 모달 닫기
                } else {
                    alert("프로필 변경 실패");

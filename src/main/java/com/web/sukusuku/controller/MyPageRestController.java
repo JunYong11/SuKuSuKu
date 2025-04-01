@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
@@ -26,6 +27,7 @@ import com.web.sukusuku.model.User;
 import com.web.sukusuku.service.MyPageService;
 import com.web.sukusuku.service.UserService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,8 +61,6 @@ public class MyPageRestController {
 		calendar.setCheck(false);
 		
 		Calendar resultCalendar = myPageService.saveCalendar(calendar);
-		
-		log.info("resultCalendar:{}",resultCalendar);
 
 		// 데이터를 처리하고 응답을 반환
 		Map<String, String> response = new HashMap<>();
@@ -125,8 +125,6 @@ public class MyPageRestController {
 	        userAchievements.add(achievement);
 	    }
 	    
-	    log.info("userAchievements: {}", userAchievements);
-	    
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("userAchievements", userAchievements);
 	  
@@ -140,9 +138,6 @@ public class MyPageRestController {
 			@SessionAttribute(name = "loginUser", required = false) User loginUser) {
 	    String username = loginUser.getUsername();
 	    String profileImage = request.get("profileImage");
-	    
-	    log.info("username:{}",username);
-	    log.info("profileImage:{}",profileImage);
 
 	    userService.updateProfileImage(username, profileImage); // DB 업데이트
 
@@ -158,5 +153,19 @@ public class MyPageRestController {
         return stats;
     }
 
-	
+	//헤더 프로필 정보 세션에 반영
+	@GetMapping("/getProfileImage")
+	@ResponseBody
+	public Map<String, String> getProfileImage(HttpSession session) {
+	    Map<String, String> response = new HashMap<>();
+	    
+	    User loginUser = (User) session.getAttribute("loginUser");
+	    
+	    Optional<User> optionalUser = userService.findByUsername(loginUser.getUsername());
+	    User user = optionalUser.get();
+	    
+	    response.put("profileImage", user.getProfileImage());
+	    
+	    return response;
+	}
 }
