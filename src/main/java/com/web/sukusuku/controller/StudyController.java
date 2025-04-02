@@ -61,7 +61,7 @@ public String moveLevelChoicePage(Model model,HttpSession session) {
 	// ✅ JS 비동기 호출용 (챕터 데이터 JSON 반환)
 	@GetMapping("/studies/levelChoice/api")
 	@ResponseBody
-	public List<ChapterDto> levelChoiceApi(@RequestParam Integer levelId,
+	public List<ChapterDto> levelChoiceApi(@RequestParam(name = "levelId") Integer levelId,
 										   HttpSession session) {
 		log.info("API levelId={}", levelId);
 
@@ -77,8 +77,8 @@ public String moveLevelChoicePage(Model model,HttpSession session) {
 // ==============================    study ====================================
 
 	@GetMapping("/studies/startStudy/{levelId}/{chapterId}")
-	public String startStudy(@PathVariable Integer levelId,
-							 @PathVariable Integer chapterId,
+	public String startStudy(@PathVariable(name = "levelId") Integer levelId,
+							 @PathVariable(name = "chapterId") Integer chapterId,
 							 HttpSession session,
 							 Model model) {
 	log.info("컨:startStudy={}", levelId);
@@ -109,7 +109,7 @@ public String moveLevelChoicePage(Model model,HttpSession session) {
 
 	@GetMapping("/studies/remainingWords")
 	@ResponseBody
-	public List<WordDto> getRemainingWords(@RequestParam Integer chapterId,
+	public List<WordDto> getRemainingWords(@RequestParam(name = "chapterId") Integer chapterId,
 										   HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		log.info("컨(getRemainingWords)loginUser={} chpater={}", loginUser,chapterId);
@@ -129,7 +129,7 @@ public String moveLevelChoicePage(Model model,HttpSession session) {
 	// 새로운 리셋 엔드포인트 추가
 	@PostMapping("/studies/resetChapter")
 	@ResponseBody
-	public ResponseEntity<String> resetChapter(@RequestParam Integer chapterId, 
+	public ResponseEntity<String> resetChapter(@RequestParam(name = "chapterId")	 Integer chapterId,
 											  HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
 		studyService.resetChapterProgress(loginUser, chapterId);
