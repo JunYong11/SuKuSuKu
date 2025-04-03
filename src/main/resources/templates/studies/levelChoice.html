@@ -1,325 +1,342 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-
-<title>레벨 선택</title>
-<meta content="" name="description">
-<meta content="" name="keywords">
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>레벨 선택</title>
 
   <!-- Favicons -->
-  <link href="/assets/img/logo.png" rel="icon">
-  <link href="/assets/img/logo.png" rel="apple-touch-icon">
-<!-- Google Fonts -->
-<link href="https://fonts.g.assets.com" rel="preconnect">
-<link
-	href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-	rel="stylesheet">
+  <link href="/assets/img/favicon.png" rel="icon">
+  <link href="/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
-<!-- Vendor CSS Files -->
-<link href="/assets/vendor/bootstrap/css/bootstrap.min.css"
-	rel="stylesheet">
-<link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css"
-	rel="stylesheet">
-<link href="/assets/vendor/boxicons/css/boxicons.min.css"
-	rel="stylesheet">
-<link href="/assets/vendor/quill/quill.snow.css" rel="stylesheet">
-<link href="/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-<link href="/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-<link href="/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.g.assets.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
-<!-- Template Main CSS File -->
-<link href="/assets/css/style.css" rel="stylesheet">
+  <!-- Vendor CSS Files -->
+  <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
-<!-- FullCalendar CSS -->
-<link
-	href="https://cdn.jsdelivr.net/npm/fullcalendar@3.10.0/dist/fullcalendar.min.css"
-	rel="stylesheet">
+  <!-- Template Main CSS File -->
+  <link href="/assets/css/style.css" rel="stylesheet">
 
-<!-- jQuery (required for FullCalendar) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- FullCalendar CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@3.10.0/dist/fullcalendar.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- CSS 스타일 -->
+  <style>
+    body {
+      font-family: 'Poppins', 'Nunito', 'Open Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .flex-center {
+      display: flex;
+      justify-content: center;
+    }
+
+    .level-tab {
+      list-style: none;
+      padding: 10px;
+      margin: 0;
+    }
+
+    .level-tab li {
+      margin: 0 10px;
+    }
+
+    .level-button {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .level-button:hover .level-image {
+      transform: scale(1.1);
+    }
+
+    .level-image {
+      height: 150px;
+      width: auto;
+      object-fit: contain;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .level-selection {
+      padding: 20px 0;
+    }
+
+    .container {
+      padding: 0 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -10px;
+    }
+
+    .column-3 {
+      width: 100%;
+      max-width: 33.33%;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 768px) {
+      .column-3 {
+        max-width: 100%;
+      }
+    }
+
+    .chapter-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .chapter-link:hover {
+      transform: scale(1.03);
+    }
+
+    .chapter-wrapper {
+      position: relative;
+      margin-bottom: 20px;
+      transition: transform 0.2s ease-in-out;
+      max-width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .chapter-wrapper:hover {
+      transform: scale(1.05);
+    }
+
+    .chapter-background {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .chapter-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 10px;
+      bottom: 0;
+      display: flex;
+      padding: 10px;
+    }
+
+    .chapter-left-content,
+    .chapter-right-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .chapter-number {
+      font-size: 48px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .chapter-overlay h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .chapter-overlay p {
+      margin: 5px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    /* Fade-in animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    /* 레벨 탭 위치 및 크기 조정 */
+.level-tab {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  transition: all 0.5s ease;
+  margin: 100px 0;
+}
+
+/* 화면 가운데 */
+.level-tab.center {
+  min-height: calc(100vh - 100px); /* 상단바 제외하고 높이 확보 */
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  padding-bottom: 50px; /* 챕터 등장 여유 공간 */
+  box-sizing: border-box;
+}
 
 
-<!-- CSS 스타일 추가 -->
-<style>
-	body {
-		font-family: 'Poppins', 'Nunito', 'Open Sans', sans-serif;
-		margin: 0;
-		padding: 0;
-	}
+/* 크기 변화 */
+.level-tab.big .level-image {
+  height: 200px;
+  transition: all 0.4s ease;
+}
 
-	.flex-center {
-		display: flex;
-		justify-content: center;
-	}
+.level-tab.small {
+  margin: 20px 0;
+}
 
-	.nav-tabs {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		border-bottom: 1px solid #ddd;
-	}
+.level-tab.small .level-image {
+  height: 100px;
+}
 
-	.nav-tabs li {
-		margin: 0 10px;
-	}
+/* 챕터 fade-in */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-	.level-button {
-		background: none;
-		border: none;
-		padding: 0;
-		cursor: pointer;
-		transition: transform 0.2s;
-	}
-
-	.level-button:hover .level-image {
-		transform: scale(1.1);
-	}
-
-	.level-image {
-		height: 150px;
-		width: auto;
-		object-fit: contain;
-		transition: transform 0.2s ease-in-out;
-	}
-
-	.level-selection {
-		padding: 20px 0;
-	}
-
-	.container {
-		padding: 0 20px;
-		max-width: 1200px;
-		margin: 0 auto;
-	}
-
-	.row {
-		display: flex;
-		flex-wrap: wrap;
-		margin: 0 -10px;
-	}
-
-	.column-3 {
-		width: 100%;
-		max-width: 33.33%;
-		padding: 10px;
-		box-sizing: border-box;
-	}
-
-	@media (max-width: 768px) {
-		.column-3 {
-			max-width: 100%;
-		}
-	}
-
-	.chapter-link {
-		text-decoration: none;
-		color: inherit;
-		display: block;
-		transition: transform 0.2s ease-in-out;
-	}
-
-	.chapter-link:hover {
-		transform: scale(1.03);
-	}
-
-	.chapter-wrapper {
-		position: relative;
-		margin-bottom: 20px;
-		transition: transform 0.2s ease-in-out;
-		max-width: 300px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	.chapter-wrapper:hover {
-		transform: scale(1.05);
-	}
-
-	.chapter-background {
-		width: 100%;
-		height: auto;
-		display: block;
-	}
-
-	.chapter-overlay {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 10px;
-		bottom: 0;
-		display: flex;
-		padding: 10px;
-	}
-
-	.chapter-left-content,
-	.chapter-right-content {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.chapter-number {
-		font-size: 48px;
-		font-weight: bold;
-		color: #333;
-	}
-
-	.chapter-overlay h3 {
-		font-size: 24px;
-		margin-bottom: 10px;
-		color: #333;
-	}
-
-	.chapter-overlay p {
-		margin: 5px 0;
-		color: #333;
-		font-size: 16px;
-	}
-
-</style>
+.fade-in {
+  animation: fadeIn 0.5s ease;
+}
+ #main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: url('/assets/img/level/backbuk.webp');
+      background-size: cover;
+      background-position: center;
+    }
+ 
+  </style>
 </head>
+
 <body>
-	<!-- Header 및 Sidebar (Thymeleaf 템플릿 사용) -->
-	<!-- 상단바 -->
-	<div th:replace="~{header.html}"></div>
-	<!-- 사이드바 -->
-	<div th:replace="~{sidebar.html}"></div>
-	
-	<main id="main" class="main">
-		<!-- 카드 영역 -->
-		<!-- 카드 시작 -->
-		<section class="section">
-			<div class="container">
-				<!-- 레벨 선택 영역 -->
-				<div class="level-selection">
-					<ul class="nav-tabs flex-center" id="levelTabs" role="tablist">
-						<li th:each="level : ${levels}">
-							<button class="level-button" th:attr="data-level-id=${level.levelId}">
-								<img th:src="@{'/assets/img/level/n' + ${level.levelId} + '.png'}" th:alt="${level.levelName}" class="level-image">
-							</button>
-						</li>
-					</ul>
-				</div>
+  <!-- Header 및 Sidebar -->
+  <div th:replace="~{header.html}"></div>
+  <div th:replace="~{sidebar.html}"></div>
 
-				<!-- 챕터 컨테이너 부분 수정 -->
-				<div id="chapters-container">
-					<h2 th:text="'챕터 목록 - N' + ${selectedLevelId}" class="text-center">챕터 목록</h2>
-					<div class="row">
-						<div class="column-3" th:each="chapter : ${chapters}">
-							<a th:href="@{/studies/startStudy/{levelId}/{chapterId}(levelId=${selectedLevelId}, chapterId=${chapter.chapterId})}" class="chapter-link">
-								<div class="chapter-wrapper">
-									<img th:src="@{/assets/img/level/chpater.png}" alt="Chapter Image" class="chapter-background">
-									<div class="chapter-overlay">
-										<div class="chapter-left-content">
-											<h3>
-  <span th:text="'Chapter ' + ${chapter.chapterId}"></span>
-  <br>
-  <small th:text="${chapter.chapterName}"></small>
-</h3>
+    <main id="main" class="main">
+    <section class="section">
+      <div class="container">
+	<h1>레벨을 선택해주세요</h1>
+        <!-- ✅ 레벨 선택 -->
+        <div class="level-selection">
+          <ul class="level-tab flex-center center big" id="levelTabs" role="tablist">
+            <li th:each="level : ${levels}">
+              <button class="level-button" th:attr="data-level-id=${level.levelId}">
+                <img th:src="@{'/assets/img/level/n' + ${level.levelId} + '.png'}" th:alt="${level.levelName}" class="level-image">
+              </button>
+            </li>
+          </ul>
+        </div>
 
-										</div>
-										<div class="chapter-right-content">
-											<p>누적 단어 수</p>
-											<p th:text=" ${chapter.cumulativeWords} + '개'"></p>
-											<p th:text="'회독 횟수: ' + ${chapter.reviewCount} + '회'"></p>
-										</div>
-									</div>
-								</div>
-							</a>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
+        <!-- 챕터 목록 (처음엔 숨김) -->
+        <div id="chapters-container" style="display: none;"></div>
 
-	</main>
+      </div>
+    </section>
+  </main>
 
-	<!-- Footer -->
-	<footer id="footer" class="footer">
-		<div class="copyright">
-			&copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights
-			Reserved
-		</div>
-		<div class="credits">
-			Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-		</div>
-	</footer>
-	<!-- End Footer -->
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-	<a href="#"
-		class="back-to-top d-flex align-items-center justify-content-center"><i
-		class="bi bi-arrow-up-short"></i></a>
+  <!-- JS Files -->
+  <script src="/assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="/assets/vendor/echarts/echarts.min.js"></script>
+  <script src="/assets/vendor/quill/quill.js"></script>
+  <script src="/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="/assets/vendor/php-email-form/validate.js"></script>
+  <script src="/assets/js/main.js"></script>
 
-	<!-- Vendor JS Files -->
-	<script src="/assets/vendor/apexcharts/apexcharts.min.js"></script>
-	<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-	<script src="/assets/vendor/chart.js/chart.umd.js"></script>
-	<script src="/assets/vendor/echarts/echarts.min.js"></script>
-	<script src="/assets/vendor/quill/quill.js"></script>
-	<script src="/assets/vendor/simple-datatables/simple-datatables.js"></script>
-	<script src="/assets/vendor/tinymce/tinymce.min.js"></script>
-	<script src="/assets/vendor/php-email-form/validate.js"></script>
+  <!-- 챕터 로딩 JS -->
+  <script>
+  document.querySelectorAll('#levelTabs button').forEach(button => {
+	  button.addEventListener('click', function (event) {
+	    event.preventDefault();
+	    const levelId = event.target.tagName === 'IMG'
+	      ? event.target.closest('button').getAttribute('data-level-id')
+	      : event.target.getAttribute('data-level-id');
 
-	<!-- Template Main JS File -->
-	<script src="/assets/js/main.js"></script>
+	    // 레벨 탭 스타일 변경
+	    const tab = document.getElementById('levelTabs');
+	    tab.classList.remove('center', 'big');
+	    tab.classList.add('small');
 
-	<!-- loadChapters 함수도 수정 -->
-	<script>
-		document.querySelectorAll('#levelTabs button').forEach(button => {
-			button.addEventListener('click', function(event) {
-				event.preventDefault();
-				
-				// 이벤트 타겟이 이미지인 경우 부모 버튼의 data-level-id를 가져옴
-				const levelId = event.target.tagName === 'IMG' 
-					? event.target.closest('button').getAttribute('data-level-id')
-					: event.target.getAttribute('data-level-id');
-					
-				loadChapters(levelId);
-			});
-		});
-
-		function loadChapters(levelId) {
-			fetch(`/studies/levelChoice/api?levelId=${levelId}`)
-				.then(response => response.json())
-				.then(chapters => {
-					const container = document.getElementById('chapters-container');
-
-					let html = `<h2>챕터 목록 - N${levelId}</h2><div class="row">`;
-
-					chapters.forEach(chapter => {
-						html += `
-							<div class="column-3">
-								<a href="/studies/startStudy/${levelId}/${chapter.chapterId}" class="chapter-link">
-									<div class="chapter-wrapper">
-										<img src="/assets/img/level/chpater.png" alt="Chapter Image" class="chapter-background">
-										<div class="chapter-overlay">
-											<div class="chapter-left-content">
-												<h3>
-													Chapter ${chapter.chapterId}<br>
-													<small>${chapter.chapterName}</small>
-												</h3>
-											</div>
-											<div class="chapter-right-content">
-												<p>누적 단어 수: ${chapter.cumulativeWords}개</p>
-												<p>회독 횟수: ${chapter.reviewCount}회</p>
-											</div>
-										</div>
-									</div>
-								</a>
-							</div>
-						`;
-					});
+	    loadChapters(levelId);
+	  });
+	});
 
 
-					html += '</div>';
-					container.innerHTML = html;
-				})
-				.catch(error => console.error('Error:', error));
-		}
-	</script>
+    function loadChapters(levelId) {
+      fetch(`/studies/levelChoice/api?levelId=${levelId}`)
+        .then(response => response.json())
+        .then(chapters => {
+          const container = document.getElementById('chapters-container');
+          container.classList.remove('fade-in');
+          void container.offsetWidth; // reflow
+          container.style.display = 'block';
+
+          let html = `<h2 class="text-center">챕터 목록 - N${levelId}</h2><div class="row">`;
+
+          chapters.forEach(chapter => {
+            html += `
+              <div class="column-3">
+                <a href="/studies/startStudy/${levelId}/${chapter.chapterId}" class="chapter-link">
+                  <div class="chapter-wrapper">
+                    <img src="/assets/img/level/chpater.png" alt="Chapter Image" class="chapter-background">
+                    <div class="chapter-overlay">
+                      <div class="chapter-left-content">
+                        <h3>Chapter</h3>
+                        <div class="chapter-number">${chapter.chapterName}</div>
+                      </div>
+                      <div class="chapter-right-content">
+                        <p>누적 단어 수:<br>${chapter.cumulativeWords}개</p>
+                        <p>회독 횟수: ${chapter.reviewCount}회</p>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            `;
+          });
+
+          html += '</div>';
+          container.innerHTML = html;
+          container.classList.add('fade-in');
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  </script>
 </body>
 </html>

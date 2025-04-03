@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReviewQueue {
+public class ReviewQueue { // 모른다인 단어 모음
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,11 @@ public class ReviewQueue {
     private Word word;
 
     @Enumerated(EnumType.STRING)
-    private ReviewStatus reviewStatus;
+    private ReviewStatus reviewStatus; //
+
+    // 몇번 모른다고 눌렀는지 횟수
+    @Column(name = "fail_count")
+    private int failCount;
 
     private LocalDateTime addedAt;
 

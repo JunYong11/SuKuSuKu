@@ -33,8 +33,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<Post> getPosts(Category category, String keyword, String searchType, String sort, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, getSort(sort));
+        Pageable pageable = PageRequest.of(page, size);
 
+        // 검색어 있을 때는 기존 로직 유지
         if (keyword != null && !keyword.isEmpty()) {
             switch (searchType) {
                 case "content":
@@ -47,16 +48,26 @@ public class PostServiceImpl implements PostService {
             }
         }
 
-        return postRepository.findByCategory(category, pageable);
+        // 🔥 정렬 조건 따라 admin 고정 쿼리 사용
+        switch (sort.toLowerCase()) {
+            case "views":
+                return postRepository.findWithAdminPinnedByViews(category, pageable);
+            case "oldest":
+                return postRepository.findWithAdminPinnedByOldest(category, pageable); // ← 이건 너가 추가해야 돼
+            case "recent":
+            default:
+                return postRepository.findWithAdminPinnedByRecent(category, pageable);
+        }
     }
 
-    	
+
+       
     private Sort getSort(String sort) {
         if (sort == null) sort = "recent"; // 기본값 세팅
 
         switch (sort.toLowerCase()) {
             case "views":
-                return Sort.by(Sort.Direction.DESC, "views");	
+                return Sort.by(Sort.Direction.DESC, "views");   
             case "oldest":
                 return Sort.by(Sort.Direction.ASC, "createdAt");
             case "recent":
@@ -181,8 +192,8 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public void createPost(PostCreateDto postForm, List<MultipartFile> files, User user) throws IOException {
-    	 Post post = postForm.toEntity(user.getUsername());
-    	 post.setUser(user);
+        Post post = postForm.toEntity(user.getUsername());
+        post.setUser(user);
         // 첨부파일 처리
         List<UploadFile> uploadFiles = new ArrayList<>();
 
@@ -202,6 +213,5 @@ public class PostServiceImpl implements PostService {
     }
 
 
-
 }
-	
+   

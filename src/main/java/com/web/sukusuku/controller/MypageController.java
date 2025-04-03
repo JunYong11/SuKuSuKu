@@ -1,5 +1,7 @@
 package com.web.sukusuku.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -47,12 +49,19 @@ public class MypageController {
 		Optional<User> OptionalUser = userService.findByUsername(loginUser.getUsername());
 		User FindUser = OptionalUser.get();
 		
+		List<Integer> chartData = myPageService.SearchStudyData2(loginUser);
+		
+		
+
+		
 		 // endDate 기준으로 오름차순 정렬
 	    FindCalendars.sort(Comparator.comparing(Calendar::getEndDate));
 		
 		model.addAttribute("loginUser",FindUser);
 		model.addAttribute("projects",FindProjects);
 		model.addAttribute("events",FindCalendars);
+		
+		model.addAttribute("chartData", chartData);
 		
 		return "mypage/mypage";
 	}

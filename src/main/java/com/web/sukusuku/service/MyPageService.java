@@ -1,6 +1,7 @@
 package com.web.sukusuku.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,13 +9,16 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.web.sukusuku.dto.ChapterChartDto;
 import com.web.sukusuku.model.Calendar;
 import com.web.sukusuku.model.Chapter;
+import com.web.sukusuku.model.Level;
 import com.web.sukusuku.model.Project;
 import com.web.sukusuku.model.StudyProgress;
 import com.web.sukusuku.model.User;
 import com.web.sukusuku.repository.CalendarRepository;
 import com.web.sukusuku.repository.ChapterRepository;
+import com.web.sukusuku.repository.LevelRepository;
 import com.web.sukusuku.repository.ProjectRepository;
 import com.web.sukusuku.repository.StudyProgressRepository;
 
@@ -93,7 +97,6 @@ public class MyPageService {
 	public List<Map<String, Object>> SearchStudyData1(User loginUser) {
 		// TODO Auto-generated method stub
 		List<StudyProgress> findStudyProgressData = studyProgressRepository.findByUser_Username(loginUser.getUsername());
-		log.info("findStudyProgressData:{}",findStudyProgressData);
 
 		int[] levelCount = new int[5];
 		
@@ -121,7 +124,6 @@ public class MyPageService {
 				break;
 			}
 		}
-		
 		// stats 리스트 초기화 후 levelCount 값 적용
 		List<Map<String, Object>> stats = new ArrayList<>();
 		String[] levelNames = { "N1", "N2", "N3", "N4", "N5" };
@@ -131,6 +133,97 @@ public class MyPageService {
 		}
 		return stats;
 	}
-
 	
+	// 2번 차트 데이터 찾기 및 계산하기
+	public List<Integer> SearchStudyData2(User loginUser) {
+		// TODO Auto-generated method stub
+		int [] maxLevels = new int[5];
+		int [] countLevels = new int[5];
+		
+		List<Chapter> chapters = chapterRepository.findAll();
+		List<ChapterChartDto> chapterChartDtos = new ArrayList<>();
+		List<StudyProgress> findStudyProgressData = studyProgressRepository.findByUser_Username(loginUser.getUsername());
+		
+		for(int i = 0 ;i<chapters.size();i++) {
+			ChapterChartDto dto = new ChapterChartDto();
+			dto.setChapterId(chapters.get(i).getChapterId());
+			dto.setLevel(chapters.get(i).getLevel().getLevelId());
+			chapterChartDtos.add(dto);
+		}
+		
+		// 챕터에 해당하는 레벨 아이디를 기준으로 카운트 하여 각 레벨별 챕터의 최대값을 구하는 코드
+		for(int i = 0;i<chapterChartDtos.size();i++) {
+			switch (chapterChartDtos.get(i).getLevel()) {
+			case 1: {
+				maxLevels[0]++;
+				break;
+			}
+			case 2: {
+				maxLevels[1]++;
+				break;
+			}
+			case 3: {
+				maxLevels[2]++;
+				break;
+			}
+			case 4: {
+				maxLevels[3]++;
+				break;
+			}
+			case 5: {
+				maxLevels[4]++;
+				break;
+			}
+			default:
+				continue;
+			}
+		}
+		
+		for(int i = 0;i<findStudyProgressData.size();i++) {
+			if(findStudyProgressData.get(i).getReviewCount() != 0) {
+				for(int j = 0;j<chapterChartDtos.size();j++) {
+					if(findStudyProgressData.get(i).getChapterId()==chapterChartDtos.get(j).getChapterId()) {
+						switch(chapterChartDtos.get(j).getLevel()) {
+						case 1: {
+							countLevels[0]++;
+							break;
+						}
+						case 2: {
+							countLevels[1]++;
+							break;
+						}
+						case 3: {
+							countLevels[2]++;
+							break;
+						}
+						case 4: {
+							countLevels[3]++;
+							break;
+						}
+						case 5: {
+							countLevels[4]++;
+							break;
+						}
+						default:
+							continue;
+						}
+					}
+				}
+			}
+			else {
+				continue;
+			}
+		}
+		int maxValue = Arrays.stream(maxLevels).max().orElse(1);
+		
+		List<Integer> percentageList = new ArrayList<>();
+
+        // 3. 퍼센트 값 계산 후 리스트에 추가
+        for (int i = 0; i < countLevels.length; i++) {
+            int percentage = (int) (((double) countLevels[i] / maxValue) * 100);
+            percentageList.add(percentage);
+        }
+
+		return percentageList;
+	}
 }

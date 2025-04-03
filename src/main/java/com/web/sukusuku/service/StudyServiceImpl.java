@@ -30,6 +30,9 @@ public class StudyServiceImpl implements StudyService {
     private final WordRepository wordRepository;
     private final StudyProgressRepository studyProgressRepository;
     private final StudyWordProgressRepository studyWordProgressRepository;
+    private final ReviewQueueRepository reviewQueueRepository;
+    private final ReviewFailLogRepository reviewFailLogRepository;
+
 
     /**✅ 메서드 ============================================*/
     // 챕터별 단어 누적
@@ -118,13 +121,14 @@ public void startStudy(User user, Integer levelId, Integer chapterId) {
         // 해당 챕터의 모든 단어를 가져와서 StudyWordProgress에 '모른다' 상태로 초기화하여 저장
         for (Word word : allWords) {
             // ✅ 중복 체크 후 저장
-            boolean exists = studyWordProgressRepository.findByUserAndWord(user, word).isPresent();
+            boolean exists = studyWordProgressRepository.findByUserAndChapterIdAndWord(user,chapterId, word).isPresent();
             if (!exists) {
                 // 학습 기록이 없을 때만 저장
                 studyWordProgressRepository.save(
                         StudyWordProgress.builder()
                                 .user(user)                                     // 사용자 정보 설정
-                                .word(word)                                     // 단어 정보 설정
+                                .chapterId(chapterId)
+                                .word(word)                                   // 단어 정보 설정
                                 .status(StudyWordProgress.Status.모른다)       // 초기 상태를 '모른다'로 설정
                                 .build()
                 );
@@ -136,7 +140,7 @@ public void startStudy(User user, Integer levelId, Integer chapterId) {
         log.info("A단어 등록 완료 - 등록된 단어 개수: {}", allWords.size());
     }
 }
-    // 레벨초이스에서 챕터선택하면 작동 2(학습 이력이 있을 때)
+    // 레벨초이스에서 챕터선택하면 작동 2(학습 이력이 있을 때) -------------------------------------------------------------
     @Override
     public List<WordDto> getRemainingWordsByChapter(User user, Integer chapterId) {
         log.info("서getRemainingWordsByChapter ");
@@ -149,7 +153,7 @@ public void startStudy(User user, Integer levelId, Integer chapterId) {
         List<WordDto> remainingWords = new ArrayList<>();
 
         for (Word word : wordList) {
-            Optional<StudyWordProgress> progressOpt = studyWordProgressRepository.findByUserAndWord(user, word);
+            Optional<StudyWordProgress> progressOpt = studyWordProgressRepository.findByUserAndChapterIdAndWord(user, chapterId, word);
             if (progressOpt.isPresent() && progressOpt.get().getStatus() == StudyWordProgress.Status.모른다) {
                 remainingWords.add(new WordDto(
                         word.getWordId(),
@@ -173,32 +177,61 @@ public void startStudy(User user, Integer levelId, Integer chapterId) {
         
         return remainingWords;
     }
-    // 안다,모른다 버튼 누르면 작동
+    // 안다,모른다 버튼 누르면 작동 --------------------------------------------------
     @Override
     public int updateWordProgress(User user, WordProgressRequestDto dto) {
+    // 단어 학습 상태 업로드(안다, 모른다)
         Word word = wordRepository.findById(dto.getWordId())
                 .orElseThrow(() -> new RuntimeException("단어 없음"));
 
-        StudyWordProgress progress = studyWordProgressRepository.findByUserAndWord(user, word)
+        StudyWordProgress progress = studyWordProgressRepository.findByUserAndChapterIdAndWord(user, dto.getChapterId(),  word)
                 .orElseThrow(() -> new RuntimeException("학습 기록 없음"));
         // ✅ 상태 변경 전 로그
         log.info("[서:updateWordProgress] 유저: {}, 단어 ID: {}, 기존 상태: {}", user.getUsername(), word.getWordId(), progress.getStatus());
 
         progress.setStatus(StudyWordProgress.Status.valueOf(dto.getStatus()));
         studyWordProgressRepository.save(progress);
-        
-        // 현재 챕터 ID에 해당하는 레벨 ID 가져오기
-        int levelId = chapterRepository.findLevelIdByChapterId(dto.getChapterId());
-        // 누적 범위의 시작 챕터 ID 계산
-        int startChapterId = getStartChapterId(levelId, dto.getChapterId(), DEFAULT_CHAPTER_RANGE);
-        
+    // ---------------------------------------------------------------------------------------------
+    // 모른다고  한 단어 reviewQueue 테이블에 저장
+        if (dto.getStatus().equals("모른다")) {
+            Optional<ReviewQueue> existing = reviewQueueRepository.findByUserAndWord(user, word);
+
+            if (existing.isEmpty()) {
+                // 처음 모른다 선택한 경우
+                ReviewQueue queue = ReviewQueue.builder()
+                        .user(user)
+                        .word(word)
+                        .reviewStatus(ReviewQueue.ReviewStatus.대기)
+                        .failCount(1)  // 처음은 1
+                        .build();
+                reviewQueueRepository.save(queue);
+                log.info("✅ review_queue 새로 저장됨: word={}, failCount=1", word.getKanji());
+            } else {
+                // 이미 존재하는 경우 → failCount 증가
+                ReviewQueue queue = existing.get();
+                queue.setFailCount(queue.getFailCount() + 1);
+                reviewQueueRepository.save(queue);
+                log.info("✅ review_queue 누적 실패: word={}, failCount={}", word.getKanji(), queue.getFailCount());
+            }
+            // 모른다 로그 저장
+            reviewFailLogRepository.save(
+                    ReviewFailLog.builder()
+                            .user(user)
+                            .word(word)
+                            .build()
+            );
+        }
+    // -----------------------------------------------------------------------------------------------
+    // 학습 해야 할 단어 수 계산(안다 개수/ 총 단어 개수)
+
         // 챕터 범위 내의 모든 "안다" 단어 개수 계산
-        int knownWordsCount = studyWordProgressRepository.countKnownWordsBetweenChapters(user, startChapterId, dto.getChapterId());
+        int knownWordsCount = studyWordProgressRepository.countKnownWords(user,dto.getChapterId());
+        log.info("[서:updateWordProgress]안다 카운트={}",knownWordsCount);
         int cumulativeWords = dto.getCumulativeWords(); // 전체 단어 갯수
 
         log.info("[서:updateWordProgress] 유저: {}, 챕터 ID: {}, 안다 개수: {}, 총 단어 수: {}",
                 user.getUsername(), dto.getChapterId(), knownWordsCount, cumulativeWords);
-            // 한챕터의 모든 단어를 안다고 하면
+            // 한 챕터의 모든 단어를 안다고 하면
         if (knownWordsCount == cumulativeWords) {
             StudyProgress studyProgress = studyProgressRepository.findByUserAndChapterId(user, dto.getChapterId())
                     .orElseThrow(() -> new RuntimeException("챕터 진행 없음"));
@@ -206,25 +239,26 @@ public void startStudy(User user, Integer levelId, Integer chapterId) {
             studyProgress.setStatus(StudyProgress.Status.완료);
             studyProgress.setReviewCount(studyProgress.getReviewCount() + 1);
             studyProgress.setLastReviewedAt(LocalDateTime.now());
-            // ✅ 리뷰 카운트 증가 로그
+            // ✅ 리뷰 카운트 증가 로그 확인
             log.info("[서:updateWordProgress] 유저: {}, 챕터 ID: {}, 학습 완료! 리뷰 카운트 증가: {}",
                     user.getUsername(), dto.getChapterId(), studyProgress.getReviewCount());
 
             studyProgressRepository.save(studyProgress);
-            // 다시 학습을 위해 모른다로 초기화하는 로직 ----------------
+        // 다시 학습을 위해 모른다로 초기화하는 로직 ----------------
             // resetStudyWordProgress(user, dto.getChapterId());
             resetChapterProgress(user, dto.getChapterId());
-
+            // 확인
             log.info("[서:updateWordProgress] 유저: {}, 챕터 ID: {} 완료 - 리뷰 카운트 증가", user.getUsername(), dto.getChapterId());
 
 
 //            return ; // 프론트에 학습 완료 신호 보내기
 
         }
+
         return knownWordsCount;
     }
 
-    // (아래의)리셋 기능을 별도의 퍼블릭 메서드로 노출
+    // (아래의)리셋 기능을 별도의 퍼블릭 메서드로 노출 (아래의 메서드랑 하나로 합쳐서 service로 보내야함)
     @Override
     public void resetChapterProgress(User user, Integer chapterId) {
         resetStudyWordProgress(user, chapterId);
@@ -236,15 +270,17 @@ public void startStudy(User user, Integer levelId, Integer chapterId) {
         int levelId = chapterRepository.findLevelIdByChapterId(chapterId);
         // 누적 범위의 시작 챕터 ID 계산
         int startChapterId = getStartChapterId(levelId,chapterId, DEFAULT_CHAPTER_RANGE);
-        for (int i = startChapterId; i <= chapterId+1; i++) {
-            List<StudyWordProgress> progresses = studyWordProgressRepository.findByUserAndChapterId(user, i);
+//        for (int i = startChapterId; i <= chapterId+1; i++) { // studywordprocess 테이블에 chpaterId 컬럼을 가지고 오기 전에 사용(이거 안하면 챕터 1에서 완료 한 후 챕터 2로 갈때 챕터2에서 챕터1의 단어는 안다고 체크되어서)
+            List<StudyWordProgress> progresses = studyWordProgressRepository.findByUserAndChapterId(user, chapterId);
 
             progresses.forEach(p -> {
                 p.setStatus(StudyWordProgress.Status.모른다);
                 studyWordProgressRepository.save(p);
             });
-            log.info("[서]resetStudyWordProgress: 단어 상태 초기화 완료 - chapterId: {}", i);
-        }
+            log.info("[서]resetStudyWordProgress: 단어 상태 초기화 완료 - chapterId: {}", chapterId);
+//        }
     }
+
+
 
 }
