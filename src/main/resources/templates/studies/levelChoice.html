@@ -181,6 +181,33 @@
 		font-size: 16px;
 	}
 
+	/* 복습 버튼 스타일 */
+	.review-button-container {
+		margin: 20px 0 30px;
+		text-align: center;
+	}
+	
+	.review-button {
+		font-size: 1.2rem;
+		padding: 12px 30px;
+		border-radius: 50px;
+		background: linear-gradient(to right, #4e73df, #36b9cc);
+		border: none;
+		color: white;
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+		transition: all 0.3s ease;
+	}
+	
+	.review-button:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+		background: linear-gradient(to right, #36b9cc, #4e73df);
+	}
+	
+	.review-button i {
+		margin-right: 8px;
+	}
+
 </style>
 </head>
 <body>
@@ -204,6 +231,14 @@
 							</button>
 						</li>
 					</ul>
+				</div>
+				
+				<!-- 복습 버튼 추가 -->
+				<div class="review-button-container">
+					<a href="/studies/review" class="btn review-button">
+						<i class="bi bi-arrow-repeat"></i> 오늘의 복습하기
+					</a>
+					<p class="text-muted mt-2">모르는 단어들을 복습해보세요!</p>
 				</div>
 
 				<!-- 챕터 컨테이너 부분 수정 -->
@@ -236,16 +271,7 @@
 	</main>
 
 	<!-- Footer -->
-	<footer id="footer" class="footer">
-		<div class="copyright">
-			&copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights
-			Reserved
-		</div>
-		<div class="credits">
-			Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-		</div>
-	</footer>
-	<!-- End Footer -->
+
 
 	<a href="#"
 		class="back-to-top d-flex align-items-center justify-content-center"><i
@@ -286,10 +312,26 @@
 					console.log(levelId)
 					const container = document.getElementById('chapters-container');
 
-					let html = `<h2>챕터 목록 - N${levelId}</h2><div class="row">`;
+					// 제목 부분만 업데이트
+					const titleElement = container.querySelector('h2');
+					if (titleElement) {
+						titleElement.textContent = `챕터 목록 - N${levelId}`;
+					} else {
+						container.insertAdjacentHTML('afterbegin', `<h2>챕터 목록 - N${levelId}</h2>`);
+					}
+					
+					// 챕터 부분만 새로 구성
+					let chaptersRow = container.querySelector('.row');
+					if (!chaptersRow) {
+						chaptersRow = document.createElement('div');
+						chaptersRow.className = 'row';
+						container.appendChild(chaptersRow);
+					} else {
+						chaptersRow.innerHTML = '';
+					}
 
 					chapters.forEach(chapter => {
-						html += `
+						const chapterHtml = `
 							<div class="column-3">
 								<a href="/studies/startStudy/${levelId}/${chapter.chapterId}" class="chapter-link">
 									<div class="chapter-wrapper">
@@ -298,9 +340,6 @@
 											<div class="chapter-left-content">
 												<h3>Chapter</h3>
 										<div class="chapter-number">${chapter.chapterName}</div>
-<!--												<div class="chapter-number">${chapter.chapterId}</div>-->
-
-
 											</div>
 											<div class="chapter-right-content">
 												<p>누적 단어 수:<br>${chapter.cumulativeWords}개</p>
@@ -311,10 +350,8 @@
 								</a>
 							</div>
 						`;
+						chaptersRow.insertAdjacentHTML('beforeend', chapterHtml);
 					});
-
-					html += '</div>';
-					container.innerHTML = html;
 				})
 				.catch(error => console.error('Error:', error));
 		}

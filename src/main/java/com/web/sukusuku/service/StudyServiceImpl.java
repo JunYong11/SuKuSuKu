@@ -280,6 +280,40 @@ public void startStudy(User user, Integer levelId, Integer chapterId) {
             log.info("[서]resetStudyWordProgress: 단어 상태 초기화 완료 - chapterId: {}", chapterId);
 //        }
     }
+    @Override
+    public List<WordDto> reviewStudy(User user){
+        // 모른다 1개 이상인것만 거르기
+        int unknownCount = 1;
+        List<Integer> failCountWordsId = reviewQueueRepository.findWordIdsByUserAndFailCount(user , unknownCount);
+        // wordDto로 변경
+        List<WordDto> reviewWords = new ArrayList<>();
+
+        for (Integer wordId : failCountWordsId) {
+            Word reviewWord = wordRepository.findById(wordId).orElse(null);
+            reviewWords.add(new WordDto(
+                    reviewWord.getWordId(),
+                    reviewWord.getKanji(),
+                    reviewWord.getHiragana(),
+                    reviewWord.getMeaning()
+                ));
+            }
+
+        // 보여주기
+        return reviewWords;
+    }
+    @Override
+    public void reviewUpdate(User user, int wordId){
+        // "완전히 안다" 버튼을 클릭하면 review_queue에서 해당 단어를 삭제
+        log.info("[서:reviewUpdate] 사용자: {}, 완전히 안다고 선택한 단어 ID: {}", user.getUsername(), wordId);
+        
+        try {
+            reviewQueueRepository.deleteByUserAndWord_WordId(user, wordId);
+            log.info("[서:reviewUpdate] 성공: review_queue에서 단어 ID {} 삭제 완료", wordId);
+        } catch (Exception e) {
+            log.error("[서:reviewUpdate] 실패: review_queue에서 단어 ID {} 삭제 중 오류 발생 - {}", wordId, e.getMessage());
+            throw new RuntimeException("복습 단어 삭제 중 오류가 발생했습니다.", e);
+        }
+    }
 
 
 

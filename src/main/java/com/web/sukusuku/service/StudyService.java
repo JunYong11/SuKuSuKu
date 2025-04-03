@@ -44,6 +44,9 @@ public interface StudyService {
     int getStartChapterId(int levelId, int chapterId, int chapterRange);
     // 챕터 리셋
     void resetChapterProgress(User user, Integer chapterId);
+    //복습 챕터 단어 갖고 오기(모른다 누른 횟수 1이상)
+    List<WordDto> reviewStudy(User user);
+    //복습 챕터에서 제거하기 버튼누르면 그 단어 테이블에서 삭제
+    void reviewUpdate(User user, int wordId);
 
-
-}
+    }
