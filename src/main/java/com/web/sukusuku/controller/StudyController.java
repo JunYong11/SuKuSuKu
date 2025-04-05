@@ -21,6 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 //import static org.assertj.core.api.Assertions.assertThat;
@@ -31,108 +32,148 @@ import java.util.Optional;
 //@RestController//(@Controller + @ResponseBody)
 //@RequestMapping("studies")
 public class StudyController {
-   // 인터페이스 기준으로 선언!
-   private final StudyService studyService;
-   // user 임의 삽입
-   private final UserRepository userRepository;
-   private final WordRepository wordRepository;
-   private final StudyWordProgressRepository studyWordProgressRepository;
+	// 인터페이스 기준으로 선언!
+	private final StudyService studyService;
+	// user 임의 삽입
+	private final UserRepository userRepository;
+	private final WordRepository wordRepository;
+	private final StudyWordProgressRepository studyWordProgressRepository;
 
-   // =========== 레벨 초이스 ===============
+	// =========== 레벨 초이스 ===============
 // ✅ 기본 렌더링 (초기 로드)
 @GetMapping("/studies/levelChoice")
 public String moveLevelChoicePage(Model model,HttpSession session) {
-   List<Level> levels = studyService.getAllLevels();
-   model.addAttribute("levels", levels);
+	List<Level> levels = studyService.getAllLevels();
+	model.addAttribute("levels", levels);
 
-   User loginUser = (User) session.getAttribute("loginUser");
+	User loginUser = (User) session.getAttribute("loginUser");
 
-   // 기본값: levelId 1 (N1)
-   Integer defaultLevelId = 1;
-   List<ChapterDto> chapterDto = studyService.getChaptersByLevelId(defaultLevelId , loginUser);
-   model.addAttribute("selectedLevelId", defaultLevelId);
-   model.addAttribute("chapters", chapterDto);
+	// 기본값: levelId 1 (N1)
+	Integer defaultLevelId = 1;
+	List<ChapterDto> chapterDto = studyService.getChaptersByLevelId(defaultLevelId , loginUser);
+	model.addAttribute("selectedLevelId", defaultLevelId);
+	model.addAttribute("chapters", chapterDto);
 
 
-   log.info("[컨]moveLevelChoicePage 끝");
-   return "studies/levelChoice";
+	log.info("[컨]moveLevelChoicePage 끝");
+	return "studies/levelChoice";
 }
 
-   // ✅ JS 비동기 호출용 (챕터 데이터 JSON 반환)
-   @GetMapping("/studies/levelChoice/api")
-   @ResponseBody
-   public List<ChapterDto> levelChoiceApi(@RequestParam(name = "levelId") Integer levelId,
-                                 HttpSession session) {
-      log.info("API levelId={}", levelId);
+	// ✅ JS 비동기 호출용 (챕터 데이터 JSON 반환)
+	@GetMapping("/studies/levelChoice/api")
+	@ResponseBody
+	public List<ChapterDto> levelChoiceApi(@RequestParam(name = "levelId") Integer levelId,
+										   HttpSession session) {
+		log.info("API levelId={}", levelId);
 
-      User loginUser = (User) session.getAttribute("loginUser");
+		User loginUser = (User) session.getAttribute("loginUser");
 
-      List<ChapterDto> chapterDto = studyService.getChaptersByLevelId(levelId,loginUser);
-      log.info("[컨]levelChoiceApi 끝");
-      return chapterDto;
-   }
+		List<ChapterDto> chapterDto = studyService.getChaptersByLevelId(levelId,loginUser);
+		log.info("[컨]levelChoiceApi 끝");
+		return chapterDto;
+	}
 
 
 
 // ==============================    study ====================================
 
-   @GetMapping("/studies/startStudy/{levelId}/{chapterId}")
-   public String startStudy(@PathVariable(name = "levelId") Integer levelId,
-                      @PathVariable(name = "chapterId") Integer chapterId,
-                      HttpSession session,
-                      Model model) {
-   log.info("컨:startStudy={}", levelId);
+	@GetMapping("/studies/startStudy/{levelId}/{chapterId}")
+	public String startStudy(@PathVariable(name = "levelId") Integer levelId,
+							 @PathVariable(name = "chapterId") Integer chapterId,
+							 HttpSession session,
+							 Model model) {
+	log.info("컨:startStudy={}", levelId);
 
-      User loginUser = (User) session.getAttribute("loginUser");
-//      log.info("컨(startStudy):loginUser={}", loginUser);
+		User loginUser = (User) session.getAttribute("loginUser");
+//		log.info("컨(startStudy):loginUser={}", loginUser);
 
-      studyService.startStudy(loginUser, levelId, chapterId);
-      List<WordDto> words = studyService.getRemainingWordsByChapter(loginUser,chapterId);
+		studyService.startStudy(loginUser, levelId, chapterId);
+		List<WordDto> words = studyService.getRemainingWordsByChapter(loginUser,chapterId);
 
-      log.info("컨(startStudy):words={}",words);
-      // 안다고 한 단어
-      int knownWordsCount = studyWordProgressRepository.countKnownWords(loginUser, chapterId);
-      log.info("[컨:startStudy]안다 카운트={}",knownWordsCount);
+		log.info("컨(startStudy):words={}",words);
+		// 안다고 한 단어
+		int knownWordsCount = studyWordProgressRepository.countKnownWords(loginUser, chapterId);
+		log.info("[컨:startStudy]안다 카운트={}",knownWordsCount);
 
-      // 챕터별 누적 단어 갯수
-      // ✅ 누적 단어 수 구하기 (레벨ID, 챕터ID 기준 누적 범위 사용)
-      int startChapterId = studyService.getStartChapterId(levelId, chapterId, 5);  // 범위는 DEFAULT_CHAPTER_RANGE 값
-      int cumulativeWords = wordRepository.countWordsBetweenChapters(levelId, startChapterId, chapterId);
+		// 챕터별 누적 단어 갯수
+		// ✅ 누적 단어 수 구하기 (레벨ID, 챕터ID 기준 누적 범위 사용)
+		int startChapterId = studyService.getStartChapterId(levelId, chapterId, 5);  // 범위는 DEFAULT_CHAPTER_RANGE 값
+		int cumulativeWords = wordRepository.countWordsBetweenChapters(levelId, startChapterId, chapterId);
 
-      model.addAttribute("words", words);
-      model.addAttribute("chapterId", chapterId);
-      model.addAttribute("knownWordsCount", knownWordsCount);
-      model.addAttribute("cumulativeWords",cumulativeWords);
+		model.addAttribute("words", words);
+		model.addAttribute("chapterId", chapterId);
+		model.addAttribute("knownWordsCount", knownWordsCount);
+		model.addAttribute("cumulativeWords",cumulativeWords);
 
-      return "studies/study"; // 타임리프 템플릿
-   }
+		return "studies/study"; // 타임리프 템플릿
+	}
 
-   @GetMapping("/studies/remainingWords")
-   @ResponseBody
-   public List<WordDto> getRemainingWords(@RequestParam(name = "chapterId") Integer chapterId,
-                                 HttpSession session) {
-      User loginUser = (User) session.getAttribute("loginUser");
-      log.info("컨(getRemainingWords)loginUser={} chpater={}", loginUser,chapterId);
-      return studyService.getRemainingWordsByChapter(loginUser,chapterId);
-   }
+	@GetMapping("/studies/remainingWords")
+	@ResponseBody
+	public List<WordDto> getRemainingWords(@RequestParam(name = "chapterId") Integer chapterId,
+										   HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		log.info("컨(getRemainingWords)loginUser={} chpater={}", loginUser,chapterId);
+		return studyService.getRemainingWordsByChapter(loginUser,chapterId);
+	}
 
-   @PostMapping("/studies/wordProgress")
-   @ResponseBody
-   public int updateWordProgress(@RequestBody WordProgressRequestDto dto, HttpSession session) {
-      User loginUser = (User) session.getAttribute("loginUser");
-//      log.info("컨(updateWordProgress)loginUser={}", loginUser);
+	@PostMapping("/studies/wordProgress")
+	@ResponseBody
+	public int updateWordProgress(@RequestBody WordProgressRequestDto dto, HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
+//		log.info("컨(updateWordProgress)loginUser={}", loginUser);
 
 
-      return studyService.updateWordProgress(loginUser, dto);
-   }
+		return studyService.updateWordProgress(loginUser, dto);
+	}
 
-   // 새로운 리셋 엔드포인트 추가
-   @PostMapping("/studies/resetChapter")
-   @ResponseBody
-   public ResponseEntity<String> resetChapter(@RequestParam(name = "chapterId")    Integer chapterId,
-                                   HttpSession session) {
-      User loginUser = (User) session.getAttribute("loginUser");
-      studyService.resetChapterProgress(loginUser, chapterId);
-      return ResponseEntity.ok("챕터가 성공적으로 리셋되었습니다");
-      }
-   }
+	// 새로운 리셋 엔드포인트 추가
+	@PostMapping("/studies/resetChapter")
+	@ResponseBody
+	public ResponseEntity<String> resetChapter(@RequestParam(name = "chapterId")	 Integer chapterId,
+											  HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		studyService.resetChapterProgress(loginUser, chapterId);
+		return ResponseEntity.ok("챕터가 성공적으로 리셋되었습니다");
+		}
+
+	// 복습 챕터
+	@GetMapping("/studies/review")
+	public String review(HttpSession session, Model model) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		List<WordDto> words = studyService.reviewStudy(loginUser);
+		
+		log.info("컨(reviewStudy):words={}", words);
+		
+		// 총 복습할 단어 수
+		int cumulativeWords = words.size();
+		// 안다 카운트는 0으로 시작
+		int knownWordsCount = 0;
+		
+		model.addAttribute("words", words);
+		model.addAttribute("knownWordsCount", knownWordsCount);
+		model.addAttribute("cumulativeWords", cumulativeWords);
+		
+		return "studies/review";
+	}
+
+	// 완전히 안다 버튼을 눌렀을 때 단어를 삭제하는 엔드포인트
+	@PostMapping("/studies/reviewUpdate")
+	@ResponseBody
+	public ResponseEntity<String> reviewUpdate(@RequestBody Map<String, Integer> requestBody, HttpSession session) {
+		User loginUser = (User) session.getAttribute("loginUser");
+		Integer wordId = requestBody.get("wordId");
+		
+		log.info("[컨:reviewUpdate] 요청 받음 - 사용자: {}, 단어 ID: {}", loginUser.getUsername(), wordId);
+		
+		if (wordId == null) {
+			log.warn("[컨:reviewUpdate] 단어 ID가 없습니다.");
+			return ResponseEntity.badRequest().body("단어 ID가 없습니다.");
+		}
+		
+		studyService.reviewUpdate(loginUser, wordId);
+		log.info("[컨:reviewUpdate] 완료 - 단어 ID: {}", wordId);
+		return ResponseEntity.ok("단어가 삭제되었습니다.");
+	}
+
+	}

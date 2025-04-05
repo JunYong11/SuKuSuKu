@@ -1,7 +1,10 @@
 package com.web.sukusuku.controller;
 
 import com.web.sukusuku.model.GameWord;
+import com.web.sukusuku.model.User;
 import com.web.sukusuku.service.RainGameService;
+
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,4 +35,9 @@ public class RainGameController {
         return rainGameService.getWordsByLevel(1); // N1
     }
 
+    // 복습: 6
+    @GetMapping("/review")
+    public List<GameWord> getReview(@SessionAttribute(name = "loginUser", required = false) User loginUser ) {
+    	return rainGameService.getUsername(loginUser); // 복습단어
+    }
 }

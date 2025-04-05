@@ -235,6 +235,32 @@
       background-size: cover;
       background-position: center;
     }
+    
+    .review-button-container {
+		margin: 20px 0 30px;
+		text-align: center;
+	}
+	
+	.review-button {
+		font-size: 1.2rem;
+		padding: 12px 30px;
+		border-radius: 50px;
+		background: linear-gradient(to right, #4e73df, #36b9cc);
+		border: none;
+		color: white;
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+		transition: all 0.3s ease;
+	}
+	
+	.review-button:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+		background: linear-gradient(to right, #36b9cc, #4e73df);
+	}
+	
+	.review-button i {
+		margin-right: 8px;
+	}
  
   </style>
 </head>
@@ -247,7 +273,6 @@
     <main id="main" class="main">
     <section class="section">
       <div class="container">
-	<h1>레벨을 선택해주세요</h1>
         <!-- ✅ 레벨 선택 -->
         <div class="level-selection">
           <ul class="level-tab flex-center center big" id="levelTabs" role="tablist">
@@ -258,6 +283,13 @@
             </li>
           </ul>
         </div>
+        <!-- 복습 버튼 추가 -->
+				<div class="review-button-container">
+					<a href="/studies/review" class="btn review-button">
+						<i class="bi bi-arrow-repeat"></i> 오늘의 복습하기
+					</a>
+					<p class="text-muted mt-2">모르는 단어들을 복습해보세요!</p>
+				</div>
 
         <!-- 챕터 목록 (처음엔 숨김) -->
         <div id="chapters-container" style="display: none;"></div>
@@ -337,6 +369,8 @@
         })
         .catch(error => console.error('Error:', error));
     }
+    
+    
   </script>
 </body>
 </html>
