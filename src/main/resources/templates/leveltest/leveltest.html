@@ -110,8 +110,13 @@
 <body>
 
   <!-- 상단바 -->
+  <th:block th:if="${session.loginUser != null}">
   <div th:replace="~{header.html}"></div>
+</th:block>
 
+<th:block th:unless="${session.loginUser != null}">
+  <div th:replace="~{user/registerHeader.html}"></div>
+</th:block>
   <!-- 사이드바 -->
   <div th:replace="~{sidebar.html}"></div>
 
