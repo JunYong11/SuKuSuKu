@@ -2,6 +2,7 @@ package com.web.sukusuku.service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +37,10 @@ public class UserService {
         user.setUpdateDate(LocalDateTime.now());
         
         // 	회원 가입시 디폴트로 프로필 사진과 프로젝트(분류없음) 추가해주는 코드
-        user.setProfileImage("profile1.jpg");
+        Random random = new Random();
+        int randomNumber = random.nextInt(10) + 1;
+        String profileImage = "profile" + randomNumber + ".jpg"; 
+        user.setProfileImage(profileImage);
         
         Project project = new Project();
         

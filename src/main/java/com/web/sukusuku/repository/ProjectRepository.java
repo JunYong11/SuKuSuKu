@@ -12,6 +12,4 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
 	List<Project> findByUser_Username(String username);
 	
-	
-
 }
