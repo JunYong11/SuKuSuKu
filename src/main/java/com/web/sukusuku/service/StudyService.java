@@ -12,6 +12,9 @@ public interface StudyService {
     List<Level> getAllLevels();
     //레벨에 맞는 챕터 목록을 가져오는 메서드(레벨id로 챕터 목록 갖고오기)
     List<ChapterDto> getChaptersByLevelId(Integer levelId, User user);
+    
+    //레벨별 마지막으로 공부했던 챕터 가지고 오기
+//    Integer getLastStudiedChapterIdByLevel(User user, Integer levelId);
 
 //    //챕터에서 나갔던 그 상태의 정보 불러오기 (user 정보와 챕터Id로 학습하던 정보 불러오기)
 //        //!! user 말고 username이면 될거 같은데?!
@@ -44,6 +47,11 @@ public interface StudyService {
     int getStartChapterId(int levelId, int chapterId, int chapterRange);
     // 챕터 리셋
     void resetChapterProgress(User user, Integer chapterId);
+    //복습 챕터 단어 갖고 오기(모른다 횟수 선택)
+    List<WordDto> reviewStudy(User user, int failCount);
+    //복습 챕터에서 제거하기 버튼누르면 그 단어 테이블에서 삭제
+    void reviewUpdate(User user, int wordId);
+    
+    
 
-
-}
+    }

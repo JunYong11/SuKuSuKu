@@ -20,7 +20,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 //import static org.assertj.core.api.Assertions.assertThat;
@@ -52,6 +54,16 @@ public String moveLevelChoicePage(Model model,HttpSession session) {
    List<ChapterDto> chapterDto = studyService.getChaptersByLevelId(defaultLevelId , loginUser);
    model.addAttribute("selectedLevelId", defaultLevelId);
    model.addAttribute("chapters", chapterDto);
+   
+
+//    // 👇 각 레벨별 마지막 학습 챕터 ID 리스트 만들기
+//    Map<Integer, Integer> lastChapterMap = new HashMap<>();
+//    for (Level level : levels) {
+//        Integer lastChapterId = studyService.getLastStudiedChapterIdByLevel(loginUser, level.getLevelId());
+//        lastChapterMap.put(level.getLevelId(), lastChapterId);
+//    }
+//    model.addAttribute("lastChapterMap", lastChapterMap);
+
 
 
    log.info("[컨]moveLevelChoicePage 끝");
@@ -135,4 +147,46 @@ public String moveLevelChoicePage(Model model,HttpSession session) {
       studyService.resetChapterProgress(loginUser, chapterId);
       return ResponseEntity.ok("챕터가 성공적으로 리셋되었습니다");
       }
+
+   // 복습 챕터
+   @GetMapping("/studies/review")
+   public String review(@RequestParam(name = "failCount", defaultValue = "1") int failCount,
+         HttpSession session, Model model) {
+      User loginUser = (User) session.getAttribute("loginUser");
+       List<WordDto> words = studyService.reviewStudy(loginUser, failCount);  // <- 수정
+      log.info("컨(reviewStudy):failCount={}", failCount);
+
+      log.info("컨(reviewStudy):words={}", words);
+      
+      // 총 복습할 단어 수
+      int cumulativeWords = words.size();
+      // 안다 카운트는 0으로 시작
+      int knownWordsCount = 0;
+      
+      model.addAttribute("words", words);
+      model.addAttribute("knownWordsCount", knownWordsCount);
+      model.addAttribute("cumulativeWords", cumulativeWords);
+      
+      return "studies/review";
+   }
+
+   // 완전히 안다 버튼을 눌렀을 때 단어를 삭제하는 엔드포인트
+   @PostMapping("/studies/reviewUpdate")
+   @ResponseBody
+   public ResponseEntity<String> reviewUpdate(@RequestBody Map<String, Integer> requestBody, HttpSession session) {
+      User loginUser = (User) session.getAttribute("loginUser");
+      Integer wordId = requestBody.get("wordId");
+      
+      log.info("[컨:reviewUpdate] 요청 받음 - 사용자: {}, 단어 ID: {}", loginUser.getUsername(), wordId);
+      
+      if (wordId == null) {
+         log.warn("[컨:reviewUpdate] 단어 ID가 없습니다.");
+         return ResponseEntity.badRequest().body("단어 ID가 없습니다.");
+      }
+      
+      studyService.reviewUpdate(loginUser, wordId);
+      log.info("[컨:reviewUpdate] 완료 - 단어 ID: {}", wordId);
+      return ResponseEntity.ok("단어가 삭제되었습니다.");
+   }
+
    }

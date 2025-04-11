@@ -1,22 +1,35 @@
 package com.web.sukusuku.service;
 
-import com.web.sukusuku.dto.ChapterDto;
-import com.web.sukusuku.dto.StudyDto;
-import com.web.sukusuku.dto.WordDto;
-import com.web.sukusuku.dto.WordProgressRequestDto;
-import com.web.sukusuku.model.*;
-import com.web.sukusuku.repository.*;
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.web.sukusuku.dto.ChapterDto;
+import com.web.sukusuku.dto.WordDto;
+import com.web.sukusuku.dto.WordProgressRequestDto;
+import com.web.sukusuku.model.Chapter;
+import com.web.sukusuku.model.Level;
+import com.web.sukusuku.model.ReviewFailLog;
+import com.web.sukusuku.model.ReviewQueue;
+import com.web.sukusuku.model.StudyProgress;
+import com.web.sukusuku.model.StudyWordProgress;
+import com.web.sukusuku.model.User;
+import com.web.sukusuku.model.Word;
+import com.web.sukusuku.repository.ChapterRepository;
+import com.web.sukusuku.repository.LevelRepository;
+import com.web.sukusuku.repository.ReviewFailLogRepository;
+import com.web.sukusuku.repository.ReviewQueueRepository;
+import com.web.sukusuku.repository.StudyProgressRepository;
+import com.web.sukusuku.repository.StudyWordProgressRepository;
+import com.web.sukusuku.repository.WordRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
@@ -279,6 +292,43 @@ public void startStudy(User user, Integer levelId, Integer chapterId) {
             });
             log.info("[서]resetStudyWordProgress: 단어 상태 초기화 완료 - chapterId: {}", chapterId);
 //        }
+    }
+    @Override
+    public List<WordDto> reviewStudy(User user, int failCount){
+        // 모른다 1개 이상인것만 거르기
+        int unknownCount = failCount;
+        log.info("서(reviewStudy):failCount={}", failCount);
+
+
+        List<Integer> failCountWordsId = reviewQueueRepository.findWordIdsByUserAndFailCount(user , unknownCount);
+        // wordDto로 변경
+        List<WordDto> reviewWords = new ArrayList<>();
+
+        for (Integer wordId : failCountWordsId) {
+            Word reviewWord = wordRepository.findById(wordId).orElse(null);
+            reviewWords.add(new WordDto(
+                    reviewWord.getWordId(),
+                    reviewWord.getKanji(),
+                    reviewWord.getHiragana(),
+                    reviewWord.getMeaning()
+                ));
+            }
+
+        // 보여주기
+        return reviewWords;
+    }
+    @Override
+    public void reviewUpdate(User user, int wordId){
+        // "완전히 안다" 버튼을 클릭하면 review_queue에서 해당 단어를 삭제
+        log.info("[서:reviewUpdate] 사용자: {}, 완전히 안다고 선택한 단어 ID: {}", user.getUsername(), wordId);
+        
+        try {
+            reviewQueueRepository.deleteByUserAndWord_WordId(user, wordId);
+            log.info("[서:reviewUpdate] 성공: review_queue에서 단어 ID {} 삭제 완료", wordId);
+        } catch (Exception e) {
+            log.error("[서:reviewUpdate] 실패: review_queue에서 단어 ID {} 삭제 중 오류 발생 - {}", wordId, e.getMessage());
+            throw new RuntimeException("복습 단어 삭제 중 오류가 발생했습니다.", e);
+        }
     }
 
 
